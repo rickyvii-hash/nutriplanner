@@ -254,3 +254,10 @@ input[type="checkbox"], input[type="radio"] { min-width: 28px; min-height: 28px;
   .summary-table { font-size: 11pt; }
   .footer-note { color: #333; }
 }
+
+/* Doctor summary: each status has its own look, with no good/bad judgement. */
+.summary-status { font-weight: 600; white-space: nowrap; }
+.summary-status.status-within { color: var(--green); }
+.summary-status.status-above, .summary-status.status-below { color: #7a5a1e; background: var(--tan-soft); }
+.summary-status.status-incomplete { color: var(--muted); font-style: italic; }
+

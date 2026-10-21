@@ -12,6 +12,11 @@ function averageText(row) {
   return row.incomplete ? `≥${text}` : text;
 }
 
+/** CSS class for a status label: "Within target" -> "within", "Incomplete data" -> "incomplete". */
+function statusSlug(status) {
+  return String(status).split(' ')[0].toLowerCase();
+}
+
 export function renderSummary(ctx) {
   const { state, recipesById, foodsById } = ctx;
   const root = el(`<div class="screen screen-summary"></div>`);
@@ -59,7 +64,7 @@ export function renderSummary(ctx) {
     tbody.appendChild(el(`<tr>
       <td>${escapeHtml(objective)}</td>
       <td>${averageText(row)}</td>
-      <td class="summary-status">${escapeHtml(row.status)}</td>
+      <td class="summary-status status-${statusSlug(row.status)}">${escapeHtml(row.status)}</td>
     </tr>`));
   }
   root.appendChild(table);

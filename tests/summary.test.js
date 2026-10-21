@@ -18,10 +18,10 @@ test('summary statuses are within, above, below or incomplete', () => {
   assert.equal(targetStatus('min', 100, 100), 'Within target');
   assert.equal(targetStatus('min', 99, 100), 'Below target');
   assert.equal(targetStatus('min', null, 100), 'Incomplete data');
-  // Partial averages can only confirm a target in the direction they prove.
+  // Partial averages (a nutrient value is missing) never get a certain status.
   assert.equal(targetStatus('max', 2000, 2000, true), 'Incomplete data');
-  assert.equal(targetStatus('max', 2001, 2000, true), 'Above target');
-  assert.equal(targetStatus('min', 100, 100, true), 'Within target');
+  assert.equal(targetStatus('max', 2001, 2000, true), 'Incomplete data');
+  assert.equal(targetStatus('min', 100, 100, true), 'Incomplete data');
   assert.equal(targetStatus('min', 99, 100, true), 'Incomplete data');
 });
 
@@ -164,7 +164,8 @@ test('incomplete averages are never shown as certain target statuses', () => {
     foodsById,
   }).rows[0];
   assert.equal(maxAbove.incomplete, true);
-  assert.equal(maxAbove.status, 'Above target');
+  // Even when the partial value already passes the maximum, a missing value means no certain status.
+  assert.equal(maxAbove.status, 'Incomplete data');
 
   const maxUncertain = buildSummary({
     targets: [{ nutrient: 'satFat', kind: 'max', daily: 13 }],
@@ -198,7 +199,7 @@ test('incomplete averages are never shown as certain target statuses', () => {
     foodsById,
   }).rows[0];
   assert.equal(minWithin.incomplete, true);
-  assert.equal(minWithin.status, 'Within target');
+  assert.equal(minWithin.status, 'Incomplete data');
 
   const minUncertain = buildSummary({
     targets: [{ nutrient: 'fibre', kind: 'min', daily: 30 }],

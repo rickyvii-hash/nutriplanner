@@ -13,15 +13,12 @@ export const SUMMARY_STATUS = {
 
 /**
  * Comparison of one average with its target. No other judgement is added.
- * When a nutrient has missing values the average is only a partial sum, so a
- * target can be confirmed only in the direction the known values prove.
+ * When a nutrient has missing values the average is only a partial sum, so the status is
+ * always "Incomplete data" (the partial value is still shown, with a leading "≥").
  */
 export function targetStatus(kind, average, daily, incomplete = false) {
-  if (average === null || average === undefined) return SUMMARY_STATUS.incomplete;
-  if (incomplete) {
-    if (kind === 'max') return average > daily ? SUMMARY_STATUS.above : SUMMARY_STATUS.incomplete;
-    return average >= daily ? SUMMARY_STATUS.within : SUMMARY_STATUS.incomplete;
-  }
+  // A partial sum (some nutrient value is missing) never gets a certain status.
+  if (incomplete || average === null || average === undefined) return SUMMARY_STATUS.incomplete;
   if (kind === 'max') return average > daily ? SUMMARY_STATUS.above : SUMMARY_STATUS.within;
   return average < daily ? SUMMARY_STATUS.below : SUMMARY_STATUS.within;
 }
