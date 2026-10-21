@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Log pizza and ice cream. Read the Plan updated screen and say whether the reason makes sense and the tone feels calm.
   Commit: `Add meal logging and plan recalculation`
 
-- [ ] **4. You can tick what you bought and the plan uses it**
+- [x] **4. You can tick what you bought and the plan uses it**
   Becomes usable: A Shopping list built from the plan, grouped by category, with tickable items and an "Already at home" section; ticked food is favoured when the plan is recalculated, and a note explains when a meal was kept because of it.
   Why now: Completes the core loop from `scope.md`. It builds on the working replan, so it can be checked against slice 3.
   PRD ref: `prd.md > Shopping list`, `prd.md > Plan updated`, `prd.md > The Core Journey` (steps 4 and 7)
