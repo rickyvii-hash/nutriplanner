@@ -85,4 +85,7 @@ Activity mode: not started
 - 2026-10-21: Recovery profile often surfaces “targets cannot all be met” because a 2200 kcal daily minimum is hard to hit with the current recipe set; the screen shows the closest plan as specified.
 - 2026-10-21: Initial month plans can repeat the same dinner across days when one recipe scores best for every day; variety was not required by the PRD.
 - 2026-10-21: Shopping list grams are totals for the remaining month (not a single shop), which can look large; acceptable for the POC.
+- 2026-10-21: Replan window. `prd.md > Plan updated` says the rest of the month is recalculated, but spreading one off-plan meal over about 30 days diluted it to nothing: pizza and ice cream on the Cholesterol profile gave "No changes needed". The update now makes the overshoot up over the next 4 days and leaves the rest of the month unchanged, which matches the approved mockup ("lower over the next 3 days"). A swapped meal must have less of the nutrient that went over.
+- 2026-10-21: Recovery was unreachable (month average 1453 kcal against a minimum of 2200). Added 12 energy-dense recipes (36 in total, all from foods already in the data) and changed the recipe choice to look at the whole day at once instead of one meal at a time.
+- 2026-10-21: Variety. A recipe now rests for up to 3 days before it can fill the same slot again, so the same dinner no longer repeats every day. The shopping list still shows month totals (accepted for the proof of concept).
 
