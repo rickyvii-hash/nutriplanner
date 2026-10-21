@@ -49,7 +49,7 @@ Build mode: fast
   Learner check: Tick spinach and chicken, log a meal, and see whether the plan keeps meals that use them and the list agrees.
   Commit: `Add shopping list and pantry-aware replanning`
 
-- [ ] **5. It looks and behaves like the mockups, with every empty state**
+- [x] **5. It looks and behaves like the mockups, with every empty state**
   Becomes usable: The finished proof of concept: look and feel as in `devpost/design/`, disclaimer on every screen, all states from the PRD, mobile and desktop layouts, a README and start instructions.
   Why now: Design and presentation carry half of the judging, so polish gets a proper slice after the behavior is proven.
   PRD ref: `prd.md > Look and Feel`, `prd.md > States and Boundaries`, `prd.md > What We're Building`
@@ -81,4 +81,8 @@ Reflection: not started
 Activity mode: not started
 
 ## Revisions
+
+- 2026-10-21: Recovery profile often surfaces “targets cannot all be met” because a 2200 kcal daily minimum is hard to hit with the current recipe set; the screen shows the closest plan as specified.
+- 2026-10-21: Initial month plans can repeat the same dinner across days when one recipe scores best for every day; variety was not required by the PRD.
+- 2026-10-21: Shopping list grams are totals for the remaining month (not a single shop), which can look large; acceptable for the POC.
 
