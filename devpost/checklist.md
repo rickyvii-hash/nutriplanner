@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Choose Recovery, change one target, build the plan, reload the page, and confirm everything is still there.
   Commit: `Add targets, month plan and local storage`
 
-- [ ] **3. You can log a meal and see the plan update (the kernel)**
+- [x] **3. You can log a meal and see the plan update (the kernel)**
   Becomes usable: Log "pizza and ice cream", save, and see the Plan updated screen: before and after for the changed meals, a one-sentence reason, the effect on each target, and the buttons "Keep my original plan" and "Use updated plan".
   Why now: This is the unique kernel from `scope.md`, so it comes as early as the plan allows. Everything after it improves or feeds this moment.
   PRD ref: `prd.md > Logging a meal`, `prd.md > Plan updated`, `prd.md > The Core Journey` (steps 5-7), `prd.md > States and Boundaries` (targets cannot all be met, nothing to change)
