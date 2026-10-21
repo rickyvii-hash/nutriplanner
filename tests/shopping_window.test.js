@@ -6,7 +6,9 @@ import {
   addDays,
   buildShoppingList,
   currentShopStart,
+  savedShopStart,
   shoppingWindow,
+  windowCoverage,
 } from '../src/engine/shopping.js';
 import { profileById } from '../src/engine/profiles.js';
 
@@ -105,5 +107,32 @@ test('a shopping window that has ended rolls forward to the one that contains to
   assert.equal(currentShopStart('2026-10-21', 7, '2026-10-28'), '2026-10-28');
   assert.equal(currentShopStart('2026-10-21', 3, '2026-11-02'), '2026-11-02');
   assert.equal(currentShopStart('2026-10-21', 3, '2026-11-01'), '2026-10-30');
+});
+
+test('window coverage: a window crossing the month end is truncated', () => {
+  const coverage = windowCoverage(plan(), shoppingWindow('2026-10-30', 3));
+  assert.deepEqual(coverage, {
+    lastPlanDate: '2026-10-31',
+    coveredDays: 2,
+    requestedDays: 3,
+    truncated: true,
+  });
+});
+
+test('window coverage: a window inside the month is not truncated', () => {
+  const coverage = windowCoverage(plan(), shoppingWindow('2026-10-21', 7));
+  assert.deepEqual(coverage, {
+    lastPlanDate: '2026-10-31',
+    coveredDays: 7,
+    requestedDays: 7,
+    truncated: false,
+  });
+});
+
+test('changing the frequency keeps the saved start, not the rolled-forward one', () => {
+  assert.equal(savedShopStart('2026-10-21', '2026-11-05'), '2026-10-21');
+  assert.equal(savedShopStart(null, '2026-11-05'), '2026-11-05');
+  // The rolled-forward start is only for the current list; it is not saved back.
+  assert.equal(currentShopStart('2026-10-21', 7, '2026-11-05'), '2026-11-04');
 });
 

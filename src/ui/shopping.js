@@ -1,4 +1,11 @@
-import { buildShoppingList, shoppingWindow, currentShopStart, SHOP_EVERY_OPTIONS } from '../engine/shopping.js';
+import {
+  buildShoppingList,
+  shoppingWindow,
+  currentShopStart,
+  windowCoverage,
+  savedShopStart,
+  SHOP_EVERY_OPTIONS,
+} from '../engine/shopping.js';
 import { todayIso } from '../engine/planner.js';
 import { el, escapeHtml } from './dom.js';
 
@@ -23,13 +30,18 @@ export function renderShopping(ctx) {
   }
 
   const shopEvery = SHOP_EVERY_OPTIONS.includes(state.shopEvery) ? state.shopEvery : 7;
-  const savedStart = state.shopStart || todayIso();
+  const savedStart = savedShopStart(state.shopStart, todayIso());
   const shopStart = currentShopStart(savedStart, shopEvery, todayIso());
   const window = shoppingWindow(shopStart, shopEvery);
+  const coverage = windowCoverage(state.plan, window);
+  const coverageNote = coverage.truncated
+    ? `<p class="muted tiny" data-window-note>The month plan ends on ${escapeHtml(coverage.lastPlanDate)}, so this list covers ${coverage.coveredDays} of ${coverage.requestedDays} days.</p>`
+    : '';
 
   const windowCard = el(`<section class="card shop-window">
     <h2>Shopping window</h2>
     <p class="shop-dates" data-window>Meals from ${window.from} to ${window.to}</p>
+    ${coverageNote}
     <p class="field-label">Shop every</p>
     <div class="freq-options" role="group" aria-label="Shop every">
       ${SHOP_EVERY_OPTIONS.map((n) => `<button type="button" class="freq-option${n === shopEvery ? ' is-active' : ''}" data-shop-every="${n}" aria-pressed="${n === shopEvery ? 'true' : 'false'}">${n} days</button>`).join('')}
@@ -39,7 +51,7 @@ export function renderShopping(ctx) {
   root.appendChild(windowCard);
 
   const pickFrequency = (nextEvery) => {
-    const next = { ...state, shopEvery: nextEvery, shopStart };
+    const next = { ...state, shopEvery: nextEvery, shopStart: savedStart };
     ctx.onChange(next);
   };
   windowCard.querySelectorAll('[data-shop-every]').forEach((btn) => {

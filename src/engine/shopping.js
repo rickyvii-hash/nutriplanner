@@ -46,6 +46,33 @@ export function shoppingWindow(fromDate, shopEvery = 7) {
 }
 
 /**
+ * How much of a shopping window the month plan can cover. The plan is not
+ * extended beyond its own month, so a window that crosses the month end is
+ * truncated: 2026-10-30..2026-11-01 has only the last two October days.
+ */
+export function windowCoverage(plan, window) {
+  const planDates = Object.keys(plan?.days || {}).sort();
+  const lastPlanDate = planDates.length > 0 ? planDates[planDates.length - 1] : null;
+  const requestedDays = window?.from && window?.to ? dayDiff(window.from, window.to) + 1 : 0;
+  const coveredDays = planDates.filter((date) => date >= window.from && date <= window.to).length;
+  return {
+    lastPlanDate,
+    coveredDays,
+    requestedDays,
+    truncated: coveredDays < requestedDays,
+  };
+}
+
+/**
+ * Start to keep when the frequency changes: the saved start (or today when
+ * none was saved), never the rolled-forward one, so future trips keep the
+ * cadence the user chose.
+ */
+export function savedShopStart(shopStart, today) {
+  return shopStart || today;
+}
+
+/**
  * Build a shopping list for meals inside [fromDate, toDate] (both inclusive).
  * Returns { toBuy: [{ foodId, name, category, grams }], atHome: same }.
  * Each foodId appears in at most one section.

@@ -6,9 +6,10 @@ function decimalsFor(key) {
   return key === 'kcal' || key === 'sodium' ? 0 : 1;
 }
 
-function averageText(average, key) {
-  if (average === null || average === undefined) return 'n/a';
-  return `${average.toFixed(decimalsFor(key))} ${nutrientUnit(key)}`;
+function averageText(row) {
+  if (row.average === null || row.average === undefined) return 'n/a';
+  const text = `${row.average.toFixed(decimalsFor(row.nutrient))} ${nutrientUnit(row.nutrient)}`;
+  return row.incomplete ? `≥${text}` : text;
 }
 
 export function renderSummary(ctx) {
@@ -37,6 +38,7 @@ export function renderSummary(ctx) {
     <h2>Profile and period</h2>
     <p><span class="muted">Profile:</span> ${escapeHtml(profile?.name || 'None selected')}</p>
     <p><span class="muted">Period:</span> ${escapeHtml(periodText)}</p>
+    <p><span class="muted">Days with logged meals:</span> ${summary.loggedDays}</p>
   </section>`));
 
   const sourceNote = summary.source === 'log'
@@ -56,7 +58,7 @@ export function renderSummary(ctx) {
     const objective = `${nutrientLabel(row.nutrient)} (${formatKind(row.kind).toLowerCase()} ${row.daily} ${nutrientUnit(row.nutrient)})`;
     tbody.appendChild(el(`<tr>
       <td>${escapeHtml(objective)}</td>
-      <td>${averageText(row.average, row.nutrient)}</td>
+      <td>${averageText(row)}</td>
       <td class="summary-status">${escapeHtml(row.status)}</td>
     </tr>`));
   }
