@@ -37,13 +37,13 @@ A person sets targets, gets a month plan and a tickable shopping list, logs a me
 - Logging actual meals and recalculating the rest of the month
 - Tickable shopping list; tick what has been bought, and the plan uses what is in stock
 - Health disclaimer
-- Example profiles: weight loss, cholesterol, recovery
+- Example profiles: weight loss, cholesterol, recovery, athlete
+- Shopping by frequency, with "I'm shopping now"
+- A printable summary to share with a doctor
 
 ## Later
-- "I'm going shopping now" instead of the planned day, with the list and plan adjusting
 - Entering results after the first period (for example weight) to recalibrate targets
 - Summary to share with a doctor
-- Athletes and other target profiles
 
 ## Explicitly Cut
 - Blood test history and lab-value tracking: health claims are risky and out of reach for a proof of concept

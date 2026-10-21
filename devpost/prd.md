@@ -61,6 +61,14 @@ Established from the mockups the learner chose:
 - The screen shows before and after for each changed meal, a one-sentence reason, and the effect on each target.
 - "Keep my original plan" leaves the plan unchanged.
 
+### Shopping by frequency
+- The user chooses how often they shop: every 2, 3, 5 or 7 days (default 7). The list shows the meals from the start of the current shopping window to the day before the next shop, with its dates.
+- "I'm shopping now" starts a new window from today, whatever was planned, and the list is rebuilt for it. Items already at home stay out of the to-buy list.
+
+### Summary for your doctor
+- A screen reachable from the Month plan: the profile and period, the targets, the meals logged (date and foods with grams), and the average per logged day against each target in neutral words ("Within target", "Above target", "Below target"). If nothing is logged yet it shows the planned averages and says so.
+- A "Print or save as PDF" button uses the browser's print view; the navigation and buttons are not printed. The page says it only lists what was entered and is not medical advice.
+
 ### Shopping list
 - The list is built from the planned meals, grouped by category.
 - The user ticks what has been bought. Ticked items count as available when the plan is recalculated.
@@ -91,16 +99,17 @@ Established from the mockups the learner chose:
 - Logging a meal, from plan or by searching a food with a portion
 - Plan recalculation after a log, with the Plan updated screen (before and after, reason, effect, keep or use)
 - Tickable shopping list with "Already at home", feeding the recalculation
+- Shopping by frequency: the user chooses how often they shop (every 2, 3, 5 or 7 days); the list covers only the meals until the next shop, and "I'm shopping now" starts a new list from today
+- A printable summary for the user's doctor (targets, what was eaten, averages against the targets), with the disclaimer
+- A fourth example profile, Athlete (high energy and protein minimums)
 - Persistence on the device, disclaimer on every screen
 
 ## Deferred From the POC
-- "I'm going shopping now" instead of the planned day — needs date logic around the list and plan
 - Entering results after the first period (for example weight) to recalibrate targets — second feedback loop
-- A summary to share with a doctor — export feature
 - Recipes, Progress and Profile areas — not needed to prove the kernel
 
 ## Possible Later Enhancements
-Athlete and other target profiles; family profiles; supermarket links; richer progress charts.
+Other target profiles; family profiles; supermarket links; richer progress charts.
 
 ## Non-Goals
 - No blood test or lab-value tracking: health claims are out of reach for a proof of concept.
