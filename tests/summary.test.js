@@ -49,7 +49,7 @@ test('with nothing logged the summary uses plan averages and says so', () => {
     const expected = sum / Object.keys(plan.days).length;
     const row = summary.rows.find((r) => r.nutrient === target.nutrient);
     assert.ok(Math.abs(row.average - expected) < 1e-9, `${target.nutrient} average`);
-    assert.equal(row.status, targetStatus(target.kind, expected, target.daily));
+    assert.equal(row.status, targetStatus(target.kind, expected, target.daily, row.incomplete));
   }
 });
 
@@ -232,4 +232,22 @@ test('with no plan the period runs from the first to the last logged date', () =
   assert.deepEqual(summary.period, { from: '2026-10-21', to: '2026-10-25' });
   assert.equal(summary.days, 2);
   assert.equal(summary.loggedDays, 2);
+});
+
+test('plan averages with a recipe that has a missing nutrient are marked incomplete, not certain', () => {
+  // "Nut and dried fruit mix" has no saturated-fat value in the USDA data for one of its foods.
+  const days = {};
+  for (let d = 1; d <= 3; d += 1) {
+    days[`2026-10-0${d}`] = {
+      breakfast: 'greek-yogurt-bowl',
+      lunch: 'lentil-salad-feta',
+      dinner: 'salmon-quinoa-greens',
+      snack: 'nut-and-fruit-mix',
+    };
+  }
+  const targets = [{ nutrient: 'satFat', kind: 'max', daily: 13 }];
+  const summary = buildSummary({ targets, plan: { month: '2026-10', days }, log: [], recipesById, foodsById });
+  const row = summary.rows.find((r) => r.nutrient === 'satFat');
+  assert.equal(row.incomplete, true, 'the missing value must be flagged');
+  assert.equal(row.status, 'Incomplete data', 'a partial average below the max must not say Within target');
 });

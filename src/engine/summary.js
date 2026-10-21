@@ -85,7 +85,16 @@ export function planAverages(plan, recipesById, foodsById) {
     for (const slot of ['breakfast', 'lunch', 'dinner', 'snack']) {
       const recipe = recipesById.get(meals[slot]);
       if (!recipe) continue;
-      addNutrients(acc, recipeNutrients(recipe, foodsById).totals);
+      // Keep what the recipe knows AND remember what it does not: a recipe with a missing nutrient
+      // makes the whole average for that nutrient a partial sum.
+      const r = recipeNutrients(recipe, foodsById);
+      for (const key of NUTRIENT_KEYS) {
+        if (!r.unknown[key]) {
+          acc.totals[key] += r.totals[key];
+          acc.known[key] += 1;
+        }
+        if (r.unknown[key] || r.incomplete[key]) acc.missing[key] += 1;
+      }
     }
   }
   const measured = dates.length === 0 ? { averages: null, incomplete: {} } : averagesFrom(acc, dates.length);
