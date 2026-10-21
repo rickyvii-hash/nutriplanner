@@ -88,14 +88,18 @@ function recipesForSlot(recipes, slot) {
   return recipes.filter((r) => r.slot === slot);
 }
 
+/**
+ * Small preference for recipes whose ingredients are already bought. It is the share of
+ * ingredients at home (0..1) times a small weight, so it breaks ties between similar
+ * recipes but can never outweigh missing a target, even when everything is ticked.
+ */
+function boughtShare(recipe, boughtSet) {
+  if (!boughtSet || boughtSet.size === 0 || recipe.ingredients.length === 0) return 0;
+  return recipe.ingredients.filter((ing) => boughtSet.has(ing.foodId)).length / recipe.ingredients.length;
+}
+
 function boughtBonus(recipe, boughtSet) {
-  if (!boughtSet || boughtSet.size === 0) return 0;
-  let hits = 0;
-  for (const ing of recipe.ingredients) {
-    if (boughtSet.has(ing.foodId)) hits += 1;
-  }
-  // Prefer recipes that use what is already bought (lower score is better).
-  return -hits * 0.35;
+  return -boughtShare(recipe, boughtSet) * 0.4;
 }
 
 /** Days a recipe must rest before it can fill the same slot again (variety). */
@@ -226,10 +230,6 @@ function averageDailyTotals(plan, recipesById, foodsById, dates) {
   const avg = emptyTotals();
   for (const k of NUTRIENT_KEYS) avg[k] = sum[k] / dates.length;
   return avg;
-}
-
-function recipeUsesBought(recipe, boughtSet) {
-  return recipe.ingredients.some((ing) => boughtSet.has(ing.foodId));
 }
 
 function nutrientWords(key) {
@@ -396,7 +396,10 @@ export function replan(state) {
       const merged = { ...day };
       for (const slot of SLOTS) {
         const prevRecipe = recipesById.get(prev?.[slot]);
-        if (!prevRecipe || !recipeUsesBought(prevRecipe, boughtSet) || avoid[slot].has(prevRecipe.id)) continue;
+        if (!prevRecipe || avoid[slot].has(prevRecipe.id)) continue;
+        // Keep the old meal only when it has a bigger share of food already at home than its replacement;
+        // if everything is at home there is no pantry reason to keep it.
+        if (boughtShare(prevRecipe, boughtSet) <= boughtShare(recipesById.get(day[slot]), boughtSet)) continue;
         // Keep the old meal when it uses bought food and does not worsen the score much.
         let soFar = emptyTotals();
         for (const s of SLOTS) {
@@ -406,7 +409,7 @@ export function replan(state) {
         }
         const keepScore = scoreAgainstTargets(addTotals(soFar, recipeNutrients(prevRecipe, foodsById).totals), dayTargets).score;
         const pickScore = scoreAgainstTargets(addTotals(soFar, recipeNutrients(recipesById.get(day[slot]), foodsById).totals), dayTargets).score;
-        if (keepScore <= pickScore + 0.5) {
+        if (keepScore <= pickScore + 0.15) {
           merged[slot] = prevRecipe.id;
           keptForBought.push({ date, slot, recipeId: prevRecipe.id });
         }

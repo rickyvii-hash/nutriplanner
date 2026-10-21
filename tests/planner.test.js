@@ -193,3 +193,21 @@ test('every profile is reachable: the month average meets each default target', 
     }
   }
 });
+
+test('pizza and ice cream still change the next days when every food is already at home', () => {
+  const targets = profileById('cholesterol').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  const fromDate = '2026-10-21';
+  const log = [{
+    date: fromDate,
+    time: '20:00',
+    items: [{ foodId: 'pizza-cheese', grams: 350 }, { foodId: 'ice-cream-vanilla', grams: 100 }],
+  }];
+  const bought = foods.map((f) => f.id);
+  const result = replan({ targets, recipes, plan, log, bought, foodsById, fromDate });
+  const days = new Set(result.changed.map((c) => c.date));
+  assert.ok(days.size >= 3 && days.size <= 5, `changed days: ${days.size}`);
+  const sat = result.effects.find((e) => e.nutrient === 'satFat');
+  assert.ok(sat.after < sat.before, 'saturated fat should go down');
+});
+

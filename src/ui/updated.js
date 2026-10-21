@@ -34,15 +34,12 @@ export function renderUpdated(ctx) {
   if (proposal.changed?.length) {
     const changes = el(`<section class="card"><h3>What changed</h3><ul class="change-list"></ul></section>`);
     const ul = changes.querySelector('.change-list');
-    for (const c of proposal.changed.slice(0, 12)) {
+    for (const c of proposal.changed) {
       ul.appendChild(el(`<li class="change-item">
         <div class="change-date">${c.date} · ${c.slot}</div>
         <div class="change-before"><span class="muted">Before</span> ${c.beforeIcon} ${escapeHtml(c.beforeName)}</div>
         <div class="change-after"><span class="muted">After</span> ${c.afterIcon} ${escapeHtml(c.afterName)}</div>
       </li>`));
-    }
-    if (proposal.changed.length > 12) {
-      ul.appendChild(el(`<li class="muted">…and ${proposal.changed.length - 12} more</li>`));
     }
     root.appendChild(changes);
   }
