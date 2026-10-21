@@ -1,7 +1,134 @@
-import { NUTRIENTS, recipeNutrients, formatNutrient } from './engine/nutrients.js';
+import { loadState, saveState, getStorageNotice } from './store.js';
+import { buildPlan, replan, todayIso } from './engine/planner.js';
+import { renderTargets } from './ui/targets.js';
+import { renderPlan } from './ui/plan.js';
+import { renderLog } from './ui/log.js';
+import { renderUpdated } from './ui/updated.js';
+import { renderShopping } from './ui/shopping.js';
 
 const app = document.getElementById('app');
-const SHOWN = ['kcal', 'protein', 'satFat', 'fibre', 'sodium'];
+
+const ctx = {
+  state: loadState(),
+  foods: [],
+  recipes: [],
+  foodsById: new Map(),
+  recipesById: new Map(),
+  screen: 'targets',
+  selectedDate: null,
+  proposal: null,
+  logDraft: null,
+  navigate: (name) => {
+    ctx.screen = name;
+    if (name !== 'log') ctx.logDraft = null;
+    render();
+  },
+  refresh: () => {
+    render();
+  },
+  onChange: (next) => {
+    ctx.state = next;
+    saveState(ctx.state);
+    render();
+  },
+  buildPlan: () => {
+    if (!ctx.state.targets?.length) return;
+    const now = new Date();
+    const plan = buildPlan(
+      ctx.state.targets,
+      ctx.recipes,
+      { year: now.getFullYear(), month: now.getMonth() + 1 },
+      ctx.foodsById,
+      ctx.state.bought || [],
+    );
+    ctx.state = { ...ctx.state, plan, keptForBought: [] };
+    saveState(ctx.state);
+    ctx.selectedDate = todayIso();
+    ctx.navigate('plan');
+  },
+  saveLogAndReplan: (items) => {
+    if (!items?.length || !ctx.state.plan) return;
+    const entry = {
+      date: todayIso(),
+      time: new Date().toISOString().slice(11, 16),
+      items,
+    };
+    const log = [...(ctx.state.log || []), entry];
+    const result = replan({
+      targets: ctx.state.targets,
+      recipes: ctx.recipes,
+      plan: ctx.state.plan,
+      log,
+      bought: ctx.state.bought || [],
+      foodsById: ctx.foodsById,
+      fromDate: todayIso(),
+    });
+    ctx.state = { ...ctx.state, log };
+    saveState(ctx.state);
+    ctx.proposal = result;
+    ctx.logDraft = null;
+    ctx.navigate('updated');
+  },
+  useUpdatedPlan: () => {
+    if (!ctx.proposal) return;
+    ctx.state = {
+      ...ctx.state,
+      plan: ctx.proposal.plan,
+      keptForBought: ctx.proposal.keptForBought || [],
+    };
+    saveState(ctx.state);
+    ctx.proposal = null;
+    ctx.navigate('plan');
+  },
+  keepOriginalPlan: () => {
+    ctx.proposal = null;
+    ctx.navigate('plan');
+  },
+};
+
+function navBar() {
+  const items = [
+    { id: 'plan', label: 'Plan', icon: '📅' },
+    { id: 'shopping', label: 'Shopping', icon: '🛒' },
+    { id: 'targets', label: 'Targets', icon: '🎯' },
+  ];
+  const nav = document.createElement('nav');
+  nav.className = 'bottom-nav';
+  nav.setAttribute('aria-label', 'Main');
+  for (const item of items) {
+    const active = ctx.screen === item.id
+      || (item.id === 'plan' && (ctx.screen === 'log' || ctx.screen === 'updated'));
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `nav-item${active ? ' is-active' : ''}`;
+    btn.innerHTML = `<span aria-hidden="true">${item.icon}</span><span>${item.label}</span>`;
+    btn.addEventListener('click', () => ctx.navigate(item.id));
+    nav.appendChild(btn);
+  }
+  return nav;
+}
+
+function render() {
+  app.innerHTML = '';
+  const notice = getStorageNotice();
+  if (notice) {
+    const n = document.createElement('div');
+    n.className = 'storage-notice';
+    n.textContent = notice;
+    app.appendChild(n);
+  }
+
+  let screen;
+  if (ctx.screen === 'targets') screen = renderTargets(ctx);
+  else if (ctx.screen === 'plan') screen = renderPlan(ctx);
+  else if (ctx.screen === 'log') screen = renderLog(ctx);
+  else if (ctx.screen === 'updated') screen = renderUpdated(ctx);
+  else if (ctx.screen === 'shopping') screen = renderShopping(ctx);
+  else screen = renderTargets(ctx);
+
+  app.appendChild(screen);
+  app.appendChild(navBar());
+}
 
 async function loadJson(path) {
   const res = await fetch(path);
@@ -9,52 +136,29 @@ async function loadJson(path) {
   return res.json();
 }
 
-function el(html) {
-  const t = document.createElement('template');
-  t.innerHTML = html.trim();
-  return t.content.firstChild;
-}
-
-function header() {
-  return `<header class="brand"><span class="logo" aria-hidden="true">🌿</span>
-    <div><h1>NutriPlanner</h1><p>Adaptive meal planning that flexes with real life.</p></div></header>`;
-}
-
-function footer() {
-  return `<p class="footer-note">Support tool, not medical advice.</p>`;
-}
-
-function renderRecipes(recipes, foodsById) {
-  const heads = SHOWN.map((k) => {
-    const n = NUTRIENTS.find((x) => x.key === k);
-    return `<th>${n.label}<br>${n.unit}</th>`;
-  }).join('');
-  const rows = recipes
-    .map((r) => {
-      const res = recipeNutrients(r, foodsById);
-      const cells = SHOWN.map((k) => `<td>${formatNutrient(res, k, k === 'kcal' || k === 'sodium' ? 0 : 1)}</td>`).join('');
-      return `<tr><td>${r.icon} ${r.name}<span class="slot">${r.slot}</span></td>${cells}</tr>`;
-    })
-    .join('');
-  return `<section class="card">
-      <h2>Recipes</h2>
-      <p class="muted">Nutrients per serving, added up from USDA FoodData Central values. “≥” means a value was missing for some ingredient; “n/a” means no ingredient has a value.</p>
-      <div style="overflow-x:auto"><table class="recipes"><thead><tr><th>Recipe</th>${heads}</tr></thead><tbody>${rows}</tbody></table></div>
-    </section>`;
-}
-
 async function start() {
   try {
-    const [foods, recipes] = await Promise.all([loadJson('data/foods.json'), loadJson('data/recipes.json')]);
-    const foodsById = new Map(foods.map((f) => [f.id, f]));
-    app.innerHTML = header() + renderRecipes(recipes, foodsById) + footer();
+    const [foods, recipes] = await Promise.all([
+      loadJson('data/foods.json'),
+      loadJson('data/recipes.json'),
+    ]);
+    ctx.foods = foods;
+    ctx.recipes = recipes;
+    ctx.foodsById = new Map(foods.map((f) => [f.id, f]));
+    ctx.recipesById = new Map(recipes.map((r) => [r.id, r]));
+    if (ctx.state.plan) ctx.screen = 'plan';
+    else ctx.screen = 'targets';
+    render();
   } catch (err) {
-    app.innerHTML =
-      header() +
-      `<div class="error"><strong>The app could not load its data.</strong>
+    app.innerHTML = `<div class="screen">
+      <header class="brand"><span class="logo" aria-hidden="true">🌿</span>
+        <div><h1>NutriPlanner</h1><p>Adaptive meal planning that flexes with real life.</p></div>
+      </header>
+      <div class="error"><strong>The app could not load its data.</strong>
         <p>Start it with <code>npx serve .</code> and open the address it prints, instead of opening index.html directly.</p>
-        <p class="muted">${err.message}</p></div>` +
-      footer();
+        <p class="muted">${err.message}</p></div>
+      <p class="footer-note">Support tool, not medical advice.</p>
+    </div>`;
   }
 }
 

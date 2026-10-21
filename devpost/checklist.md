@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Open the app and look at three recipes you know. Say whether the calories and protein look believable.
   Commit: `Add USDA food data, recipes and nutrient calculator`
 
-- [ ] **2. You can set targets and get a month plan**
+- [x] **2. You can set targets and get a month plan**
   Becomes usable: Pick a profile (Weight loss, Cholesterol, Recovery), edit the targets, add a custom target, press "Build my month plan" and see a Month plan screen with today's meals and daily progress bars. Everything is saved and still there after a reload.
   Why now: The plan is what the kernel later changes, and it needs real targets. Saving it here also tests the data model early.
   PRD ref: `prd.md > Targets`, `prd.md > Month plan`, `prd.md > Screens and Layout` (screens 1 and 2)
