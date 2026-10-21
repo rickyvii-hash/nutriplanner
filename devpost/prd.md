@@ -66,7 +66,7 @@ Established from the mockups the learner chose:
 - "I'm shopping now" starts a new window from today, whatever was planned, and the list is rebuilt for it. Items already at home stay out of the to-buy list.
 
 ### Summary for your doctor
-- A screen reachable from the Month plan: the profile and period, the targets, the meals logged (date and foods with grams), and the average per logged day against each target in neutral words ("Within target", "Above target", "Below target"). If nothing is logged yet it shows the planned averages and says so.
+- A screen reachable from the Month plan: the profile and period, the targets, the meals logged (date and foods with grams), and the average per logged day against each target in neutral words ("Within target", "Above target", "Below target", or "Incomplete data" when a nutrient value is missing, because a partial sum must never look like a certain result). If nothing is logged yet it shows the planned averages and says so.
 - A "Print or save as PDF" button uses the browser's print view; the navigation and buttons are not printed. The page says it only lists what was entered and is not medical advice.
 
 ### Shopping list
