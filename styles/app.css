@@ -1,0 +1,47 @@
+/* NutriPlanner: calm greens and warm neutrals, rounded cards, no red. */
+:root {
+  --bg: #f7f5ef;
+  --card: #fdfcf8;
+  --ink: #1f3a2d;
+  --muted: #5d6b62;
+  --line: #e4e0d3;
+  --green: #2f5d44;
+  --green-soft: #e3eddf;
+  --sage: #8aae8a;
+  --tan: #d8b98b;
+  --radius: 18px;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); }
+
+.app { max-width: 720px; margin: 0 auto; padding: 16px 16px 96px; }
+
+h1, h2, h3 { margin: 0; line-height: 1.2; }
+h1 { font-size: 1.7rem; }
+h2 { font-size: 1.3rem; margin-bottom: 4px; }
+.muted { color: var(--muted); }
+
+.brand { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; }
+.brand .logo { font-size: 2rem; }
+.brand p { margin: 2px 0 0; color: var(--muted); }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+table.recipes { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+table.recipes th, table.recipes td { text-align: right; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+table.recipes th:first-child, table.recipes td:first-child { text-align: left; }
+table.recipes th { color: var(--muted); font-weight: 600; font-size: 0.8rem; }
+.slot { display: inline-block; font-size: 0.72rem; background: var(--green-soft); color: var(--green); padding: 2px 8px; border-radius: 99px; margin-left: 6px; }
+
+.footer-note { text-align: center; color: var(--muted); font-size: 0.82rem; margin-top: 20px; }
+.error { background: #fbf1e3; border: 1px solid var(--tan); border-radius: var(--radius); padding: 16px; }

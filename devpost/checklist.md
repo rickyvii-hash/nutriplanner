@@ -1,0 +1,84 @@
+---
+doc: checklist
+status: approved
+---
+
+# Build Checklist
+
+Build mode: fast
+
+## Slices
+
+- [x] **1. You can see real recipes with their nutrients, calculated from USDA data**
+  Becomes usable: A running app (opened through the local server) that lists the recipes, each with calories, protein, saturated fat, fibre and sodium calculated from real USDA foods. Missing values show as "n/a".
+  Why now: The USDA files are the biggest unknown, so the data build comes first. It also proves the whole path end to end (scaffold, data, calculation, screen) and every later slice depends on these numbers.
+  PRD ref: `prd.md > Month plan`, `prd.md > States and Boundaries` (missing nutrient value)
+  Spec ref: `spec.md > Food and recipe data`, `spec.md > Nutrient calculator`, `spec.md > File Structure`, `spec.md > Stack`
+  Build: Scaffold the project per the spec's file structure. Check the real USDA download format first, then write `scripts/build-foods.js` to produce `data/foods.json` (about 250 foods, nutrients per 100 g, missing values as null) from `data/curated_foods.json`. Write about 20 recipes in `data/recipes.json`. Add `src/engine/nutrients.js` and a simple page that lists recipes with their totals.
+  Verify (mechanical): `node --test` passes for the nutrient calculator, including a missing-value case; `data/foods.json` contains at least 200 foods and every recipe ingredient resolves to a food; the local server starts and the page lists the recipes.
+  Learner check: Open the app and look at three recipes you know. Say whether the calories and protein look believable.
+  Commit: `Add USDA food data, recipes and nutrient calculator`
+
+- [ ] **2. You can set targets and get a month plan**
+  Becomes usable: Pick a profile (Weight loss, Cholesterol, Recovery), edit the targets, add a custom target, press "Build my month plan" and see a Month plan screen with today's meals and daily progress bars. Everything is saved and still there after a reload.
+  Why now: The plan is what the kernel later changes, and it needs real targets. Saving it here also tests the data model early.
+  PRD ref: `prd.md > Targets`, `prd.md > Month plan`, `prd.md > Screens and Layout` (screens 1 and 2)
+  Spec ref: `spec.md > Planner`, `spec.md > Storage`, `spec.md > Screens`, `spec.md > Data Model`
+  Build: Add `src/store.js`, `buildPlan` in `src/engine/planner.js`, the Targets and Plan screens and the small router with the bottom bar.
+  Verify (mechanical): Tests show `buildPlan` fills every slot of every day for each profile and stays reasonably near the targets; reload in the browser and confirm targets and plan are restored.
+  Learner check: Choose Recovery, change one target, build the plan, reload the page, and confirm everything is still there.
+  Commit: `Add targets, month plan and local storage`
+
+- [ ] **3. You can log a meal and see the plan update (the kernel)**
+  Becomes usable: Log "pizza and ice cream", save, and see the Plan updated screen: before and after for the changed meals, a one-sentence reason, the effect on each target, and the buttons "Keep my original plan" and "Use updated plan".
+  Why now: This is the unique kernel from `scope.md`, so it comes as early as the plan allows. Everything after it improves or feeds this moment.
+  PRD ref: `prd.md > Logging a meal`, `prd.md > Plan updated`, `prd.md > The Core Journey` (steps 5-7), `prd.md > States and Boundaries` (targets cannot all be met, nothing to change)
+  Spec ref: `spec.md > Planner`, `spec.md > Screens`, `spec.md > Important Failure Modes`
+  Build: Add the Log a meal screen (from plan or search a food, with a portion), `replan` in the planner with the reason built from the numbers, and the Plan updated screen. "Use updated plan" saves the new plan; "Keep my original plan" leaves it alone.
+  Verify (mechanical): Tests with a worked example: a high-saturated-fat meal lowers saturated fat in the following days, "nothing to change" returns no changes, impossible targets return the closest plan with a flag; in the browser, log a meal and confirm both buttons behave correctly.
+  Learner check: Log pizza and ice cream. Read the Plan updated screen and say whether the reason makes sense and the tone feels calm.
+  Commit: `Add meal logging and plan recalculation`
+
+- [ ] **4. You can tick what you bought and the plan uses it**
+  Becomes usable: A Shopping list built from the plan, grouped by category, with tickable items and an "Already at home" section; ticked food is favoured when the plan is recalculated, and a note explains when a meal was kept because of it.
+  Why now: Completes the core loop from `scope.md`. It builds on the working replan, so it can be checked against slice 3.
+  PRD ref: `prd.md > Shopping list`, `prd.md > Plan updated`, `prd.md > The Core Journey` (steps 4 and 7)
+  Spec ref: `spec.md > Shopping list builder`, `spec.md > Planner`, `spec.md > Data Model`
+  Build: Add `src/engine/shopping.js`, the Shopping screen, ticked items saved, and the bonus for ticked ingredients in `replan`, with the note text.
+  Verify (mechanical): Tests show that ticking an ingredient makes a recipe using it more likely to be kept, and that ticked items leave the "to buy" list; in the browser, tick items, log a meal, and confirm the note appears.
+  Learner check: Tick spinach and chicken, log a meal, and see whether the plan keeps meals that use them and the list agrees.
+  Commit: `Add shopping list and pantry-aware replanning`
+
+- [ ] **5. It looks and behaves like the mockups, with every empty state**
+  Becomes usable: The finished proof of concept: look and feel as in `devpost/design/`, disclaimer on every screen, all states from the PRD, mobile and desktop layouts, a README and start instructions.
+  Why now: Design and presentation carry half of the judging, so polish gets a proper slice after the behavior is proven.
+  PRD ref: `prd.md > Look and Feel`, `prd.md > States and Boundaries`, `prd.md > What We're Building`
+  Spec ref: `spec.md > Look and Feel`, `spec.md > Where It Runs and How Someone Tries It`, `spec.md > Important Failure Modes`
+  Build: Apply the colours, type and spacing from the spec to every screen, add first-use, empty and error states, the footer disclaimer, icons or emoji instead of photos, and write the README with the start command.
+  Verify (mechanical): Walk the core journey in the browser at a phone width and a desktop width and compare against the mockups; confirm the disclaimer appears on all five screens; run all tests.
+  Learner check: Go through the whole journey once as if recording the demo, and say what you would change.
+  Commit: `Polish design, states and README`
+
+## Hands-on Checkpoints
+
+- [ ] Early usable behavior explored — after slice 3 (the kernel)
+- [ ] Final kick-the-tires exploration and feedback completed
+
+## Final Review
+
+- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+
+## Code Tour and App Map
+
+- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+
+Activity and evidence: not started
+Route and stops: not started
+Edit outcome: not started
+Reflection: not started
+Activity mode: not started
+
+## Revisions
+

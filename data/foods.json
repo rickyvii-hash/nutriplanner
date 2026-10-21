@@ -1,0 +1,3674 @@
+[
+ {
+  "id": "almond-milk-unsweetened",
+  "fdcId": 174832,
+  "name": "Almond milk, unsweetened",
+  "category": "Pantry",
+  "usdaName": "Beverages, almond milk, unsweetened, shelf stable",
+  "per100g": {
+   "protein": 0.4,
+   "fat": 0.96,
+   "carbs": 1.31,
+   "kcal": 15,
+   "fibre": 0.2,
+   "sodium": 72,
+   "satFat": 0.08,
+   "sugars": 0.81
+  }
+ },
+ {
+  "id": "almonds",
+  "fdcId": 170567,
+  "name": "Almonds",
+  "category": "Pantry",
+  "usdaName": "Nuts, almonds",
+  "per100g": {
+   "protein": 21.15,
+   "fat": 49.93,
+   "carbs": 21.55,
+   "kcal": 579,
+   "fibre": 12.5,
+   "sodium": 1,
+   "satFat": 3.802,
+   "sugars": 4.35
+  }
+ },
+ {
+  "id": "apple-juice",
+  "fdcId": 173933,
+  "name": "Apple juice",
+  "category": "Pantry",
+  "usdaName": "Apple juice, canned or bottled, unsweetened, without added ascorbic acid",
+  "per100g": {
+   "protein": 0.1,
+   "fat": 0.13,
+   "carbs": 11.3,
+   "kcal": 46,
+   "fibre": 0.2,
+   "sodium": 4,
+   "satFat": 0.022,
+   "sugars": 9.62
+  }
+ },
+ {
+  "id": "apple-raw",
+  "fdcId": 168202,
+  "name": "Apple, raw",
+  "category": "Produce",
+  "usdaName": "Apples, raw, golden delicious, with skin",
+  "per100g": {
+   "protein": 0.28,
+   "fat": 0.15,
+   "carbs": 13.6,
+   "kcal": 57,
+   "fibre": 2.4,
+   "sodium": 2,
+   "satFat": null,
+   "sugars": 10.04
+  }
+ },
+ {
+  "id": "apricots-raw",
+  "fdcId": 171697,
+  "name": "Apricots, raw",
+  "category": "Produce",
+  "usdaName": "Apricots, raw",
+  "per100g": {
+   "protein": 1.4,
+   "fat": 0.39,
+   "carbs": 11.12,
+   "kcal": 48,
+   "fibre": 2,
+   "sodium": 1,
+   "satFat": 0.027,
+   "sugars": 9.24
+  }
+ },
+ {
+  "id": "artichoke-cooked",
+  "fdcId": 168386,
+  "name": "Artichoke, cooked",
+  "category": "Produce",
+  "usdaName": "Artichokes, (globe or french), cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 2.89,
+   "fat": 0.34,
+   "carbs": 11.95,
+   "kcal": 53,
+   "fibre": 5.7,
+   "sodium": 60,
+   "satFat": 0.079,
+   "sugars": 0.99
+  }
+ },
+ {
+  "id": "arugula-raw",
+  "fdcId": 169387,
+  "name": "Arugula, raw",
+  "category": "Produce",
+  "usdaName": "Arugula, raw",
+  "per100g": {
+   "protein": 2.58,
+   "fat": 0.66,
+   "carbs": 3.65,
+   "kcal": 25,
+   "fibre": 1.6,
+   "sodium": 27,
+   "satFat": 0.086,
+   "sugars": 2.05
+  }
+ },
+ {
+  "id": "asparagus-raw",
+  "fdcId": 168389,
+  "name": "Asparagus, raw",
+  "category": "Produce",
+  "usdaName": "Asparagus, raw",
+  "per100g": {
+   "protein": 2.2,
+   "fat": 0.12,
+   "carbs": 3.88,
+   "kcal": 20,
+   "fibre": 2.1,
+   "sodium": 2,
+   "satFat": 0.04,
+   "sugars": 1.88
+  }
+ },
+ {
+  "id": "avocado-raw",
+  "fdcId": 171705,
+  "name": "Avocado, raw",
+  "category": "Produce",
+  "usdaName": "Avocados, raw, all commercial varieties",
+  "per100g": {
+   "protein": 2,
+   "fat": 14.66,
+   "carbs": 8.53,
+   "kcal": 160,
+   "fibre": 6.7,
+   "sodium": 7,
+   "satFat": 2.126,
+   "sugars": 0.66
+  }
+ },
+ {
+  "id": "balsamic-vinegar",
+  "fdcId": 172241,
+  "name": "Balsamic vinegar",
+  "category": "Pantry",
+  "usdaName": "Vinegar, balsamic",
+  "per100g": {
+   "protein": 0.49,
+   "fat": 0,
+   "carbs": 17.03,
+   "kcal": 88,
+   "fibre": null,
+   "sodium": 23,
+   "satFat": 0,
+   "sugars": 14.95
+  }
+ },
+ {
+  "id": "banana-raw",
+  "fdcId": 173944,
+  "name": "Banana, raw",
+  "category": "Produce",
+  "usdaName": "Bananas, raw",
+  "per100g": {
+   "protein": 1.09,
+   "fat": 0.33,
+   "carbs": 22.84,
+   "kcal": 89,
+   "fibre": 2.6,
+   "sodium": 1,
+   "satFat": 0.112,
+   "sugars": 12.23
+  }
+ },
+ {
+  "id": "barley-cooked",
+  "fdcId": 170285,
+  "name": "Barley, cooked",
+  "category": "Pantry",
+  "usdaName": "Barley, pearled, cooked",
+  "per100g": {
+   "protein": 2.26,
+   "fat": 0.44,
+   "carbs": 28.22,
+   "kcal": 123,
+   "fibre": 3.8,
+   "sodium": 3,
+   "satFat": 0.093,
+   "sugars": 0.28
+  }
+ },
+ {
+  "id": "basil-fresh",
+  "fdcId": 172232,
+  "name": "Basil, fresh",
+  "category": "Produce",
+  "usdaName": "Basil, fresh",
+  "per100g": {
+   "protein": 3.15,
+   "fat": 0.64,
+   "carbs": 2.65,
+   "kcal": 23,
+   "fibre": 1.6,
+   "sodium": 4,
+   "satFat": 0.041,
+   "sugars": 0.3
+  }
+ },
+ {
+  "id": "beef-sirloin-cooked",
+  "fdcId": 168635,
+  "name": "Beef sirloin, cooked",
+  "category": "Protein",
+  "usdaName": "Beef, top sirloin, steak, separable lean only, trimmed to 0\" fat, choice, cooked, broiled",
+  "per100g": {
+   "protein": 30.29,
+   "fat": 6.55,
+   "carbs": 0,
+   "kcal": 188,
+   "fibre": 0,
+   "sodium": 63,
+   "satFat": 2.495,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "beetroot-raw",
+  "fdcId": 169145,
+  "name": "Beetroot, raw",
+  "category": "Produce",
+  "usdaName": "Beets, raw",
+  "per100g": {
+   "protein": 1.61,
+   "fat": 0.17,
+   "carbs": 9.56,
+   "kcal": 43,
+   "fibre": 2.8,
+   "sodium": 78,
+   "satFat": 0.027,
+   "sugars": 6.76
+  }
+ },
+ {
+  "id": "black-beans-cooked",
+  "fdcId": 173735,
+  "name": "Black beans, cooked",
+  "category": "Protein",
+  "usdaName": "Beans, black, mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 8.86,
+   "fat": 0.54,
+   "carbs": 23.71,
+   "kcal": 132,
+   "fibre": 8.7,
+   "sodium": 1,
+   "satFat": 0.139,
+   "sugars": 0.32
+  }
+ },
+ {
+  "id": "blackberries-raw",
+  "fdcId": 173946,
+  "name": "Blackberries, raw",
+  "category": "Produce",
+  "usdaName": "Blackberries, raw",
+  "per100g": {
+   "protein": 1.39,
+   "fat": 0.49,
+   "carbs": 9.61,
+   "kcal": 43,
+   "fibre": 5.3,
+   "sodium": 1,
+   "satFat": 0.014,
+   "sugars": 4.88
+  }
+ },
+ {
+  "id": "blueberries-frozen",
+  "fdcId": 173950,
+  "name": "Blueberries, frozen",
+  "category": "Frozen",
+  "usdaName": "Blueberries, frozen, unsweetened (Includes foods for USDA's Food Distribution Program)",
+  "per100g": {
+   "protein": 0.42,
+   "fat": 0.64,
+   "carbs": 12.17,
+   "kcal": 51,
+   "fibre": 2.7,
+   "sodium": 1,
+   "satFat": 0.053,
+   "sugars": 8.45
+  }
+ },
+ {
+  "id": "blueberries-raw",
+  "fdcId": 171711,
+  "name": "Blueberries, raw",
+  "category": "Produce",
+  "usdaName": "Blueberries, raw",
+  "per100g": {
+   "protein": 0.74,
+   "fat": 0.33,
+   "carbs": 14.49,
+   "kcal": 57,
+   "fibre": 2.4,
+   "sodium": 1,
+   "satFat": 0.028,
+   "sugars": 9.96
+  }
+ },
+ {
+  "id": "broccoli-frozen-cooked",
+  "fdcId": 169969,
+  "name": "Broccoli, frozen, cooked",
+  "category": "Frozen",
+  "usdaName": "Broccoli, frozen, chopped, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 3.1,
+   "fat": 0.12,
+   "carbs": 5.35,
+   "kcal": 28,
+   "fibre": 3,
+   "sodium": 11,
+   "satFat": 0.018,
+   "sugars": 1.47
+  }
+ },
+ {
+  "id": "broccoli-raw",
+  "fdcId": 170379,
+  "name": "Broccoli, raw",
+  "category": "Produce",
+  "usdaName": "Broccoli, raw",
+  "per100g": {
+   "protein": 2.82,
+   "fat": 0.37,
+   "carbs": 6.64,
+   "kcal": 34,
+   "fibre": 2.6,
+   "sodium": 33,
+   "satFat": 0.114,
+   "sugars": 1.7
+  }
+ },
+ {
+  "id": "brown-rice-cooked",
+  "fdcId": 169704,
+  "name": "Brown rice, cooked",
+  "category": "Pantry",
+  "usdaName": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)",
+  "per100g": {
+   "protein": 2.74,
+   "fat": 0.97,
+   "carbs": 25.58,
+   "kcal": 123,
+   "fibre": 1.6,
+   "sodium": 4,
+   "satFat": 0.26,
+   "sugars": 0.24
+  }
+ },
+ {
+  "id": "brussels-sprouts-raw",
+  "fdcId": 170383,
+  "name": "Brussels sprouts, raw",
+  "category": "Produce",
+  "usdaName": "Brussels sprouts, raw",
+  "per100g": {
+   "protein": 3.38,
+   "fat": 0.3,
+   "carbs": 8.95,
+   "kcal": 43,
+   "fibre": 3.8,
+   "sodium": 25,
+   "satFat": 0.062,
+   "sugars": 2.2
+  }
+ },
+ {
+  "id": "buckwheat-groats-cooked",
+  "fdcId": 170686,
+  "name": "Buckwheat groats, cooked",
+  "category": "Pantry",
+  "usdaName": "Buckwheat groats, roasted, cooked",
+  "per100g": {
+   "protein": 3.38,
+   "fat": 0.62,
+   "carbs": 19.94,
+   "kcal": 92,
+   "fibre": 2.7,
+   "sodium": 4,
+   "satFat": 0.134,
+   "sugars": 0.9
+  }
+ },
+ {
+  "id": "bulgur-cooked",
+  "fdcId": 170287,
+  "name": "Bulgur, cooked",
+  "category": "Pantry",
+  "usdaName": "Bulgur, cooked",
+  "per100g": {
+   "protein": 3.08,
+   "fat": 0.24,
+   "carbs": 18.58,
+   "kcal": 83,
+   "fibre": 4.5,
+   "sodium": 5,
+   "satFat": 0.042,
+   "sugars": 0.1
+  }
+ },
+ {
+  "id": "butter-unsalted",
+  "fdcId": 173430,
+  "name": "Butter, unsalted",
+  "category": "Dairy",
+  "usdaName": "Butter, without salt",
+  "per100g": {
+   "protein": 0.85,
+   "fat": 81.11,
+   "carbs": 0.06,
+   "kcal": 717,
+   "fibre": 0,
+   "sodium": 11,
+   "satFat": 50.489,
+   "sugars": 0.06
+  }
+ },
+ {
+  "id": "butternut-squash-cooked",
+  "fdcId": 169296,
+  "name": "Butternut squash, cooked",
+  "category": "Produce",
+  "usdaName": "Squash, winter, butternut, cooked, baked, without salt",
+  "per100g": {
+   "protein": 0.9,
+   "fat": 0.09,
+   "carbs": 10.49,
+   "kcal": 40,
+   "fibre": 3.2,
+   "sodium": 4,
+   "satFat": 0.019,
+   "sugars": 1.97
+  }
+ },
+ {
+  "id": "cabbage-raw",
+  "fdcId": 169975,
+  "name": "Cabbage, raw",
+  "category": "Produce",
+  "usdaName": "Cabbage, raw",
+  "per100g": {
+   "protein": 1.28,
+   "fat": 0.1,
+   "carbs": 5.8,
+   "kcal": 25,
+   "fibre": 2.5,
+   "sodium": 18,
+   "satFat": 0.034,
+   "sugars": 3.2
+  }
+ },
+ {
+  "id": "canola-oil",
+  "fdcId": 172336,
+  "name": "Canola oil",
+  "category": "Pantry",
+  "usdaName": "Oil, canola",
+  "per100g": {
+   "protein": 0,
+   "fat": 100,
+   "carbs": 0,
+   "kcal": 884,
+   "fibre": 0,
+   "sodium": 0,
+   "satFat": 7.365,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "carrots-raw",
+  "fdcId": 170393,
+  "name": "Carrots, raw",
+  "category": "Produce",
+  "usdaName": "Carrots, raw",
+  "per100g": {
+   "protein": 0.93,
+   "fat": 0.24,
+   "carbs": 9.58,
+   "kcal": 41,
+   "fibre": 2.8,
+   "sodium": 69,
+   "satFat": 0.032,
+   "sugars": 4.74
+  }
+ },
+ {
+  "id": "cashews-dry-roasted",
+  "fdcId": 170571,
+  "name": "Cashews, dry roasted",
+  "category": "Pantry",
+  "usdaName": "Nuts, cashew nuts, dry roasted, without salt added",
+  "per100g": {
+   "protein": 15.31,
+   "fat": 46.35,
+   "carbs": 32.69,
+   "kcal": 574,
+   "fibre": 3,
+   "sodium": 16,
+   "satFat": 9.157,
+   "sugars": 5.01
+  }
+ },
+ {
+  "id": "cauliflower-frozen-cooked",
+  "fdcId": 170399,
+  "name": "Cauliflower, frozen, cooked",
+  "category": "Frozen",
+  "usdaName": "Cauliflower, frozen, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 1.61,
+   "fat": 0.22,
+   "carbs": 3.75,
+   "kcal": 19,
+   "fibre": 2.7,
+   "sodium": 18,
+   "satFat": 0.034,
+   "sugars": 1.05
+  }
+ },
+ {
+  "id": "cauliflower-raw",
+  "fdcId": 169986,
+  "name": "Cauliflower, raw",
+  "category": "Produce",
+  "usdaName": "Cauliflower, raw",
+  "per100g": {
+   "protein": 1.92,
+   "fat": 0.28,
+   "carbs": 4.97,
+   "kcal": 25,
+   "fibre": 2,
+   "sodium": 30,
+   "satFat": 0.13,
+   "sugars": 1.91
+  }
+ },
+ {
+  "id": "celery-raw",
+  "fdcId": 169988,
+  "name": "Celery, raw",
+  "category": "Produce",
+  "usdaName": "Celery, raw",
+  "per100g": {
+   "protein": 0.69,
+   "fat": 0.17,
+   "carbs": 2.97,
+   "kcal": 14,
+   "fibre": 1.6,
+   "sodium": 80,
+   "satFat": 0.042,
+   "sugars": 1.34
+  }
+ },
+ {
+  "id": "cheddar-cheese",
+  "fdcId": 170899,
+  "name": "Cheddar cheese",
+  "category": "Dairy",
+  "usdaName": "Cheese, cheddar, sharp, sliced",
+  "per100g": {
+   "protein": 24.25,
+   "fat": 33.82,
+   "carbs": 2.13,
+   "kcal": 410,
+   "fibre": 0,
+   "sodium": 644,
+   "satFat": 19.368,
+   "sugars": 0.27
+  }
+ },
+ {
+  "id": "cherries-raw",
+  "fdcId": 171719,
+  "name": "Cherries, raw",
+  "category": "Produce",
+  "usdaName": "Cherries, sweet, raw",
+  "per100g": {
+   "protein": 1.06,
+   "fat": 0.2,
+   "carbs": 16.01,
+   "kcal": 63,
+   "fibre": 2.1,
+   "sodium": 0,
+   "satFat": 0.038,
+   "sugars": 12.82
+  }
+ },
+ {
+  "id": "chia-seeds",
+  "fdcId": 170554,
+  "name": "Chia seeds",
+  "category": "Pantry",
+  "usdaName": "Seeds, chia seeds, dried",
+  "per100g": {
+   "protein": 16.54,
+   "fat": 30.74,
+   "carbs": 42.12,
+   "kcal": 486,
+   "fibre": 34.4,
+   "sodium": 16,
+   "satFat": 3.33,
+   "sugars": null
+  }
+ },
+ {
+  "id": "chicken-breast-roasted",
+  "fdcId": 171477,
+  "name": "Chicken breast, roasted",
+  "category": "Protein",
+  "usdaName": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+  "per100g": {
+   "protein": 31.02,
+   "fat": 3.57,
+   "carbs": 0,
+   "kcal": 165,
+   "fibre": 0,
+   "sodium": 74,
+   "satFat": 1.01,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "chicken-broth",
+  "fdcId": 174536,
+  "name": "Chicken broth",
+  "category": "Pantry",
+  "usdaName": "Soup, chicken broth, ready-to-serve",
+  "per100g": {
+   "protein": 0.64,
+   "fat": 0.21,
+   "carbs": 0.44,
+   "kcal": 6,
+   "fibre": 0,
+   "sodium": 371,
+   "satFat": 0.013,
+   "sugars": 0.43
+  }
+ },
+ {
+  "id": "chicken-thigh-roasted",
+  "fdcId": 172388,
+  "name": "Chicken thigh, roasted",
+  "category": "Protein",
+  "usdaName": "Chicken, broilers or fryers, thigh, meat only, cooked, roasted",
+  "per100g": {
+   "protein": 24.76,
+   "fat": 8.15,
+   "carbs": 0,
+   "kcal": 179,
+   "fibre": 0,
+   "sodium": 106,
+   "satFat": 2.311,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "chickpeas-canned",
+  "fdcId": 175206,
+  "name": "Chickpeas, canned",
+  "category": "Protein",
+  "usdaName": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, solids and liquids",
+  "per100g": {
+   "protein": 4.92,
+   "fat": 1.95,
+   "carbs": 13.49,
+   "kcal": 88,
+   "fibre": 4.4,
+   "sodium": 278,
+   "satFat": 0.204,
+   "sugars": null
+  }
+ },
+ {
+  "id": "chickpeas-cooked",
+  "fdcId": 173757,
+  "name": "Chickpeas, cooked",
+  "category": "Protein",
+  "usdaName": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 8.86,
+   "fat": 2.59,
+   "carbs": 27.42,
+   "kcal": 164,
+   "fibre": 7.6,
+   "sodium": 7,
+   "satFat": 0.269,
+   "sugars": 4.8
+  }
+ },
+ {
+  "id": "chocolate-chip-cookies",
+  "fdcId": 172715,
+  "name": "Chocolate chip cookies",
+  "category": "Pantry",
+  "usdaName": "Cookies, chocolate chip, commercially prepared, regular, lower fat",
+  "per100g": {
+   "protein": 5.97,
+   "fat": 17.91,
+   "carbs": 67.49,
+   "kcal": 451,
+   "fibre": 3,
+   "sodium": 418,
+   "satFat": 5.962,
+   "sugars": 32.84
+  }
+ },
+ {
+  "id": "club-soda",
+  "fdcId": 174842,
+  "name": "Club soda",
+  "category": "Pantry",
+  "usdaName": "Beverages, carbonated, club soda",
+  "per100g": {
+   "protein": 0,
+   "fat": 0,
+   "carbs": 0,
+   "kcal": 0,
+   "fibre": 0,
+   "sodium": 21,
+   "satFat": 0,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "coconut-milk-canned",
+  "fdcId": 170173,
+  "name": "Coconut milk, canned",
+  "category": "Pantry",
+  "usdaName": "Nuts, coconut milk, canned (liquid expressed from grated meat and water)",
+  "per100g": {
+   "protein": 2.02,
+   "fat": 21.33,
+   "carbs": 2.81,
+   "kcal": 197,
+   "fibre": null,
+   "sodium": 13,
+   "satFat": 18.915,
+   "sugars": null
+  }
+ },
+ {
+  "id": "cod-cooked",
+  "fdcId": 171956,
+  "name": "Cod, cooked",
+  "category": "Protein",
+  "usdaName": "Fish, cod, Atlantic, cooked, dry heat",
+  "per100g": {
+   "protein": 22.83,
+   "fat": 0.86,
+   "carbs": 0,
+   "kcal": 105,
+   "fibre": 0,
+   "sodium": 78,
+   "satFat": 0.168,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "coffee-brewed",
+  "fdcId": 171890,
+  "name": "Coffee, brewed",
+  "category": "Pantry",
+  "usdaName": "Beverages, coffee, brewed, prepared with tap water",
+  "per100g": {
+   "protein": 0.12,
+   "fat": 0.02,
+   "carbs": 0,
+   "kcal": 1,
+   "fibre": 0,
+   "sodium": 2,
+   "satFat": 0.002,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "collard-greens-raw",
+  "fdcId": 170406,
+  "name": "Collard greens, raw",
+  "category": "Produce",
+  "usdaName": "Collards, raw",
+  "per100g": {
+   "protein": 3.02,
+   "fat": 0.61,
+   "carbs": 5.42,
+   "kcal": 32,
+   "fibre": 4,
+   "sodium": 17,
+   "satFat": 0.055,
+   "sugars": 0.46
+  }
+ },
+ {
+  "id": "corn-tortilla",
+  "fdcId": 175036,
+  "name": "Corn tortilla",
+  "category": "Pantry",
+  "usdaName": "Tortillas, ready-to-bake or -fry, corn",
+  "per100g": {
+   "protein": 5.7,
+   "fat": 2.85,
+   "carbs": 44.64,
+   "kcal": 218,
+   "fibre": 6.3,
+   "sodium": 45,
+   "satFat": 0.453,
+   "sugars": 0.88
+  }
+ },
+ {
+  "id": "corn-frozen-cooked",
+  "fdcId": 168399,
+  "name": "Corn, frozen, cooked",
+  "category": "Frozen",
+  "usdaName": "Corn, sweet, yellow, frozen, kernels cut off cob, boiled, drained, without salt",
+  "per100g": {
+   "protein": 2.55,
+   "fat": 0.67,
+   "carbs": 19.3,
+   "kcal": 81,
+   "fibre": 2.4,
+   "sodium": 1,
+   "satFat": 0.103,
+   "sugars": 3.07
+  }
+ },
+ {
+  "id": "corn-sweet-cooked",
+  "fdcId": 169999,
+  "name": "Corn, sweet, cooked",
+  "category": "Produce",
+  "usdaName": "Corn, sweet, yellow, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 3.41,
+   "fat": 1.5,
+   "carbs": 20.98,
+   "kcal": 96,
+   "fibre": 2.4,
+   "sodium": 1,
+   "satFat": 0.197,
+   "sugars": 4.54
+  }
+ },
+ {
+  "id": "cornflakes",
+  "fdcId": 174648,
+  "name": "Cornflakes",
+  "category": "Pantry",
+  "usdaName": "Cereals ready-to-eat, RALSTON Corn Flakes",
+  "per100g": {
+   "protein": 5.9,
+   "fat": 0.91,
+   "carbs": 88.01,
+   "kcal": 384,
+   "fibre": 2.7,
+   "sodium": 571,
+   "satFat": 0.227,
+   "sugars": 7.84
+  }
+ },
+ {
+  "id": "cottage-cheese-low-fat",
+  "fdcId": 172182,
+  "name": "Cottage cheese, low-fat",
+  "category": "Dairy",
+  "usdaName": "Cheese, cottage, lowfat, 2% milkfat",
+  "per100g": {
+   "protein": 10.45,
+   "fat": 2.27,
+   "carbs": 4.76,
+   "kcal": 81,
+   "fibre": 0,
+   "sodium": 308,
+   "satFat": 1.235,
+   "sugars": 4
+  }
+ },
+ {
+  "id": "couscous-cooked",
+  "fdcId": 169700,
+  "name": "Couscous, cooked",
+  "category": "Pantry",
+  "usdaName": "Couscous, cooked",
+  "per100g": {
+   "protein": 3.79,
+   "fat": 0.16,
+   "carbs": 23.22,
+   "kcal": 112,
+   "fibre": 1.4,
+   "sodium": 5,
+   "satFat": 0.029,
+   "sugars": 0.1
+  }
+ },
+ {
+  "id": "crab-cooked",
+  "fdcId": 174202,
+  "name": "Crab, cooked",
+  "category": "Protein",
+  "usdaName": "Crustaceans, crab, alaska king, cooked, moist heat",
+  "per100g": {
+   "protein": 19.35,
+   "fat": 1.54,
+   "carbs": 0,
+   "kcal": 97,
+   "fibre": 0,
+   "sodium": 1072,
+   "satFat": 0.133,
+   "sugars": null
+  }
+ },
+ {
+  "id": "crackers-whole-wheat",
+  "fdcId": 172749,
+  "name": "Crackers, whole wheat",
+  "category": "Pantry",
+  "usdaName": "Crackers, whole-wheat",
+  "per100g": {
+   "protein": 10.58,
+   "fat": 14.13,
+   "carbs": 69.55,
+   "kcal": 427,
+   "fibre": 10.3,
+   "sodium": 800,
+   "satFat": 2.063,
+   "sugars": 1.19
+  }
+ },
+ {
+  "id": "cranberries-raw",
+  "fdcId": 171722,
+  "name": "Cranberries, raw",
+  "category": "Produce",
+  "usdaName": "Cranberries, raw",
+  "per100g": {
+   "protein": 0.46,
+   "fat": 0.13,
+   "carbs": 11.97,
+   "kcal": 46,
+   "fibre": 3.6,
+   "sodium": 2,
+   "satFat": 0.008,
+   "sugars": 4.27
+  }
+ },
+ {
+  "id": "cream-cheese",
+  "fdcId": 173418,
+  "name": "Cream cheese",
+  "category": "Dairy",
+  "usdaName": "Cheese, cream",
+  "per100g": {
+   "protein": 6.15,
+   "fat": 34.44,
+   "carbs": 5.52,
+   "kcal": 350,
+   "fibre": 0,
+   "sodium": 314,
+   "satFat": 20.213,
+   "sugars": 3.76
+  }
+ },
+ {
+  "id": "cream-light",
+  "fdcId": 170857,
+  "name": "Cream, light",
+  "category": "Dairy",
+  "usdaName": "Cream, fluid, light (coffee cream or table cream)",
+  "per100g": {
+   "protein": 2.96,
+   "fat": 19.1,
+   "carbs": 3.66,
+   "kcal": 195,
+   "fibre": 0,
+   "sodium": 72,
+   "satFat": 10.176,
+   "sugars": 3.67
+  }
+ },
+ {
+  "id": "cucumber-raw",
+  "fdcId": 169225,
+  "name": "Cucumber, raw",
+  "category": "Produce",
+  "usdaName": "Cucumber, peeled, raw",
+  "per100g": {
+   "protein": 0.59,
+   "fat": 0.16,
+   "carbs": 2.16,
+   "kcal": 10,
+   "fibre": 0.7,
+   "sodium": 2,
+   "satFat": 0.078,
+   "sugars": 1.38
+  }
+ },
+ {
+  "id": "dates",
+  "fdcId": 168191,
+  "name": "Dates",
+  "category": "Pantry",
+  "usdaName": "Dates, medjool",
+  "per100g": {
+   "protein": 1.81,
+   "fat": 0.15,
+   "carbs": 74.97,
+   "kcal": 277,
+   "fibre": 6.7,
+   "sodium": 1,
+   "satFat": null,
+   "sugars": 66.47
+  }
+ },
+ {
+  "id": "dried-apricots",
+  "fdcId": 173941,
+  "name": "Dried apricots",
+  "category": "Pantry",
+  "usdaName": "Apricots, dried, sulfured, uncooked",
+  "per100g": {
+   "protein": 3.39,
+   "fat": 0.51,
+   "carbs": 62.64,
+   "kcal": 241,
+   "fibre": 7.3,
+   "sodium": 10,
+   "satFat": 0.017,
+   "sugars": 53.44
+  }
+ },
+ {
+  "id": "edamame-cooked",
+  "fdcId": 168411,
+  "name": "Edamame, cooked",
+  "category": "Protein",
+  "usdaName": "Edamame, frozen, prepared",
+  "per100g": {
+   "protein": 11.91,
+   "fat": 5.2,
+   "carbs": 8.91,
+   "kcal": 121,
+   "fibre": 5.2,
+   "sodium": 6,
+   "satFat": 0.62,
+   "sugars": 2.18
+  }
+ },
+ {
+  "id": "egg-noodles-cooked",
+  "fdcId": 168926,
+  "name": "Egg noodles, cooked",
+  "category": "Pantry",
+  "usdaName": "Noodles, egg, unenriched, cooked, without added salt",
+  "per100g": {
+   "protein": 4.54,
+   "fat": 2.07,
+   "carbs": 25.16,
+   "kcal": 138,
+   "fibre": 1.2,
+   "sodium": 5,
+   "satFat": 0.419,
+   "sugars": 0.4
+  }
+ },
+ {
+  "id": "egg-whites-raw",
+  "fdcId": 172183,
+  "name": "Egg whites, raw",
+  "category": "Dairy",
+  "usdaName": "Egg, white, raw, fresh",
+  "per100g": {
+   "protein": 10.9,
+   "fat": 0.17,
+   "carbs": 0.73,
+   "kcal": 52,
+   "fibre": 0,
+   "sodium": 166,
+   "satFat": 0,
+   "sugars": 0.71
+  }
+ },
+ {
+  "id": "egg-hard-boiled",
+  "fdcId": 173424,
+  "name": "Egg, hard-boiled",
+  "category": "Dairy",
+  "usdaName": "Egg, whole, cooked, hard-boiled",
+  "per100g": {
+   "protein": 12.58,
+   "fat": 10.61,
+   "carbs": 1.12,
+   "kcal": 155,
+   "fibre": 0,
+   "sodium": 124,
+   "satFat": 3.267,
+   "sugars": 1.12
+  }
+ },
+ {
+  "id": "egg-raw",
+  "fdcId": 171287,
+  "name": "Egg, raw",
+  "category": "Dairy",
+  "usdaName": "Egg, whole, raw, fresh",
+  "per100g": {
+   "protein": 12.56,
+   "fat": 9.51,
+   "carbs": 0.72,
+   "kcal": 143,
+   "fibre": 0,
+   "sodium": 142,
+   "satFat": 3.126,
+   "sugars": 0.37
+  }
+ },
+ {
+  "id": "eggplant-raw",
+  "fdcId": 169228,
+  "name": "Eggplant, raw",
+  "category": "Produce",
+  "usdaName": "Eggplant, raw",
+  "per100g": {
+   "protein": 0.98,
+   "fat": 0.18,
+   "carbs": 5.88,
+   "kcal": 25,
+   "fibre": 3,
+   "sodium": 2,
+   "satFat": 0.034,
+   "sugars": 3.53
+  }
+ },
+ {
+  "id": "endive-raw",
+  "fdcId": 168412,
+  "name": "Endive, raw",
+  "category": "Produce",
+  "usdaName": "Endive, raw",
+  "per100g": {
+   "protein": 1.25,
+   "fat": 0.2,
+   "carbs": 3.35,
+   "kcal": 17,
+   "fibre": 3.1,
+   "sodium": 22,
+   "satFat": 0.048,
+   "sugars": 0.25
+  }
+ },
+ {
+  "id": "fennel-raw",
+  "fdcId": 169385,
+  "name": "Fennel, raw",
+  "category": "Produce",
+  "usdaName": "Fennel, bulb, raw",
+  "per100g": {
+   "protein": 1.24,
+   "fat": 0.2,
+   "carbs": 7.3,
+   "kcal": 31,
+   "fibre": 3.1,
+   "sodium": 52,
+   "satFat": 0.09,
+   "sugars": 3.93
+  }
+ },
+ {
+  "id": "feta-cheese",
+  "fdcId": 173420,
+  "name": "Feta cheese",
+  "category": "Dairy",
+  "usdaName": "Cheese, feta",
+  "per100g": {
+   "protein": 14.21,
+   "fat": 21.49,
+   "carbs": 3.88,
+   "kcal": 265,
+   "fibre": 0,
+   "sodium": 1139,
+   "satFat": 13.3,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "figs-raw",
+  "fdcId": 173021,
+  "name": "Figs, raw",
+  "category": "Produce",
+  "usdaName": "Figs, raw",
+  "per100g": {
+   "protein": 0.75,
+   "fat": 0.3,
+   "carbs": 19.18,
+   "kcal": 74,
+   "fibre": 2.9,
+   "sodium": 1,
+   "satFat": 0.06,
+   "sugars": 16.26
+  }
+ },
+ {
+  "id": "flaxseed",
+  "fdcId": 169414,
+  "name": "Flaxseed",
+  "category": "Pantry",
+  "usdaName": "Seeds, flaxseed",
+  "per100g": {
+   "protein": 18.29,
+   "fat": 42.16,
+   "carbs": 28.88,
+   "kcal": 534,
+   "fibre": 27.3,
+   "sodium": 30,
+   "satFat": 3.663,
+   "sugars": 1.55
+  }
+ },
+ {
+  "id": "flour-tortilla",
+  "fdcId": 167535,
+  "name": "Flour tortilla",
+  "category": "Pantry",
+  "usdaName": "Tortillas, ready-to-bake or -fry, flour, shelf stable",
+  "per100g": {
+   "protein": 8.01,
+   "fat": 7.58,
+   "carbs": 49.27,
+   "kcal": 297,
+   "fibre": 2.4,
+   "sodium": 742,
+   "satFat": 1.225,
+   "sugars": 2.66
+  }
+ },
+ {
+  "id": "garlic-raw",
+  "fdcId": 169230,
+  "name": "Garlic, raw",
+  "category": "Produce",
+  "usdaName": "Garlic, raw",
+  "per100g": {
+   "protein": 6.36,
+   "fat": 0.5,
+   "carbs": 33.06,
+   "kcal": 149,
+   "fibre": 2.1,
+   "sodium": 17,
+   "satFat": 0.089,
+   "sugars": 1
+  }
+ },
+ {
+  "id": "ginger-root-raw",
+  "fdcId": 169231,
+  "name": "Ginger root, raw",
+  "category": "Produce",
+  "usdaName": "Ginger root, raw",
+  "per100g": {
+   "protein": 1.82,
+   "fat": 0.75,
+   "carbs": 17.77,
+   "kcal": 80,
+   "fibre": 2,
+   "sodium": 13,
+   "satFat": 0.203,
+   "sugars": 1.7
+  }
+ },
+ {
+  "id": "goat-cheese-soft",
+  "fdcId": 173435,
+  "name": "Goat cheese, soft",
+  "category": "Dairy",
+  "usdaName": "Cheese, goat, soft type",
+  "per100g": {
+   "protein": 18.52,
+   "fat": 21.08,
+   "carbs": 0,
+   "kcal": 264,
+   "fibre": 0,
+   "sodium": 459,
+   "satFat": 14.575,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "granola",
+  "fdcId": 171646,
+  "name": "Granola",
+  "category": "Pantry",
+  "usdaName": "Cereals ready-to-eat, granola, homemade",
+  "per100g": {
+   "protein": 13.67,
+   "fat": 24.31,
+   "carbs": 53.88,
+   "kcal": 489,
+   "fibre": 8.9,
+   "sodium": 26,
+   "satFat": 3.957,
+   "sugars": 19.8
+  }
+ },
+ {
+  "id": "granola-bar",
+  "fdcId": 167542,
+  "name": "Granola bar",
+  "category": "Pantry",
+  "usdaName": "Snacks, granola bars, hard, plain",
+  "per100g": {
+   "protein": 10.1,
+   "fat": 19.8,
+   "carbs": 64.4,
+   "kcal": 471,
+   "fibre": 5.3,
+   "sodium": 294,
+   "satFat": 2.37,
+   "sugars": 28.57
+  }
+ },
+ {
+  "id": "grapefruit-raw",
+  "fdcId": 173033,
+  "name": "Grapefruit, raw",
+  "category": "Produce",
+  "usdaName": "Grapefruit, raw, pink and red and white, all areas",
+  "per100g": {
+   "protein": 0.63,
+   "fat": 0.1,
+   "carbs": 8.08,
+   "kcal": 32,
+   "fibre": 1.1,
+   "sodium": 0,
+   "satFat": 0.014,
+   "sugars": 6.98
+  }
+ },
+ {
+  "id": "grapes-raw",
+  "fdcId": 174683,
+  "name": "Grapes, raw",
+  "category": "Produce",
+  "usdaName": "Grapes, red or green (European type, such as Thompson seedless), raw",
+  "per100g": {
+   "protein": 0.72,
+   "fat": 0.16,
+   "carbs": 18.1,
+   "kcal": 69,
+   "fibre": 0.9,
+   "sodium": 2,
+   "satFat": 0.054,
+   "sugars": 15.48
+  }
+ },
+ {
+  "id": "greek-yogurt-plain-nonfat",
+  "fdcId": 171312,
+  "name": "Greek yogurt, plain nonfat",
+  "category": "Dairy",
+  "usdaName": "Yogurt, Greek, nonfat, plain, CHOBANI",
+  "per100g": {
+   "protein": 9.53,
+   "fat": 0.24,
+   "carbs": 3.43,
+   "kcal": 54,
+   "fibre": 0.2,
+   "sodium": 37,
+   "satFat": 0.145,
+   "sugars": null
+  }
+ },
+ {
+  "id": "green-beans-frozen-cooked",
+  "fdcId": 169963,
+  "name": "Green beans, frozen, cooked",
+  "category": "Frozen",
+  "usdaName": "Beans, snap, green, frozen, cooked, boiled, drained without salt",
+  "per100g": {
+   "protein": 1.49,
+   "fat": 0.17,
+   "carbs": 6.45,
+   "kcal": 28,
+   "fibre": 3,
+   "sodium": 1,
+   "satFat": 0.044,
+   "sugars": 1.88
+  }
+ },
+ {
+  "id": "green-beans-raw",
+  "fdcId": 169961,
+  "name": "Green beans, raw",
+  "category": "Produce",
+  "usdaName": "Beans, snap, green, raw",
+  "per100g": {
+   "protein": 1.83,
+   "fat": 0.22,
+   "carbs": 6.97,
+   "kcal": 31,
+   "fibre": 2.7,
+   "sodium": 6,
+   "satFat": 0.05,
+   "sugars": 3.26
+  }
+ },
+ {
+  "id": "green-bell-pepper-raw",
+  "fdcId": 170427,
+  "name": "Green bell pepper, raw",
+  "category": "Produce",
+  "usdaName": "Peppers, sweet, green, raw",
+  "per100g": {
+   "protein": 0.86,
+   "fat": 0.17,
+   "carbs": 4.64,
+   "kcal": 20,
+   "fibre": 1.7,
+   "sodium": 3,
+   "satFat": 0.058,
+   "sugars": 2.4
+  }
+ },
+ {
+  "id": "green-onions-raw",
+  "fdcId": 170005,
+  "name": "Green onions, raw",
+  "category": "Produce",
+  "usdaName": "Onions, spring or scallions (includes tops and bulb), raw",
+  "per100g": {
+   "protein": 1.83,
+   "fat": 0.19,
+   "carbs": 7.34,
+   "kcal": 32,
+   "fibre": 2.6,
+   "sodium": 16,
+   "satFat": 0.032,
+   "sugars": 2.33
+  }
+ },
+ {
+  "id": "green-peas-frozen-cooked",
+  "fdcId": 170017,
+  "name": "Green peas, frozen, cooked",
+  "category": "Frozen",
+  "usdaName": "Peas, green, frozen, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 5.15,
+   "fat": 0.27,
+   "carbs": 14.26,
+   "kcal": 78,
+   "fibre": 4.5,
+   "sodium": 72,
+   "satFat": 0.049,
+   "sugars": 4.4
+  }
+ },
+ {
+  "id": "green-peas-raw",
+  "fdcId": 170419,
+  "name": "Green peas, raw",
+  "category": "Produce",
+  "usdaName": "Peas, green, raw",
+  "per100g": {
+   "protein": 5.42,
+   "fat": 0.4,
+   "carbs": 14.45,
+   "kcal": 81,
+   "fibre": 5.7,
+   "sodium": 5,
+   "satFat": 0.071,
+   "sugars": 5.67
+  }
+ },
+ {
+  "id": "ground-beef-90-lean-cooked",
+  "fdcId": 171793,
+  "name": "Ground beef 90% lean, cooked",
+  "category": "Protein",
+  "usdaName": "Beef, ground, 90% lean meat / 10% fat, patty, cooked, pan-broiled",
+  "per100g": {
+   "protein": 25.21,
+   "fat": 10.68,
+   "carbs": 0,
+   "kcal": 204,
+   "fibre": 0,
+   "sodium": 75,
+   "satFat": 4.189,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "ground-turkey-cooked",
+  "fdcId": 172851,
+  "name": "Ground turkey, cooked",
+  "category": "Protein",
+  "usdaName": "Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles",
+  "per100g": {
+   "protein": 27.1,
+   "fat": 11.6,
+   "carbs": 0,
+   "kcal": 213,
+   "fibre": 0,
+   "sodium": 90,
+   "satFat": 2.966,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "haddock-cooked",
+  "fdcId": 174198,
+  "name": "Haddock, cooked",
+  "category": "Protein",
+  "usdaName": "Fish, haddock, cooked, dry heat",
+  "per100g": {
+   "protein": 19.99,
+   "fat": 0.55,
+   "carbs": 0,
+   "kcal": 90,
+   "fibre": 0,
+   "sodium": 261,
+   "satFat": 0.111,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "ham-sliced",
+  "fdcId": 173864,
+  "name": "Ham, sliced",
+  "category": "Protein",
+  "usdaName": "Ham, sliced, regular (approximately 11% fat)",
+  "per100g": {
+   "protein": 16.6,
+   "fat": 8.8,
+   "carbs": 3.63,
+   "kcal": 164,
+   "fibre": 1.3,
+   "sodium": 814,
+   "satFat": 0.5,
+   "sugars": 1
+  }
+ },
+ {
+  "id": "hazelnuts",
+  "fdcId": 170581,
+  "name": "Hazelnuts",
+  "category": "Pantry",
+  "usdaName": "Nuts, hazelnuts or filberts",
+  "per100g": {
+   "protein": 14.95,
+   "fat": 60.75,
+   "carbs": 16.7,
+   "kcal": 628,
+   "fibre": 9.7,
+   "sodium": 0,
+   "satFat": 4.464,
+   "sugars": 4.34
+  }
+ },
+ {
+  "id": "honey",
+  "fdcId": 169640,
+  "name": "Honey",
+  "category": "Pantry",
+  "usdaName": "Honey",
+  "per100g": {
+   "protein": 0.3,
+   "fat": 0,
+   "carbs": 82.4,
+   "kcal": 304,
+   "fibre": 0.2,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 82.12
+  }
+ },
+ {
+  "id": "hummus",
+  "fdcId": 174289,
+  "name": "Hummus",
+  "category": "Pantry",
+  "usdaName": "Hummus, commercial",
+  "per100g": {
+   "protein": 7.78,
+   "fat": 17.82,
+   "carbs": 15,
+   "kcal": 237,
+   "fibre": 5.5,
+   "sodium": 426,
+   "satFat": 2.562,
+   "sugars": 0.62
+  }
+ },
+ {
+  "id": "ice-cream-vanilla",
+  "fdcId": 167575,
+  "name": "Ice cream, vanilla",
+  "category": "Dairy",
+  "usdaName": "Ice creams, vanilla",
+  "per100g": {
+   "protein": 3.5,
+   "fat": 11,
+   "carbs": 23.6,
+   "kcal": 207,
+   "fibre": 0.7,
+   "sodium": 80,
+   "satFat": 6.79,
+   "sugars": 21.22
+  }
+ },
+ {
+  "id": "iceberg-lettuce-raw",
+  "fdcId": 169248,
+  "name": "Iceberg lettuce, raw",
+  "category": "Produce",
+  "usdaName": "Lettuce, iceberg (includes crisphead types), raw",
+  "per100g": {
+   "protein": 0.9,
+   "fat": 0.14,
+   "carbs": 2.97,
+   "kcal": 14,
+   "fibre": 1.2,
+   "sodium": 10,
+   "satFat": 0.018,
+   "sugars": 1.97
+  }
+ },
+ {
+  "id": "jam",
+  "fdcId": 169641,
+  "name": "Jam",
+  "category": "Pantry",
+  "usdaName": "Jams and preserves",
+  "per100g": {
+   "protein": 0.37,
+   "fat": 0.07,
+   "carbs": 68.86,
+   "kcal": 278,
+   "fibre": 1.1,
+   "sodium": 32,
+   "satFat": 0.01,
+   "sugars": 48.5
+  }
+ },
+ {
+  "id": "kale-raw",
+  "fdcId": 168421,
+  "name": "Kale, raw",
+  "category": "Produce",
+  "usdaName": "Kale, raw",
+  "per100g": {
+   "protein": 2.92,
+   "fat": 1.49,
+   "carbs": 4.42,
+   "kcal": 35,
+   "fibre": 4.1,
+   "sodium": 53,
+   "satFat": 0.178,
+   "sugars": 0.99
+  }
+ },
+ {
+  "id": "ketchup",
+  "fdcId": 168556,
+  "name": "Ketchup",
+  "category": "Pantry",
+  "usdaName": "Catsup",
+  "per100g": {
+   "protein": 1.04,
+   "fat": 0.1,
+   "carbs": 27.4,
+   "kcal": 101,
+   "fibre": 0.3,
+   "sodium": 907,
+   "satFat": 0.014,
+   "sugars": 21.27
+  }
+ },
+ {
+  "id": "kidney-beans-cooked",
+  "fdcId": 175194,
+  "name": "Kidney beans, cooked",
+  "category": "Protein",
+  "usdaName": "Beans, kidney, red, mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 8.67,
+   "fat": 0.5,
+   "carbs": 22.8,
+   "kcal": 127,
+   "fibre": 7.4,
+   "sodium": 2,
+   "satFat": 0.072,
+   "sugars": 0.32
+  }
+ },
+ {
+  "id": "kiwi-raw",
+  "fdcId": 168153,
+  "name": "Kiwi, raw",
+  "category": "Produce",
+  "usdaName": "Kiwifruit, green, raw",
+  "per100g": {
+   "protein": 1.14,
+   "fat": 0.52,
+   "carbs": 14.66,
+   "kcal": 61,
+   "fibre": 3,
+   "sodium": 3,
+   "satFat": 0.029,
+   "sugars": 8.99
+  }
+ },
+ {
+  "id": "leek-raw",
+  "fdcId": 169246,
+  "name": "Leek, raw",
+  "category": "Produce",
+  "usdaName": "Leeks, (bulb and lower leaf-portion), raw",
+  "per100g": {
+   "protein": 1.5,
+   "fat": 0.3,
+   "carbs": 14.15,
+   "kcal": 61,
+   "fibre": 1.8,
+   "sodium": 20,
+   "satFat": 0.04,
+   "sugars": 3.9
+  }
+ },
+ {
+  "id": "lemon-juice",
+  "fdcId": 167747,
+  "name": "Lemon juice",
+  "category": "Produce",
+  "usdaName": "Lemon juice, raw",
+  "per100g": {
+   "protein": 0.35,
+   "fat": 0.24,
+   "carbs": 6.9,
+   "kcal": 22,
+   "fibre": 0.3,
+   "sodium": 1,
+   "satFat": 0.04,
+   "sugars": 2.52
+  }
+ },
+ {
+  "id": "lentils-cooked",
+  "fdcId": 172421,
+  "name": "Lentils, cooked",
+  "category": "Protein",
+  "usdaName": "Lentils, mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 9.02,
+   "fat": 0.38,
+   "carbs": 20.13,
+   "kcal": 116,
+   "fibre": 7.9,
+   "sodium": 2,
+   "satFat": 0.053,
+   "sugars": 1.8
+  }
+ },
+ {
+  "id": "lime-juice",
+  "fdcId": 168156,
+  "name": "Lime juice",
+  "category": "Produce",
+  "usdaName": "Lime juice, raw",
+  "per100g": {
+   "protein": 0.42,
+   "fat": 0.07,
+   "carbs": 8.42,
+   "kcal": 25,
+   "fibre": 0.4,
+   "sodium": 2,
+   "satFat": 0.008,
+   "sugars": 1.69
+  }
+ },
+ {
+  "id": "mackerel-cooked",
+  "fdcId": 175120,
+  "name": "Mackerel, cooked",
+  "category": "Protein",
+  "usdaName": "Fish, mackerel, Atlantic, cooked, dry heat",
+  "per100g": {
+   "protein": 23.85,
+   "fat": 17.81,
+   "carbs": 0,
+   "kcal": 262,
+   "fibre": 0,
+   "sodium": 83,
+   "satFat": 4.176,
+   "sugars": null
+  }
+ },
+ {
+  "id": "mango-raw",
+  "fdcId": 169910,
+  "name": "Mango, raw",
+  "category": "Produce",
+  "usdaName": "Mangos, raw",
+  "per100g": {
+   "protein": 0.82,
+   "fat": 0.38,
+   "carbs": 14.98,
+   "kcal": 60,
+   "fibre": 1.6,
+   "sodium": 1,
+   "satFat": 0.092,
+   "sugars": 13.66
+  }
+ },
+ {
+  "id": "maple-syrup",
+  "fdcId": 169661,
+  "name": "Maple syrup",
+  "category": "Pantry",
+  "usdaName": "Syrups, maple",
+  "per100g": {
+   "protein": 0.04,
+   "fat": 0.06,
+   "carbs": 67.04,
+   "kcal": 260,
+   "fibre": 0,
+   "sodium": 12,
+   "satFat": 0.007,
+   "sugars": 60.46
+  }
+ },
+ {
+  "id": "mayonnaise",
+  "fdcId": 171009,
+  "name": "Mayonnaise",
+  "category": "Pantry",
+  "usdaName": "Salad dressing, mayonnaise, regular",
+  "per100g": {
+   "protein": 0.96,
+   "fat": 74.85,
+   "carbs": 0.57,
+   "kcal": 680,
+   "fibre": 0,
+   "sodium": 635,
+   "satFat": 11.703,
+   "sugars": 0.57
+  }
+ },
+ {
+  "id": "melon-raw",
+  "fdcId": 169092,
+  "name": "Melon, raw",
+  "category": "Produce",
+  "usdaName": "Melons, cantaloupe, raw",
+  "per100g": {
+   "protein": 0.84,
+   "fat": 0.19,
+   "carbs": 8.16,
+   "kcal": 34,
+   "fibre": 0.9,
+   "sodium": 16,
+   "satFat": 0.051,
+   "sugars": 7.86
+  }
+ },
+ {
+  "id": "milk-2-fat",
+  "fdcId": 171267,
+  "name": "Milk, 2% fat",
+  "category": "Dairy",
+  "usdaName": "Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D",
+  "per100g": {
+   "protein": 3.3,
+   "fat": 1.98,
+   "carbs": 4.8,
+   "kcal": 50,
+   "fibre": 0,
+   "sodium": 47,
+   "satFat": 1.257,
+   "sugars": 5.06
+  }
+ },
+ {
+  "id": "milk-skim",
+  "fdcId": 171269,
+  "name": "Milk, skim",
+  "category": "Dairy",
+  "usdaName": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)",
+  "per100g": {
+   "protein": 3.37,
+   "fat": 0.08,
+   "carbs": 4.96,
+   "kcal": 34,
+   "fibre": 0,
+   "sodium": 42,
+   "satFat": 0.056,
+   "sugars": 5.09
+  }
+ },
+ {
+  "id": "milk-whole",
+  "fdcId": 171265,
+  "name": "Milk, whole",
+  "category": "Dairy",
+  "usdaName": "Milk, whole, 3.25% milkfat, with added vitamin D",
+  "per100g": {
+   "protein": 3.15,
+   "fat": 3.25,
+   "carbs": 4.8,
+   "kcal": 61,
+   "fibre": 0,
+   "sodium": 43,
+   "satFat": 1.865,
+   "sugars": 5.05
+  }
+ },
+ {
+  "id": "millet-cooked",
+  "fdcId": 168871,
+  "name": "Millet, cooked",
+  "category": "Pantry",
+  "usdaName": "Millet, cooked",
+  "per100g": {
+   "protein": 3.51,
+   "fat": 1,
+   "carbs": 23.67,
+   "kcal": 119,
+   "fibre": 1.3,
+   "sodium": 2,
+   "satFat": 0.172,
+   "sugars": 0.13
+  }
+ },
+ {
+  "id": "mixed-vegetables-frozen-cooked",
+  "fdcId": 170472,
+  "name": "Mixed vegetables, frozen, cooked",
+  "category": "Frozen",
+  "usdaName": "Vegetables, mixed, frozen, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 2.86,
+   "fat": 0.15,
+   "carbs": 13.09,
+   "kcal": 65,
+   "fibre": 4.4,
+   "sodium": 35,
+   "satFat": 0.031,
+   "sugars": 3.12
+  }
+ },
+ {
+  "id": "mozzarella-part-skim",
+  "fdcId": 170847,
+  "name": "Mozzarella, part-skim",
+  "category": "Dairy",
+  "usdaName": "Cheese, mozzarella, part skim milk",
+  "per100g": {
+   "protein": 24.26,
+   "fat": 15.92,
+   "carbs": 2.77,
+   "kcal": 254,
+   "fibre": 0,
+   "sodium": 619,
+   "satFat": 10.114,
+   "sugars": 1.13
+  }
+ },
+ {
+  "id": "mussels-cooked",
+  "fdcId": 174217,
+  "name": "Mussels, cooked",
+  "category": "Protein",
+  "usdaName": "Mollusks, mussel, blue, cooked, moist heat",
+  "per100g": {
+   "protein": 23.8,
+   "fat": 4.48,
+   "carbs": 7.39,
+   "kcal": 172,
+   "fibre": 0,
+   "sodium": 369,
+   "satFat": 0.85,
+   "sugars": null
+  }
+ },
+ {
+  "id": "mustard",
+  "fdcId": 172234,
+  "name": "Mustard",
+  "category": "Pantry",
+  "usdaName": "Mustard, prepared, yellow",
+  "per100g": {
+   "protein": 3.74,
+   "fat": 3.34,
+   "carbs": 5.83,
+   "kcal": 60,
+   "fibre": 4,
+   "sodium": 1104,
+   "satFat": 0.214,
+   "sugars": 0.92
+  }
+ },
+ {
+  "id": "navy-beans-cooked",
+  "fdcId": 173746,
+  "name": "Navy beans, cooked",
+  "category": "Protein",
+  "usdaName": "Beans, navy, mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 8.23,
+   "fat": 0.62,
+   "carbs": 26.05,
+   "kcal": 140,
+   "fibre": 10.5,
+   "sodium": 0,
+   "satFat": 0.098,
+   "sugars": 0.37
+  }
+ },
+ {
+  "id": "nectarines-raw",
+  "fdcId": 169914,
+  "name": "Nectarines, raw",
+  "category": "Produce",
+  "usdaName": "Nectarines, raw",
+  "per100g": {
+   "protein": 1.06,
+   "fat": 0.32,
+   "carbs": 10.55,
+   "kcal": 44,
+   "fibre": 1.7,
+   "sodium": 0,
+   "satFat": 0.025,
+   "sugars": 7.89
+  }
+ },
+ {
+  "id": "okra-raw",
+  "fdcId": 169260,
+  "name": "Okra, raw",
+  "category": "Produce",
+  "usdaName": "Okra, raw",
+  "per100g": {
+   "protein": 1.93,
+   "fat": 0.19,
+   "carbs": 7.45,
+   "kcal": 33,
+   "fibre": 3.2,
+   "sodium": 7,
+   "satFat": 0.026,
+   "sugars": 1.48
+  }
+ },
+ {
+  "id": "olive-oil",
+  "fdcId": 171413,
+  "name": "Olive oil",
+  "category": "Pantry",
+  "usdaName": "Oil, olive, salad or cooking",
+  "per100g": {
+   "protein": 0,
+   "fat": 100,
+   "carbs": 0,
+   "kcal": 884,
+   "fibre": 0,
+   "sodium": 2,
+   "satFat": 13.808,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "olives-canned",
+  "fdcId": 169094,
+  "name": "Olives, canned",
+  "category": "Produce",
+  "usdaName": "Olives, ripe, canned (small-extra large)",
+  "per100g": {
+   "protein": 0.84,
+   "fat": 10.9,
+   "carbs": 6.04,
+   "kcal": 116,
+   "fibre": 1.6,
+   "sodium": 735,
+   "satFat": 2.279,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "onion-raw",
+  "fdcId": 170000,
+  "name": "Onion, raw",
+  "category": "Produce",
+  "usdaName": "Onions, raw",
+  "per100g": {
+   "protein": 1.1,
+   "fat": 0.1,
+   "carbs": 9.34,
+   "kcal": 40,
+   "fibre": 1.7,
+   "sodium": 4,
+   "satFat": 0.042,
+   "sugars": 4.24
+  }
+ },
+ {
+  "id": "orange-juice",
+  "fdcId": 169098,
+  "name": "Orange juice",
+  "category": "Pantry",
+  "usdaName": "Orange juice, raw (Includes foods for USDA's Food Distribution Program)",
+  "per100g": {
+   "protein": 0.7,
+   "fat": 0.2,
+   "carbs": 10.4,
+   "kcal": 45,
+   "fibre": 0.2,
+   "sodium": 1,
+   "satFat": 0.024,
+   "sugars": 8.4
+  }
+ },
+ {
+  "id": "orange-raw",
+  "fdcId": 169097,
+  "name": "Orange, raw",
+  "category": "Produce",
+  "usdaName": "Oranges, raw, all commercial varieties",
+  "per100g": {
+   "protein": 0.94,
+   "fat": 0.12,
+   "carbs": 11.75,
+   "kcal": 47,
+   "fibre": 2.4,
+   "sodium": 0,
+   "satFat": 0.015,
+   "sugars": 9.35
+  }
+ },
+ {
+  "id": "papaya-raw",
+  "fdcId": 169926,
+  "name": "Papaya, raw",
+  "category": "Produce",
+  "usdaName": "Papayas, raw",
+  "per100g": {
+   "protein": 0.47,
+   "fat": 0.26,
+   "carbs": 10.82,
+   "kcal": 43,
+   "fibre": 1.7,
+   "sodium": 8,
+   "satFat": 0.081,
+   "sugars": 7.82
+  }
+ },
+ {
+  "id": "parmesan-grated",
+  "fdcId": 171247,
+  "name": "Parmesan, grated",
+  "category": "Dairy",
+  "usdaName": "Cheese, parmesan, grated",
+  "per100g": {
+   "protein": 28.42,
+   "fat": 27.84,
+   "carbs": 13.91,
+   "kcal": 420,
+   "fibre": 0,
+   "sodium": 1804,
+   "satFat": 15.371,
+   "sugars": 0.07
+  }
+ },
+ {
+  "id": "parsley-fresh",
+  "fdcId": 170416,
+  "name": "Parsley, fresh",
+  "category": "Produce",
+  "usdaName": "Parsley, fresh",
+  "per100g": {
+   "protein": 2.97,
+   "fat": 0.79,
+   "carbs": 6.33,
+   "kcal": 36,
+   "fibre": 3.3,
+   "sodium": 56,
+   "satFat": 0.132,
+   "sugars": 0.85
+  }
+ },
+ {
+  "id": "pasta-cooked",
+  "fdcId": 169737,
+  "name": "Pasta, cooked",
+  "category": "Pantry",
+  "usdaName": "Pasta, cooked, enriched, without added salt",
+  "per100g": {
+   "protein": 5.8,
+   "fat": 0.93,
+   "carbs": 30.86,
+   "kcal": 158,
+   "fibre": 1.8,
+   "sodium": 1,
+   "satFat": 0.176,
+   "sugars": 0.56
+  }
+ },
+ {
+  "id": "peach-raw",
+  "fdcId": 169928,
+  "name": "Peach, raw",
+  "category": "Produce",
+  "usdaName": "Peaches, yellow, raw",
+  "per100g": {
+   "protein": 0.91,
+   "fat": 0.25,
+   "carbs": 9.54,
+   "kcal": 39,
+   "fibre": 1.5,
+   "sodium": 0,
+   "satFat": 0.019,
+   "sugars": 8.39
+  }
+ },
+ {
+  "id": "peanut-butter-smooth",
+  "fdcId": 172470,
+  "name": "Peanut butter, smooth",
+  "category": "Pantry",
+  "usdaName": "Peanut butter, smooth style, without salt",
+  "per100g": {
+   "protein": 22.21,
+   "fat": 51.36,
+   "carbs": 22.31,
+   "kcal": 598,
+   "fibre": 5,
+   "sodium": 17,
+   "satFat": 10.325,
+   "sugars": 10.49
+  }
+ },
+ {
+  "id": "peanuts-dry-roasted",
+  "fdcId": 173806,
+  "name": "Peanuts, dry-roasted",
+  "category": "Pantry",
+  "usdaName": "Peanuts, all types, dry-roasted, without salt",
+  "per100g": {
+   "protein": 24.35,
+   "fat": 49.66,
+   "carbs": 21.26,
+   "kcal": 587,
+   "fibre": 8.4,
+   "sodium": 6,
+   "satFat": 7.723,
+   "sugars": 4.9
+  }
+ },
+ {
+  "id": "pear-raw",
+  "fdcId": 169118,
+  "name": "Pear, raw",
+  "category": "Produce",
+  "usdaName": "Pears, raw",
+  "per100g": {
+   "protein": 0.36,
+   "fat": 0.14,
+   "carbs": 15.23,
+   "kcal": 57,
+   "fibre": 3.1,
+   "sodium": 1,
+   "satFat": 0.022,
+   "sugars": 9.75
+  }
+ },
+ {
+  "id": "pecans",
+  "fdcId": 170182,
+  "name": "Pecans",
+  "category": "Pantry",
+  "usdaName": "Nuts, pecans",
+  "per100g": {
+   "protein": 9.17,
+   "fat": 71.97,
+   "carbs": 13.86,
+   "kcal": 691,
+   "fibre": 9.6,
+   "sodium": 0,
+   "satFat": 6.18,
+   "sugars": 3.97
+  }
+ },
+ {
+  "id": "pineapple-raw",
+  "fdcId": 169124,
+  "name": "Pineapple, raw",
+  "category": "Produce",
+  "usdaName": "Pineapple, raw, all varieties",
+  "per100g": {
+   "protein": 0.54,
+   "fat": 0.12,
+   "carbs": 13.12,
+   "kcal": 50,
+   "fibre": 1.4,
+   "sodium": 1,
+   "satFat": 0.009,
+   "sugars": 9.85
+  }
+ },
+ {
+  "id": "pinto-beans-cooked",
+  "fdcId": 175200,
+  "name": "Pinto beans, cooked",
+  "category": "Protein",
+  "usdaName": "Beans, pinto, mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 9.01,
+   "fat": 0.65,
+   "carbs": 26.22,
+   "kcal": 143,
+   "fibre": 9,
+   "sodium": 1,
+   "satFat": 0.136,
+   "sugars": 0.34
+  }
+ },
+ {
+  "id": "pistachios",
+  "fdcId": 170184,
+  "name": "Pistachios",
+  "category": "Pantry",
+  "usdaName": "Nuts, pistachio nuts, raw",
+  "per100g": {
+   "protein": 20.16,
+   "fat": 45.32,
+   "carbs": 27.17,
+   "kcal": 560,
+   "fibre": 10.6,
+   "sodium": 1,
+   "satFat": 5.907,
+   "sugars": 7.66
+  }
+ },
+ {
+  "id": "pita-bread-whole-wheat",
+  "fdcId": 174916,
+  "name": "Pita bread, whole-wheat",
+  "category": "Pantry",
+  "usdaName": "Bread, pita, whole-wheat",
+  "per100g": {
+   "protein": 9.8,
+   "fat": 1.71,
+   "carbs": 55.89,
+   "kcal": 262,
+   "fibre": 6.1,
+   "sodium": 421,
+   "satFat": 0.208,
+   "sugars": 2.87
+  }
+ },
+ {
+  "id": "pizza-cheese",
+  "fdcId": 170317,
+  "name": "Pizza, cheese",
+  "category": "Pantry",
+  "usdaName": "Pizza, cheese topping, regular crust, frozen, cooked",
+  "per100g": {
+   "protein": 10.36,
+   "fat": 12.28,
+   "carbs": 29.02,
+   "kcal": 268,
+   "fibre": 2.2,
+   "sodium": 447,
+   "satFat": 4.272,
+   "sugars": 3.57
+  }
+ },
+ {
+  "id": "plums-raw",
+  "fdcId": 169949,
+  "name": "Plums, raw",
+  "category": "Produce",
+  "usdaName": "Plums, raw",
+  "per100g": {
+   "protein": 0.7,
+   "fat": 0.28,
+   "carbs": 11.42,
+   "kcal": 46,
+   "fibre": 1.4,
+   "sodium": 0,
+   "satFat": 0.017,
+   "sugars": 9.92
+  }
+ },
+ {
+  "id": "pollock-cooked",
+  "fdcId": 173726,
+  "name": "Pollock, cooked",
+  "category": "Protein",
+  "usdaName": "Fish, pollock, Alaska, cooked",
+  "per100g": {
+   "protein": 19.42,
+   "fat": 0.9946,
+   "carbs": 0,
+   "kcal": 86.6164,
+   "fibre": null,
+   "sodium": 166,
+   "satFat": 0.2029,
+   "sugars": null
+  }
+ },
+ {
+  "id": "pomegranate-raw",
+  "fdcId": 169134,
+  "name": "Pomegranate, raw",
+  "category": "Produce",
+  "usdaName": "Pomegranates, raw",
+  "per100g": {
+   "protein": 1.67,
+   "fat": 1.17,
+   "carbs": 18.7,
+   "kcal": 83,
+   "fibre": 4,
+   "sodium": 3,
+   "satFat": 0.12,
+   "sugars": 13.67
+  }
+ },
+ {
+  "id": "popcorn-air-popped",
+  "fdcId": 167959,
+  "name": "Popcorn, air-popped",
+  "category": "Pantry",
+  "usdaName": "Snacks, popcorn, air-popped",
+  "per100g": {
+   "protein": 12.94,
+   "fat": 4.54,
+   "carbs": 77.78,
+   "kcal": 387,
+   "fibre": 14.5,
+   "sodium": 8,
+   "satFat": 0.637,
+   "sugars": 0.87
+  }
+ },
+ {
+  "id": "pork-loin-roasted",
+  "fdcId": 168233,
+  "name": "Pork loin, roasted",
+  "category": "Protein",
+  "usdaName": "Pork, fresh, loin, whole, separable lean only, cooked, roasted",
+  "per100g": {
+   "protein": 28.62,
+   "fat": 9.63,
+   "carbs": 0,
+   "kcal": 209,
+   "fibre": 0,
+   "sodium": 58,
+   "satFat": 3.51,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "pork-tenderloin-roasted",
+  "fdcId": 168250,
+  "name": "Pork tenderloin, roasted",
+  "category": "Protein",
+  "usdaName": "Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted",
+  "per100g": {
+   "protein": 26.17,
+   "fat": 3.51,
+   "carbs": 0,
+   "kcal": 143,
+   "fibre": 0,
+   "sodium": 57,
+   "satFat": 1.198,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "portobello-mushrooms-raw",
+  "fdcId": 169255,
+  "name": "Portobello mushrooms, raw",
+  "category": "Produce",
+  "usdaName": "Mushrooms, portabella, raw",
+  "per100g": {
+   "protein": 2.11,
+   "fat": 0.35,
+   "carbs": 3.87,
+   "kcal": 22,
+   "fibre": 1.3,
+   "sodium": 9,
+   "satFat": 0.01,
+   "sugars": 2.5
+  }
+ },
+ {
+  "id": "potato-chips",
+  "fdcId": 169677,
+  "name": "Potato chips",
+  "category": "Pantry",
+  "usdaName": "Snacks, potato chips, plain, salted",
+  "per100g": {
+   "protein": 6.39,
+   "fat": 33.98,
+   "carbs": 53.83,
+   "kcal": 532,
+   "fibre": 3.1,
+   "sodium": 527,
+   "satFat": 3.4,
+   "sugars": 0.33
+  }
+ },
+ {
+  "id": "potato-baked",
+  "fdcId": 170093,
+  "name": "Potato, baked",
+  "category": "Produce",
+  "usdaName": "Potatoes, baked, flesh and skin, without salt",
+  "per100g": {
+   "protein": 2.5,
+   "fat": 0.13,
+   "carbs": 21.15,
+   "kcal": 93,
+   "fibre": 2.2,
+   "sodium": 10,
+   "satFat": 0.034,
+   "sugars": 1.18
+  }
+ },
+ {
+  "id": "potato-boiled",
+  "fdcId": 170438,
+  "name": "Potato, boiled",
+  "category": "Produce",
+  "usdaName": "Potatoes, boiled, cooked in skin, flesh, without salt",
+  "per100g": {
+   "protein": 1.87,
+   "fat": 0.1,
+   "carbs": 20.13,
+   "kcal": 87,
+   "fibre": 1.8,
+   "sodium": 4,
+   "satFat": 0.026,
+   "sugars": 0.91
+  }
+ },
+ {
+  "id": "pretzels",
+  "fdcId": 167555,
+  "name": "Pretzels",
+  "category": "Pantry",
+  "usdaName": "Snacks, pretzels, hard, plain, salted",
+  "per100g": {
+   "protein": 10.04,
+   "fat": 2.93,
+   "carbs": 80.39,
+   "kcal": 384,
+   "fibre": 3.4,
+   "sodium": 1240,
+   "satFat": 0.391,
+   "sugars": 2.21
+  }
+ },
+ {
+  "id": "provolone-cheese",
+  "fdcId": 170850,
+  "name": "Provolone cheese",
+  "category": "Dairy",
+  "usdaName": "Cheese, provolone",
+  "per100g": {
+   "protein": 25.58,
+   "fat": 26.62,
+   "carbs": 2.14,
+   "kcal": 351,
+   "fibre": 0,
+   "sodium": 727,
+   "satFat": 17.078,
+   "sugars": 0.56
+  }
+ },
+ {
+  "id": "prunes-dried",
+  "fdcId": 168162,
+  "name": "Prunes, dried",
+  "category": "Pantry",
+  "usdaName": "Plums, dried (prunes), uncooked",
+  "per100g": {
+   "protein": 2.18,
+   "fat": 0.38,
+   "carbs": 63.88,
+   "kcal": 240,
+   "fibre": 7.1,
+   "sodium": 2,
+   "satFat": 0.088,
+   "sugars": 38.13
+  }
+ },
+ {
+  "id": "pumpkin-seeds",
+  "fdcId": 170556,
+  "name": "Pumpkin seeds",
+  "category": "Pantry",
+  "usdaName": "Seeds, pumpkin and squash seed kernels, dried",
+  "per100g": {
+   "protein": 30.23,
+   "fat": 49.05,
+   "carbs": 10.71,
+   "kcal": 559,
+   "fibre": 6,
+   "sodium": 7,
+   "satFat": 8.659,
+   "sugars": 1.4
+  }
+ },
+ {
+  "id": "pumpkin-cooked",
+  "fdcId": 168449,
+  "name": "Pumpkin, cooked",
+  "category": "Produce",
+  "usdaName": "Pumpkin, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 0.72,
+   "fat": 0.07,
+   "carbs": 4.9,
+   "kcal": 20,
+   "fibre": 1.1,
+   "sodium": 1,
+   "satFat": 0.037,
+   "sugars": 2.08
+  }
+ },
+ {
+  "id": "quinoa-cooked",
+  "fdcId": 168917,
+  "name": "Quinoa, cooked",
+  "category": "Pantry",
+  "usdaName": "Quinoa, cooked",
+  "per100g": {
+   "protein": 4.4,
+   "fat": 1.92,
+   "carbs": 21.3,
+   "kcal": 120,
+   "fibre": 2.8,
+   "sodium": 7,
+   "satFat": 0.231,
+   "sugars": 0.87
+  }
+ },
+ {
+  "id": "radicchio-raw",
+  "fdcId": 168564,
+  "name": "Radicchio, raw",
+  "category": "Produce",
+  "usdaName": "Radicchio, raw",
+  "per100g": {
+   "protein": 1.43,
+   "fat": 0.25,
+   "carbs": 4.48,
+   "kcal": 23,
+   "fibre": 0.9,
+   "sodium": 22,
+   "satFat": 0.06,
+   "sugars": 0.6
+  }
+ },
+ {
+  "id": "radish-raw",
+  "fdcId": 169276,
+  "name": "Radish, raw",
+  "category": "Produce",
+  "usdaName": "Radishes, raw",
+  "per100g": {
+   "protein": 0.68,
+   "fat": 0.1,
+   "carbs": 3.4,
+   "kcal": 16,
+   "fibre": 1.6,
+   "sodium": 39,
+   "satFat": 0.032,
+   "sugars": 1.86
+  }
+ },
+ {
+  "id": "raisins",
+  "fdcId": 168165,
+  "name": "Raisins",
+  "category": "Pantry",
+  "usdaName": "Raisins, dark, seedless (Includes foods for USDA's Food Distribution Program)",
+  "per100g": {
+   "protein": 3.3,
+   "fat": 0.25,
+   "carbs": 79.32,
+   "kcal": 299,
+   "fibre": 4.5,
+   "sodium": 26,
+   "satFat": 0.094,
+   "sugars": 65.18
+  }
+ },
+ {
+  "id": "raspberries-raw",
+  "fdcId": 167755,
+  "name": "Raspberries, raw",
+  "category": "Produce",
+  "usdaName": "Raspberries, raw",
+  "per100g": {
+   "protein": 1.2,
+   "fat": 0.65,
+   "carbs": 11.94,
+   "kcal": 52,
+   "fibre": 6.5,
+   "sodium": 1,
+   "satFat": 0.019,
+   "sugars": 4.42
+  }
+ },
+ {
+  "id": "red-bell-pepper-raw",
+  "fdcId": 170108,
+  "name": "Red bell pepper, raw",
+  "category": "Produce",
+  "usdaName": "Peppers, sweet, red, raw",
+  "per100g": {
+   "protein": 0.99,
+   "fat": 0.3,
+   "carbs": 6.03,
+   "kcal": 26,
+   "fibre": 2.1,
+   "sodium": 4,
+   "satFat": 0.059,
+   "sugars": 4.2
+  }
+ },
+ {
+  "id": "red-lentils-raw",
+  "fdcId": 174284,
+  "name": "Red lentils, raw",
+  "category": "Protein",
+  "usdaName": "Lentils, pink or red, raw",
+  "per100g": {
+   "protein": 23.91,
+   "fat": 2.17,
+   "carbs": 63.1,
+   "kcal": 358,
+   "fibre": 10.8,
+   "sodium": 7,
+   "satFat": 0.379,
+   "sugars": null
+  }
+ },
+ {
+  "id": "rice-cakes",
+  "fdcId": 170250,
+  "name": "Rice cakes",
+  "category": "Pantry",
+  "usdaName": "Snacks, rice cakes, brown rice, plain, unsalted",
+  "per100g": {
+   "protein": 8.2,
+   "fat": 2.8,
+   "carbs": 81.5,
+   "kcal": 387,
+   "fibre": 4.2,
+   "sodium": 26,
+   "satFat": 0.57,
+   "sugars": 0.88
+  }
+ },
+ {
+  "id": "ricotta-part-skim",
+  "fdcId": 171248,
+  "name": "Ricotta, part-skim",
+  "category": "Dairy",
+  "usdaName": "Cheese, ricotta, part skim milk",
+  "per100g": {
+   "protein": 11.39,
+   "fat": 7.91,
+   "carbs": 5.14,
+   "kcal": 138,
+   "fibre": 0,
+   "sodium": 99,
+   "satFat": 4.927,
+   "sugars": 0.31
+  }
+ },
+ {
+  "id": "rolled-oats-dry",
+  "fdcId": 173904,
+  "name": "Rolled oats, dry",
+  "category": "Pantry",
+  "usdaName": "Cereals, oats, regular and quick, not fortified, dry",
+  "per100g": {
+   "protein": 13.15,
+   "fat": 6.52,
+   "carbs": 67.7,
+   "kcal": 379,
+   "fibre": 10.1,
+   "sodium": 6,
+   "satFat": 1.11,
+   "sugars": 0.99
+  }
+ },
+ {
+  "id": "romaine-lettuce-raw",
+  "fdcId": 169247,
+  "name": "Romaine lettuce, raw",
+  "category": "Produce",
+  "usdaName": "Lettuce, cos or romaine, raw",
+  "per100g": {
+   "protein": 1.23,
+   "fat": 0.3,
+   "carbs": 3.29,
+   "kcal": 17,
+   "fibre": 2.1,
+   "sodium": 8,
+   "satFat": 0.039,
+   "sugars": 1.19
+  }
+ },
+ {
+  "id": "salmon-cooked",
+  "fdcId": 175168,
+  "name": "Salmon, cooked",
+  "category": "Protein",
+  "usdaName": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
+  "per100g": {
+   "protein": 22.1,
+   "fat": 12.35,
+   "carbs": 0,
+   "kcal": 206,
+   "fibre": 0,
+   "sodium": 61,
+   "satFat": 2.397,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "salmon-raw",
+  "fdcId": 175167,
+  "name": "Salmon, raw",
+  "category": "Protein",
+  "usdaName": "Fish, salmon, Atlantic, farmed, raw",
+  "per100g": {
+   "protein": 20.42,
+   "fat": 13.42,
+   "carbs": 0,
+   "kcal": 208,
+   "fibre": 0,
+   "sodium": 59,
+   "satFat": 3.05,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "sardines-canned",
+  "fdcId": 175139,
+  "name": "Sardines, canned",
+  "category": "Protein",
+  "usdaName": "Fish, sardine, Atlantic, canned in oil, drained solids with bone",
+  "per100g": {
+   "protein": 24.62,
+   "fat": 11.45,
+   "carbs": 0,
+   "kcal": 208,
+   "fibre": 0,
+   "sodium": 307,
+   "satFat": 1.528,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "sauerkraut-canned",
+  "fdcId": 169279,
+  "name": "Sauerkraut, canned",
+  "category": "Produce",
+  "usdaName": "Sauerkraut, canned, solids and liquids",
+  "per100g": {
+   "protein": 0.91,
+   "fat": 0.14,
+   "carbs": 4.28,
+   "kcal": 19,
+   "fibre": 2.9,
+   "sodium": 661,
+   "satFat": 0.034,
+   "sugars": 1.78
+  }
+ },
+ {
+  "id": "shrimp-cooked",
+  "fdcId": 171971,
+  "name": "Shrimp, cooked",
+  "category": "Protein",
+  "usdaName": "Crustaceans, shrimp, mixed species, cooked, moist heat (may contain additives to retain moisture)",
+  "per100g": {
+   "protein": 22.78,
+   "fat": 1.7,
+   "carbs": 1.52,
+   "kcal": 119,
+   "fibre": 0,
+   "sodium": 947,
+   "satFat": 0.521,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "sour-cream",
+  "fdcId": 171257,
+  "name": "Sour cream",
+  "category": "Dairy",
+  "usdaName": "Cream, sour, cultured",
+  "per100g": {
+   "protein": 2.44,
+   "fat": 19.35,
+   "carbs": 4.63,
+   "kcal": 198,
+   "fibre": 0,
+   "sodium": 31,
+   "satFat": 10.14,
+   "sugars": 3.41
+  }
+ },
+ {
+  "id": "soy-milk",
+  "fdcId": 172446,
+  "name": "Soy milk",
+  "category": "Pantry",
+  "usdaName": "Soymilk, original and vanilla, unfortified",
+  "per100g": {
+   "protein": 3.27,
+   "fat": 1.75,
+   "carbs": 6.28,
+   "kcal": 54,
+   "fibre": 0.6,
+   "sodium": 51,
+   "satFat": 0.205,
+   "sugars": 3.99
+  }
+ },
+ {
+  "id": "soy-sauce",
+  "fdcId": 174277,
+  "name": "Soy sauce",
+  "category": "Pantry",
+  "usdaName": "Soy sauce made from soy and wheat (shoyu)",
+  "per100g": {
+   "protein": 8.14,
+   "fat": 0.57,
+   "carbs": 4.93,
+   "kcal": 53,
+   "fibre": 0.8,
+   "sodium": 5493,
+   "satFat": 0.073,
+   "sugars": 0.4
+  }
+ },
+ {
+  "id": "spinach-cooked",
+  "fdcId": 168463,
+  "name": "Spinach, cooked",
+  "category": "Produce",
+  "usdaName": "Spinach, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 2.97,
+   "fat": 0.26,
+   "carbs": 3.75,
+   "kcal": 23,
+   "fibre": 2.4,
+   "sodium": 70,
+   "satFat": 0.043,
+   "sugars": 0.43
+  }
+ },
+ {
+  "id": "spinach-frozen-cooked",
+  "fdcId": 169288,
+  "name": "Spinach, frozen, cooked",
+  "category": "Frozen",
+  "usdaName": "Spinach, frozen, chopped or leaf, cooked, boiled, drained, without salt",
+  "per100g": {
+   "protein": 4.01,
+   "fat": 0.87,
+   "carbs": 4.8,
+   "kcal": 34,
+   "fibre": 3.7,
+   "sodium": 97,
+   "satFat": 0.157,
+   "sugars": 0.51
+  }
+ },
+ {
+  "id": "spinach-raw",
+  "fdcId": 168462,
+  "name": "﻿Spinach, raw",
+  "category": "Produce",
+  "usdaName": "Spinach, raw",
+  "per100g": {
+   "protein": 2.86,
+   "fat": 0.39,
+   "carbs": 3.63,
+   "kcal": 23,
+   "fibre": 2.2,
+   "sodium": 79,
+   "satFat": 0.063,
+   "sugars": 0.42
+  }
+ },
+ {
+  "id": "split-peas-cooked",
+  "fdcId": 172429,
+  "name": "Split peas, cooked",
+  "category": "Protein",
+  "usdaName": "Peas, split, mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 8.34,
+   "fat": 0.39,
+   "carbs": 21.1,
+   "kcal": 118,
+   "fibre": 8.3,
+   "sodium": 2,
+   "satFat": 0.054,
+   "sugars": 2.9
+  }
+ },
+ {
+  "id": "strawberries-frozen",
+  "fdcId": 168173,
+  "name": "Strawberries, frozen",
+  "category": "Frozen",
+  "usdaName": "Strawberries, frozen, unsweetened (Includes foods for USDA's Food Distribution Program)",
+  "per100g": {
+   "protein": 0.43,
+   "fat": 0.11,
+   "carbs": 9.13,
+   "kcal": 35,
+   "fibre": 2.1,
+   "sodium": 2,
+   "satFat": 0.006,
+   "sugars": 4.56
+  }
+ },
+ {
+  "id": "strawberries-raw",
+  "fdcId": 167762,
+  "name": "Strawberries, raw",
+  "category": "Produce",
+  "usdaName": "Strawberries, raw",
+  "per100g": {
+   "protein": 0.67,
+   "fat": 0.3,
+   "carbs": 7.68,
+   "kcal": 32,
+   "fibre": 2,
+   "sodium": 1,
+   "satFat": 0.015,
+   "sugars": 4.89
+  }
+ },
+ {
+  "id": "sugar",
+  "fdcId": 169655,
+  "name": "Sugar",
+  "category": "Pantry",
+  "usdaName": "Sugars, granulated",
+  "per100g": {
+   "protein": 0,
+   "fat": 0,
+   "carbs": 99.98,
+   "kcal": 387,
+   "fibre": 0,
+   "sodium": 1,
+   "satFat": 0,
+   "sugars": 99.8
+  }
+ },
+ {
+  "id": "sunflower-seeds",
+  "fdcId": 170562,
+  "name": "Sunflower seeds",
+  "category": "Pantry",
+  "usdaName": "Seeds, sunflower seed kernels, dried",
+  "per100g": {
+   "protein": 20.78,
+   "fat": 51.46,
+   "carbs": 20,
+   "kcal": 584,
+   "fibre": 8.6,
+   "sodium": 9,
+   "satFat": 4.455,
+   "sugars": 2.62
+  }
+ },
+ {
+  "id": "sweet-potato-baked",
+  "fdcId": 168483,
+  "name": "Sweet potato, baked",
+  "category": "Produce",
+  "usdaName": "Sweet potato, cooked, baked in skin, flesh, without salt",
+  "per100g": {
+   "protein": 2.01,
+   "fat": 0.15,
+   "carbs": 20.71,
+   "kcal": 90,
+   "fibre": 3.3,
+   "sodium": 36,
+   "satFat": 0.052,
+   "sugars": 6.48
+  }
+ },
+ {
+  "id": "swiss-chard-raw",
+  "fdcId": 169991,
+  "name": "Swiss chard, raw",
+  "category": "Produce",
+  "usdaName": "Chard, swiss, raw",
+  "per100g": {
+   "protein": 1.8,
+   "fat": 0.2,
+   "carbs": 3.74,
+   "kcal": 19,
+   "fibre": 1.6,
+   "sodium": 213,
+   "satFat": 0.03,
+   "sugars": 1.1
+  }
+ },
+ {
+  "id": "swiss-cheese",
+  "fdcId": 171251,
+  "name": "Swiss cheese",
+  "category": "Dairy",
+  "usdaName": "Cheese, swiss",
+  "per100g": {
+   "protein": 26.96,
+   "fat": 30.99,
+   "carbs": 1.44,
+   "kcal": 393,
+   "fibre": 0,
+   "sodium": 187,
+   "satFat": 18.227,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "tahini",
+  "fdcId": 168604,
+  "name": "Tahini",
+  "category": "Pantry",
+  "usdaName": "Seeds, sesame butter, tahini, type of kernels unspecified",
+  "per100g": {
+   "protein": 17.4,
+   "fat": 53.01,
+   "carbs": 21.5,
+   "kcal": 592,
+   "fibre": 4.7,
+   "sodium": 35,
+   "satFat": 7.423,
+   "sugars": null
+  }
+ },
+ {
+  "id": "tea-brewed",
+  "fdcId": 173227,
+  "name": "Tea, brewed",
+  "category": "Pantry",
+  "usdaName": "Beverages, tea, black, brewed, prepared with tap water",
+  "per100g": {
+   "protein": 0,
+   "fat": 0,
+   "carbs": 0.3,
+   "kcal": 1,
+   "fibre": 0,
+   "sodium": 3,
+   "satFat": 0.002,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "tempeh",
+  "fdcId": 174272,
+  "name": "Tempeh",
+  "category": "Protein",
+  "usdaName": "Tempeh",
+  "per100g": {
+   "protein": 20.29,
+   "fat": 10.8,
+   "carbs": 7.64,
+   "kcal": 192,
+   "fibre": null,
+   "sodium": 9,
+   "satFat": 2.539,
+   "sugars": null
+  }
+ },
+ {
+  "id": "tilapia-cooked",
+  "fdcId": 175177,
+  "name": "Tilapia, cooked",
+  "category": "Protein",
+  "usdaName": "Fish, tilapia, cooked, dry heat",
+  "per100g": {
+   "protein": 26.15,
+   "fat": 2.65,
+   "carbs": 0,
+   "kcal": 128,
+   "fibre": 0,
+   "sodium": 56,
+   "satFat": 0.94,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "tofu-firm",
+  "fdcId": 172475,
+  "name": "Tofu, firm",
+  "category": "Protein",
+  "usdaName": "Tofu, raw, firm, prepared with calcium sulfate",
+  "per100g": {
+   "protein": 17.27,
+   "fat": 8.72,
+   "carbs": 2.78,
+   "kcal": 144,
+   "fibre": 2.3,
+   "sodium": 14,
+   "satFat": 1.261,
+   "sugars": null
+  }
+ },
+ {
+  "id": "tomato-paste",
+  "fdcId": 170459,
+  "name": "Tomato paste",
+  "category": "Pantry",
+  "usdaName": "Tomato products, canned, paste, without salt added (Includes foods for USDA's Food Distribution Program)",
+  "per100g": {
+   "protein": 4.32,
+   "fat": 0.47,
+   "carbs": 18.91,
+   "kcal": 82,
+   "fibre": 4.1,
+   "sodium": 59,
+   "satFat": 0.1,
+   "sugars": 12.18
+  }
+ },
+ {
+  "id": "tomato-sauce-canned",
+  "fdcId": 170054,
+  "name": "Tomato sauce, canned",
+  "category": "Pantry",
+  "usdaName": "Tomato products, canned, sauce",
+  "per100g": {
+   "protein": 1.2,
+   "fat": 0.3,
+   "carbs": 5.31,
+   "kcal": 24,
+   "fibre": 1.5,
+   "sodium": 474,
+   "satFat": 0.041,
+   "sugars": 3.56
+  }
+ },
+ {
+  "id": "tomatoes-canned",
+  "fdcId": 170051,
+  "name": "Tomatoes, canned",
+  "category": "Pantry",
+  "usdaName": "Tomatoes, red, ripe, canned, packed in tomato juice",
+  "per100g": {
+   "protein": 0.79,
+   "fat": 0.25,
+   "carbs": 3.47,
+   "kcal": 16,
+   "fibre": 1.9,
+   "sodium": 115,
+   "satFat": 0.034,
+   "sugars": 2.55
+  }
+ },
+ {
+  "id": "tomatoes-ripe-raw",
+  "fdcId": 170457,
+  "name": "Tomatoes, ripe, raw",
+  "category": "Produce",
+  "usdaName": "Tomatoes, red, ripe, raw, year round average",
+  "per100g": {
+   "protein": 0.88,
+   "fat": 0.2,
+   "carbs": 3.89,
+   "kcal": 18,
+   "fibre": 1.2,
+   "sodium": 5,
+   "satFat": 0.028,
+   "sugars": 2.63
+  }
+ },
+ {
+  "id": "trout-cooked",
+  "fdcId": 173718,
+  "name": "Trout, cooked",
+  "category": "Protein",
+  "usdaName": "Fish, trout, rainbow, farmed, cooked, dry heat",
+  "per100g": {
+   "protein": 23.8,
+   "fat": 7.38,
+   "carbs": 0,
+   "kcal": 168,
+   "fibre": 0,
+   "sodium": 61,
+   "satFat": 1.651,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "tuna-canned-in-water",
+  "fdcId": 171986,
+  "name": "Tuna, canned in water",
+  "category": "Protein",
+  "usdaName": "Fish, tuna, light, canned in water, without salt, drained solids",
+  "per100g": {
+   "protein": 25.51,
+   "fat": 0.82,
+   "carbs": 0,
+   "kcal": 116,
+   "fibre": 0,
+   "sodium": 50,
+   "satFat": 0.234,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "turkey-breast-roasted",
+  "fdcId": 171496,
+  "name": "Turkey breast, roasted",
+  "category": "Protein",
+  "usdaName": "Turkey, whole, breast, meat only, cooked, roasted",
+  "per100g": {
+   "protein": 30.13,
+   "fat": 2.08,
+   "carbs": 0,
+   "kcal": 147,
+   "fibre": 0,
+   "sodium": 99,
+   "satFat": 0.593,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "turnip-raw",
+  "fdcId": 170465,
+  "name": "Turnip, raw",
+  "category": "Produce",
+  "usdaName": "Turnips, raw",
+  "per100g": {
+   "protein": 0.9,
+   "fat": 0.1,
+   "carbs": 6.43,
+   "kcal": 28,
+   "fibre": 1.8,
+   "sodium": 67,
+   "satFat": 0.011,
+   "sugars": 3.8
+  }
+ },
+ {
+  "id": "vegetable-broth",
+  "fdcId": 171583,
+  "name": "Vegetable broth",
+  "category": "Pantry",
+  "usdaName": "Soup, vegetable broth, ready to serve",
+  "per100g": {
+   "protein": 0.24,
+   "fat": 0.07,
+   "carbs": 0.93,
+   "kcal": 5,
+   "fibre": 0,
+   "sodium": 296,
+   "satFat": 0.028,
+   "sugars": 0.55
+  }
+ },
+ {
+  "id": "walnuts",
+  "fdcId": 170187,
+  "name": "Walnuts",
+  "category": "Pantry",
+  "usdaName": "Nuts, walnuts, english",
+  "per100g": {
+   "protein": 15.23,
+   "fat": 65.21,
+   "carbs": 13.71,
+   "kcal": 654,
+   "fibre": 6.7,
+   "sodium": 2,
+   "satFat": 6.126,
+   "sugars": 2.61
+  }
+ },
+ {
+  "id": "water",
+  "fdcId": 173647,
+  "name": "Water",
+  "category": "Pantry",
+  "usdaName": "Beverages, water, tap, drinking",
+  "per100g": {
+   "protein": 0,
+   "fat": 0,
+   "carbs": 0,
+   "kcal": 0,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "watercress-raw",
+  "fdcId": 170068,
+  "name": "Watercress, raw",
+  "category": "Produce",
+  "usdaName": "Watercress, raw",
+  "per100g": {
+   "protein": 2.3,
+   "fat": 0.1,
+   "carbs": 1.29,
+   "kcal": 11,
+   "fibre": 0.5,
+   "sodium": 41,
+   "satFat": 0.027,
+   "sugars": 0.2
+  }
+ },
+ {
+  "id": "watermelon-raw",
+  "fdcId": 167765,
+  "name": "Watermelon, raw",
+  "category": "Produce",
+  "usdaName": "Watermelon, raw",
+  "per100g": {
+   "protein": 0.61,
+   "fat": 0.15,
+   "carbs": 7.55,
+   "kcal": 30,
+   "fibre": 0.4,
+   "sodium": 1,
+   "satFat": 0.016,
+   "sugars": 6.2
+  }
+ },
+ {
+  "id": "wheat-bran",
+  "fdcId": 169722,
+  "name": "Wheat bran",
+  "category": "Pantry",
+  "usdaName": "Wheat bran, crude",
+  "per100g": {
+   "protein": 15.55,
+   "fat": 4.25,
+   "carbs": 64.51,
+   "kcal": 216,
+   "fibre": 42.8,
+   "sodium": 2,
+   "satFat": 0.63,
+   "sugars": 0.41
+  }
+ },
+ {
+  "id": "white-beans-cooked",
+  "fdcId": 175203,
+  "name": "White beans, cooked",
+  "category": "Protein",
+  "usdaName": "Beans, white, mature seeds, cooked, boiled, without salt",
+  "per100g": {
+   "protein": 9.73,
+   "fat": 0.35,
+   "carbs": 25.09,
+   "kcal": 139,
+   "fibre": 6.3,
+   "sodium": 6,
+   "satFat": 0.091,
+   "sugars": 0.34
+  }
+ },
+ {
+  "id": "white-flour",
+  "fdcId": 168894,
+  "name": "White flour",
+  "category": "Pantry",
+  "usdaName": "Wheat flour, white, all-purpose, enriched, bleached",
+  "per100g": {
+   "protein": 10.33,
+   "fat": 0.98,
+   "carbs": 76.31,
+   "kcal": 364,
+   "fibre": 2.7,
+   "sodium": 2,
+   "satFat": 0.155,
+   "sugars": 0.27
+  }
+ },
+ {
+  "id": "white-mushrooms-raw",
+  "fdcId": 169251,
+  "name": "White mushrooms, raw",
+  "category": "Produce",
+  "usdaName": "Mushrooms, white, raw",
+  "per100g": {
+   "protein": 3.09,
+   "fat": 0.34,
+   "carbs": 3.26,
+   "kcal": 22,
+   "fibre": 1,
+   "sodium": 5,
+   "satFat": 0.05,
+   "sugars": 1.98
+  }
+ },
+ {
+  "id": "white-rice-cooked",
+  "fdcId": 168878,
+  "name": "White rice, cooked",
+  "category": "Pantry",
+  "usdaName": "Rice, white, long-grain, regular, enriched, cooked",
+  "per100g": {
+   "protein": 2.69,
+   "fat": 0.28,
+   "carbs": 28.17,
+   "kcal": 130,
+   "fibre": 0.4,
+   "sodium": 1,
+   "satFat": 0.077,
+   "sugars": 0.05
+  }
+ },
+ {
+  "id": "whole-wheat-bread",
+  "fdcId": 172688,
+  "name": "Whole-wheat bread",
+  "category": "Pantry",
+  "usdaName": "Bread, whole-wheat, commercially prepared",
+  "per100g": {
+   "protein": 12.45,
+   "fat": 3.5,
+   "carbs": 42.71,
+   "kcal": 252,
+   "fibre": 6,
+   "sodium": 455,
+   "satFat": 0.722,
+   "sugars": 4.34
+  }
+ },
+ {
+  "id": "whole-wheat-flour",
+  "fdcId": 168944,
+  "name": "Whole-wheat flour",
+  "category": "Pantry",
+  "usdaName": "Wheat flour, whole-grain, soft wheat",
+  "per100g": {
+   "protein": 9.61,
+   "fat": 1.95,
+   "carbs": 74.48,
+   "kcal": 332,
+   "fibre": 13.1,
+   "sodium": 3,
+   "satFat": 0.43,
+   "sugars": 1.02
+  }
+ },
+ {
+  "id": "whole-wheat-pasta-cooked",
+  "fdcId": 168910,
+  "name": "Whole-wheat pasta, cooked",
+  "category": "Pantry",
+  "usdaName": "Pasta, whole-wheat, cooked (Includes foods for USDA's Food Distribution Program)",
+  "per100g": {
+   "protein": 5.99,
+   "fat": 1.71,
+   "carbs": 30.07,
+   "kcal": 149,
+   "fibre": 3.9,
+   "sodium": 4,
+   "satFat": 0.243,
+   "sugars": 0.75
+  }
+ },
+ {
+  "id": "wild-rice-cooked",
+  "fdcId": 168897,
+  "name": "Wild rice, cooked",
+  "category": "Pantry",
+  "usdaName": "Wild rice, cooked",
+  "per100g": {
+   "protein": 3.99,
+   "fat": 0.34,
+   "carbs": 21.34,
+   "kcal": 101,
+   "fibre": 1.8,
+   "sodium": 3,
+   "satFat": 0.049,
+   "sugars": 0.73
+  }
+ },
+ {
+  "id": "yogurt-plain-low-fat",
+  "fdcId": 170886,
+  "name": "Yogurt, plain low-fat",
+  "category": "Dairy",
+  "usdaName": "Yogurt, plain, low fat",
+  "per100g": {
+   "protein": 5.25,
+   "fat": 1.55,
+   "carbs": 7.04,
+   "kcal": 63,
+   "fibre": 0,
+   "sodium": 70,
+   "satFat": 1,
+   "sugars": 7.04
+  }
+ },
+ {
+  "id": "yogurt-plain-whole-milk",
+  "fdcId": 171284,
+  "name": "Yogurt, plain whole milk",
+  "category": "Dairy",
+  "usdaName": "Yogurt, plain, whole milk",
+  "per100g": {
+   "protein": 3.47,
+   "fat": 3.25,
+   "carbs": 4.66,
+   "kcal": 61,
+   "fibre": 0,
+   "sodium": 46,
+   "satFat": 2.096,
+   "sugars": 4.66
+  }
+ },
+ {
+  "id": "zucchini-raw",
+  "fdcId": 169291,
+  "name": "Zucchini, raw",
+  "category": "Produce",
+  "usdaName": "Squash, summer, zucchini, includes skin, raw",
+  "per100g": {
+   "protein": 1.21,
+   "fat": 0.32,
+   "carbs": 3.11,
+   "kcal": 17,
+   "fibre": 1,
+   "sodium": 8,
+   "satFat": 0.084,
+   "sugars": 2.5
+  }
+ }
+]

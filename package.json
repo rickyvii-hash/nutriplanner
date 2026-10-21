@@ -1,0 +1,11 @@
+{
+  "name": "nutriplanner",
+  "version": "0.1.0",
+  "description": "NutriPlanner: an adaptive monthly meal planner that rebuilds your plan around what you actually ate.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node --test \"tests/*.test.js\""
+  }
+}

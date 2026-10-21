@@ -1,0 +1,1298 @@
+[
+  {
+    "name": "﻿Spinach, raw",
+    "category": "Produce",
+    "fdcId": 168462,
+    "usda": "Spinach, raw"
+  },
+  {
+    "name": "Tomatoes, ripe, raw",
+    "category": "Produce",
+    "fdcId": 170457,
+    "usda": "Tomatoes, red, ripe, raw, year round average"
+  },
+  {
+    "name": "Broccoli, raw",
+    "category": "Produce",
+    "fdcId": 170379,
+    "usda": "Broccoli, raw"
+  },
+  {
+    "name": "Carrots, raw",
+    "category": "Produce",
+    "fdcId": 170393,
+    "usda": "Carrots, raw"
+  },
+  {
+    "name": "Cucumber, raw",
+    "category": "Produce",
+    "fdcId": 169225,
+    "usda": "Cucumber, peeled, raw"
+  },
+  {
+    "name": "Romaine lettuce, raw",
+    "category": "Produce",
+    "fdcId": 169247,
+    "usda": "Lettuce, cos or romaine, raw"
+  },
+  {
+    "name": "Kale, raw",
+    "category": "Produce",
+    "fdcId": 168421,
+    "usda": "Kale, raw"
+  },
+  {
+    "name": "Zucchini, raw",
+    "category": "Produce",
+    "fdcId": 169291,
+    "usda": "Squash, summer, zucchini, includes skin, raw"
+  },
+  {
+    "name": "Red bell pepper, raw",
+    "category": "Produce",
+    "fdcId": 170108,
+    "usda": "Peppers, sweet, red, raw"
+  },
+  {
+    "name": "Onion, raw",
+    "category": "Produce",
+    "fdcId": 170000,
+    "usda": "Onions, raw"
+  },
+  {
+    "name": "Garlic, raw",
+    "category": "Produce",
+    "fdcId": 169230,
+    "usda": "Garlic, raw"
+  },
+  {
+    "name": "White mushrooms, raw",
+    "category": "Produce",
+    "fdcId": 169251,
+    "usda": "Mushrooms, white, raw"
+  },
+  {
+    "name": "Cauliflower, raw",
+    "category": "Produce",
+    "fdcId": 169986,
+    "usda": "Cauliflower, raw"
+  },
+  {
+    "name": "Eggplant, raw",
+    "category": "Produce",
+    "fdcId": 169228,
+    "usda": "Eggplant, raw"
+  },
+  {
+    "name": "Sweet potato, baked",
+    "category": "Produce",
+    "fdcId": 168483,
+    "usda": "Sweet potato, cooked, baked in skin, flesh, without salt"
+  },
+  {
+    "name": "Potato, boiled",
+    "category": "Produce",
+    "fdcId": 170438,
+    "usda": "Potatoes, boiled, cooked in skin, flesh, without salt"
+  },
+  {
+    "name": "Potato, baked",
+    "category": "Produce",
+    "fdcId": 170093,
+    "usda": "Potatoes, baked, flesh and skin, without salt"
+  },
+  {
+    "name": "Avocado, raw",
+    "category": "Produce",
+    "fdcId": 171705,
+    "usda": "Avocados, raw, all commercial varieties"
+  },
+  {
+    "name": "Apple, raw",
+    "category": "Produce",
+    "fdcId": 168202,
+    "usda": "Apples, raw, golden delicious, with skin"
+  },
+  {
+    "name": "Banana, raw",
+    "category": "Produce",
+    "fdcId": 173944,
+    "usda": "Bananas, raw"
+  },
+  {
+    "name": "Orange, raw",
+    "category": "Produce",
+    "fdcId": 169097,
+    "usda": "Oranges, raw, all commercial varieties"
+  },
+  {
+    "name": "Blueberries, raw",
+    "category": "Produce",
+    "fdcId": 171711,
+    "usda": "Blueberries, raw"
+  },
+  {
+    "name": "Strawberries, raw",
+    "category": "Produce",
+    "fdcId": 167762,
+    "usda": "Strawberries, raw"
+  },
+  {
+    "name": "Pear, raw",
+    "category": "Produce",
+    "fdcId": 169118,
+    "usda": "Pears, raw"
+  },
+  {
+    "name": "Grapes, raw",
+    "category": "Produce",
+    "fdcId": 174683,
+    "usda": "Grapes, red or green (European type, such as Thompson seedless), raw"
+  },
+  {
+    "name": "Lemon juice",
+    "category": "Produce",
+    "fdcId": 167747,
+    "usda": "Lemon juice, raw"
+  },
+  {
+    "name": "Green beans, raw",
+    "category": "Produce",
+    "fdcId": 169961,
+    "usda": "Beans, snap, green, raw"
+  },
+  {
+    "name": "Green peas, raw",
+    "category": "Produce",
+    "fdcId": 170419,
+    "usda": "Peas, green, raw"
+  },
+  {
+    "name": "Celery, raw",
+    "category": "Produce",
+    "fdcId": 169988,
+    "usda": "Celery, raw"
+  },
+  {
+    "name": "Cabbage, raw",
+    "category": "Produce",
+    "fdcId": 169975,
+    "usda": "Cabbage, raw"
+  },
+  {
+    "name": "Beetroot, raw",
+    "category": "Produce",
+    "fdcId": 169145,
+    "usda": "Beets, raw"
+  },
+  {
+    "name": "Pumpkin, cooked",
+    "category": "Produce",
+    "fdcId": 168449,
+    "usda": "Pumpkin, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Leek, raw",
+    "category": "Produce",
+    "fdcId": 169246,
+    "usda": "Leeks, (bulb and lower leaf-portion), raw"
+  },
+  {
+    "name": "Fennel, raw",
+    "category": "Produce",
+    "fdcId": 169385,
+    "usda": "Fennel, bulb, raw"
+  },
+  {
+    "name": "Asparagus, raw",
+    "category": "Produce",
+    "fdcId": 168389,
+    "usda": "Asparagus, raw"
+  },
+  {
+    "name": "Arugula, raw",
+    "category": "Produce",
+    "fdcId": 169387,
+    "usda": "Arugula, raw"
+  },
+  {
+    "name": "Parsley, fresh",
+    "category": "Produce",
+    "fdcId": 170416,
+    "usda": "Parsley, fresh"
+  },
+  {
+    "name": "Basil, fresh",
+    "category": "Produce",
+    "fdcId": 172232,
+    "usda": "Basil, fresh"
+  },
+  {
+    "name": "Kiwi, raw",
+    "category": "Produce",
+    "fdcId": 168153,
+    "usda": "Kiwifruit, green, raw"
+  },
+  {
+    "name": "Peach, raw",
+    "category": "Produce",
+    "fdcId": 169928,
+    "usda": "Peaches, yellow, raw"
+  },
+  {
+    "name": "Melon, raw",
+    "category": "Produce",
+    "fdcId": 169092,
+    "usda": "Melons, cantaloupe, raw"
+  },
+  {
+    "name": "Pineapple, raw",
+    "category": "Produce",
+    "fdcId": 169124,
+    "usda": "Pineapple, raw, all varieties"
+  },
+  {
+    "name": "Mango, raw",
+    "category": "Produce",
+    "fdcId": 169910,
+    "usda": "Mangos, raw"
+  },
+  {
+    "name": "Raspberries, raw",
+    "category": "Produce",
+    "fdcId": 167755,
+    "usda": "Raspberries, raw"
+  },
+  {
+    "name": "Radish, raw",
+    "category": "Produce",
+    "fdcId": 169276,
+    "usda": "Radishes, raw"
+  },
+  {
+    "name": "Corn, sweet, cooked",
+    "category": "Produce",
+    "fdcId": 169999,
+    "usda": "Corn, sweet, yellow, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Milk, whole",
+    "category": "Dairy",
+    "fdcId": 171265,
+    "usda": "Milk, whole, 3.25% milkfat, with added vitamin D"
+  },
+  {
+    "name": "Milk, 2% fat",
+    "category": "Dairy",
+    "fdcId": 171267,
+    "usda": "Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D"
+  },
+  {
+    "name": "Milk, skim",
+    "category": "Dairy",
+    "fdcId": 171269,
+    "usda": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)"
+  },
+  {
+    "name": "Greek yogurt, plain nonfat",
+    "category": "Dairy",
+    "fdcId": 171312,
+    "usda": "Yogurt, Greek, nonfat, plain, CHOBANI"
+  },
+  {
+    "name": "Yogurt, plain low-fat",
+    "category": "Dairy",
+    "fdcId": 170886,
+    "usda": "Yogurt, plain, low fat"
+  },
+  {
+    "name": "Feta cheese",
+    "category": "Dairy",
+    "fdcId": 173420,
+    "usda": "Cheese, feta"
+  },
+  {
+    "name": "Mozzarella, part-skim",
+    "category": "Dairy",
+    "fdcId": 170847,
+    "usda": "Cheese, mozzarella, part skim milk"
+  },
+  {
+    "name": "Cheddar cheese",
+    "category": "Dairy",
+    "fdcId": 170899,
+    "usda": "Cheese, cheddar, sharp, sliced"
+  },
+  {
+    "name": "Parmesan, grated",
+    "category": "Dairy",
+    "fdcId": 171247,
+    "usda": "Cheese, parmesan, grated"
+  },
+  {
+    "name": "Cottage cheese, low-fat",
+    "category": "Dairy",
+    "fdcId": 172182,
+    "usda": "Cheese, cottage, lowfat, 2% milkfat"
+  },
+  {
+    "name": "Ricotta, part-skim",
+    "category": "Dairy",
+    "fdcId": 171248,
+    "usda": "Cheese, ricotta, part skim milk"
+  },
+  {
+    "name": "Butter, unsalted",
+    "category": "Dairy",
+    "fdcId": 173430,
+    "usda": "Butter, without salt"
+  },
+  {
+    "name": "Egg, hard-boiled",
+    "category": "Dairy",
+    "fdcId": 173424,
+    "usda": "Egg, whole, cooked, hard-boiled"
+  },
+  {
+    "name": "Egg, raw",
+    "category": "Dairy",
+    "fdcId": 171287,
+    "usda": "Egg, whole, raw, fresh"
+  },
+  {
+    "name": "Ice cream, vanilla",
+    "category": "Dairy",
+    "fdcId": 167575,
+    "usda": "Ice creams, vanilla"
+  },
+  {
+    "name": "Cream, light",
+    "category": "Dairy",
+    "fdcId": 170857,
+    "usda": "Cream, fluid, light (coffee cream or table cream)"
+  },
+  {
+    "name": "Chicken breast, roasted",
+    "category": "Protein",
+    "fdcId": 171477,
+    "usda": "Chicken, broilers or fryers, breast, meat only, cooked, roasted"
+  },
+  {
+    "name": "Chicken thigh, roasted",
+    "category": "Protein",
+    "fdcId": 172388,
+    "usda": "Chicken, broilers or fryers, thigh, meat only, cooked, roasted"
+  },
+  {
+    "name": "Turkey breast, roasted",
+    "category": "Protein",
+    "fdcId": 171496,
+    "usda": "Turkey, whole, breast, meat only, cooked, roasted"
+  },
+  {
+    "name": "Ground beef 90% lean, cooked",
+    "category": "Protein",
+    "fdcId": 171793,
+    "usda": "Beef, ground, 90% lean meat / 10% fat, patty, cooked, pan-broiled"
+  },
+  {
+    "name": "Beef sirloin, cooked",
+    "category": "Protein",
+    "fdcId": 168635,
+    "usda": "Beef, top sirloin, steak, separable lean only, trimmed to 0\" fat, choice, cooked, broiled"
+  },
+  {
+    "name": "Pork loin, roasted",
+    "category": "Protein",
+    "fdcId": 168233,
+    "usda": "Pork, fresh, loin, whole, separable lean only, cooked, roasted"
+  },
+  {
+    "name": "Ham, sliced",
+    "category": "Protein",
+    "fdcId": 173864,
+    "usda": "Ham, sliced, regular (approximately 11% fat)"
+  },
+  {
+    "name": "Salmon, cooked",
+    "category": "Protein",
+    "fdcId": 175168,
+    "usda": "Fish, salmon, Atlantic, farmed, cooked, dry heat"
+  },
+  {
+    "name": "Salmon, raw",
+    "category": "Protein",
+    "fdcId": 175167,
+    "usda": "Fish, salmon, Atlantic, farmed, raw"
+  },
+  {
+    "name": "Tuna, canned in water",
+    "category": "Protein",
+    "fdcId": 171986,
+    "usda": "Fish, tuna, light, canned in water, without salt, drained solids"
+  },
+  {
+    "name": "Cod, cooked",
+    "category": "Protein",
+    "fdcId": 171956,
+    "usda": "Fish, cod, Atlantic, cooked, dry heat"
+  },
+  {
+    "name": "Shrimp, cooked",
+    "category": "Protein",
+    "fdcId": 171971,
+    "usda": "Crustaceans, shrimp, mixed species, cooked, moist heat (may contain additives to retain moisture)"
+  },
+  {
+    "name": "Sardines, canned",
+    "category": "Protein",
+    "fdcId": 175139,
+    "usda": "Fish, sardine, Atlantic, canned in oil, drained solids with bone"
+  },
+  {
+    "name": "Tofu, firm",
+    "category": "Protein",
+    "fdcId": 172475,
+    "usda": "Tofu, raw, firm, prepared with calcium sulfate"
+  },
+  {
+    "name": "Lentils, cooked",
+    "category": "Protein",
+    "fdcId": 172421,
+    "usda": "Lentils, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "Chickpeas, cooked",
+    "category": "Protein",
+    "fdcId": 173757,
+    "usda": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "Chickpeas, canned",
+    "category": "Protein",
+    "fdcId": 175206,
+    "usda": "Chickpeas (garbanzo beans, bengal gram), mature seeds, canned, solids and liquids"
+  },
+  {
+    "name": "Black beans, cooked",
+    "category": "Protein",
+    "fdcId": 173735,
+    "usda": "Beans, black, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "Kidney beans, cooked",
+    "category": "Protein",
+    "fdcId": 175194,
+    "usda": "Beans, kidney, red, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "White beans, cooked",
+    "category": "Protein",
+    "fdcId": 175203,
+    "usda": "Beans, white, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "Edamame, cooked",
+    "category": "Protein",
+    "fdcId": 168411,
+    "usda": "Edamame, frozen, prepared"
+  },
+  {
+    "name": "Rolled oats, dry",
+    "category": "Pantry",
+    "fdcId": 173904,
+    "usda": "Cereals, oats, regular and quick, not fortified, dry"
+  },
+  {
+    "name": "Quinoa, cooked",
+    "category": "Pantry",
+    "fdcId": 168917,
+    "usda": "Quinoa, cooked"
+  },
+  {
+    "name": "Brown rice, cooked",
+    "category": "Pantry",
+    "fdcId": 169704,
+    "usda": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "name": "White rice, cooked",
+    "category": "Pantry",
+    "fdcId": 168878,
+    "usda": "Rice, white, long-grain, regular, enriched, cooked"
+  },
+  {
+    "name": "Pasta, cooked",
+    "category": "Pantry",
+    "fdcId": 169737,
+    "usda": "Pasta, cooked, enriched, without added salt"
+  },
+  {
+    "name": "Whole-wheat pasta, cooked",
+    "category": "Pantry",
+    "fdcId": 168910,
+    "usda": "Pasta, whole-wheat, cooked (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "name": "Bulgur, cooked",
+    "category": "Pantry",
+    "fdcId": 170287,
+    "usda": "Bulgur, cooked"
+  },
+  {
+    "name": "Couscous, cooked",
+    "category": "Pantry",
+    "fdcId": 169700,
+    "usda": "Couscous, cooked"
+  },
+  {
+    "name": "Whole-wheat bread",
+    "category": "Pantry",
+    "fdcId": 172688,
+    "usda": "Bread, whole-wheat, commercially prepared"
+  },
+  {
+    "name": "Olive oil",
+    "category": "Pantry",
+    "fdcId": 171413,
+    "usda": "Oil, olive, salad or cooking"
+  },
+  {
+    "name": "Almonds",
+    "category": "Pantry",
+    "fdcId": 170567,
+    "usda": "Nuts, almonds"
+  },
+  {
+    "name": "Walnuts",
+    "category": "Pantry",
+    "fdcId": 170187,
+    "usda": "Nuts, walnuts, english"
+  },
+  {
+    "name": "Peanut butter, smooth",
+    "category": "Pantry",
+    "fdcId": 172470,
+    "usda": "Peanut butter, smooth style, without salt"
+  },
+  {
+    "name": "Chia seeds",
+    "category": "Pantry",
+    "fdcId": 170554,
+    "usda": "Seeds, chia seeds, dried"
+  },
+  {
+    "name": "Flaxseed",
+    "category": "Pantry",
+    "fdcId": 169414,
+    "usda": "Seeds, flaxseed"
+  },
+  {
+    "name": "Honey",
+    "category": "Pantry",
+    "fdcId": 169640,
+    "usda": "Honey"
+  },
+  {
+    "name": "Tomato sauce, canned",
+    "category": "Pantry",
+    "fdcId": 170054,
+    "usda": "Tomato products, canned, sauce"
+  },
+  {
+    "name": "Tomatoes, canned",
+    "category": "Pantry",
+    "fdcId": 170051,
+    "usda": "Tomatoes, red, ripe, canned, packed in tomato juice"
+  },
+  {
+    "name": "Chicken broth",
+    "category": "Pantry",
+    "fdcId": 174536,
+    "usda": "Soup, chicken broth, ready-to-serve"
+  },
+  {
+    "name": "Vegetable broth",
+    "category": "Pantry",
+    "fdcId": 171583,
+    "usda": "Soup, vegetable broth, ready to serve"
+  },
+  {
+    "name": "Granola bar",
+    "category": "Pantry",
+    "fdcId": 167542,
+    "usda": "Snacks, granola bars, hard, plain"
+  },
+  {
+    "name": "Pizza, cheese",
+    "category": "Pantry",
+    "fdcId": 170317,
+    "usda": "Pizza, cheese topping, regular crust, frozen, cooked"
+  },
+  {
+    "name": "Hummus",
+    "category": "Pantry",
+    "fdcId": 174289,
+    "usda": "Hummus, commercial"
+  },
+  {
+    "name": "Soy milk",
+    "category": "Pantry",
+    "fdcId": 172446,
+    "usda": "Soymilk, original and vanilla, unfortified"
+  },
+  {
+    "name": "Almond milk, unsweetened",
+    "category": "Pantry",
+    "fdcId": 174832,
+    "usda": "Beverages, almond milk, unsweetened, shelf stable"
+  },
+  {
+    "name": "Water",
+    "category": "Pantry",
+    "fdcId": 173647,
+    "usda": "Beverages, water, tap, drinking"
+  },
+  {
+    "name": "Orange juice",
+    "category": "Pantry",
+    "fdcId": 169098,
+    "usda": "Orange juice, raw (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "name": "Cornflakes",
+    "category": "Pantry",
+    "fdcId": 174648,
+    "usda": "Cereals ready-to-eat, RALSTON Corn Flakes"
+  },
+  {
+    "name": "Crackers, whole wheat",
+    "category": "Pantry",
+    "fdcId": 172749,
+    "usda": "Crackers, whole-wheat"
+  },
+  {
+    "name": "Pretzels",
+    "category": "Pantry",
+    "fdcId": 167555,
+    "usda": "Snacks, pretzels, hard, plain, salted"
+  },
+  {
+    "name": "Popcorn, air-popped",
+    "category": "Pantry",
+    "fdcId": 167959,
+    "usda": "Snacks, popcorn, air-popped"
+  },
+  {
+    "name": "Rice cakes",
+    "category": "Pantry",
+    "fdcId": 170250,
+    "usda": "Snacks, rice cakes, brown rice, plain, unsalted"
+  },
+  {
+    "name": "Peanuts, dry-roasted",
+    "category": "Pantry",
+    "fdcId": 173806,
+    "usda": "Peanuts, all types, dry-roasted, without salt"
+  },
+  {
+    "name": "Cashews, dry roasted",
+    "category": "Pantry",
+    "fdcId": 170571,
+    "usda": "Nuts, cashew nuts, dry roasted, without salt added"
+  },
+  {
+    "name": "Sunflower seeds",
+    "category": "Pantry",
+    "fdcId": 170562,
+    "usda": "Seeds, sunflower seed kernels, dried"
+  },
+  {
+    "name": "Raisins",
+    "category": "Pantry",
+    "fdcId": 168165,
+    "usda": "Raisins, dark, seedless (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "name": "Dates",
+    "category": "Pantry",
+    "fdcId": 168191,
+    "usda": "Dates, medjool"
+  },
+  {
+    "name": "Jam",
+    "category": "Pantry",
+    "fdcId": 169641,
+    "usda": "Jams and preserves"
+  },
+  {
+    "name": "Mayonnaise",
+    "category": "Pantry",
+    "fdcId": 171009,
+    "usda": "Salad dressing, mayonnaise, regular"
+  },
+  {
+    "name": "Mustard",
+    "category": "Pantry",
+    "fdcId": 172234,
+    "usda": "Mustard, prepared, yellow"
+  },
+  {
+    "name": "Soy sauce",
+    "category": "Pantry",
+    "fdcId": 174277,
+    "usda": "Soy sauce made from soy and wheat (shoyu)"
+  },
+  {
+    "name": "Balsamic vinegar",
+    "category": "Pantry",
+    "fdcId": 172241,
+    "usda": "Vinegar, balsamic"
+  },
+  {
+    "name": "Red lentils, raw",
+    "category": "Protein",
+    "fdcId": 174284,
+    "usda": "Lentils, pink or red, raw"
+  },
+  {
+    "name": "Blueberries, frozen",
+    "category": "Frozen",
+    "fdcId": 173950,
+    "usda": "Blueberries, frozen, unsweetened (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "name": "Strawberries, frozen",
+    "category": "Frozen",
+    "fdcId": 168173,
+    "usda": "Strawberries, frozen, unsweetened (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "name": "Mixed vegetables, frozen, cooked",
+    "category": "Frozen",
+    "fdcId": 170472,
+    "usda": "Vegetables, mixed, frozen, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Spinach, frozen, cooked",
+    "category": "Frozen",
+    "fdcId": 169288,
+    "usda": "Spinach, frozen, chopped or leaf, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Green peas, frozen, cooked",
+    "category": "Frozen",
+    "fdcId": 170017,
+    "usda": "Peas, green, frozen, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Broccoli, frozen, cooked",
+    "category": "Frozen",
+    "fdcId": 169969,
+    "usda": "Broccoli, frozen, chopped, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Pollock, cooked",
+    "category": "Protein",
+    "fdcId": 173726,
+    "usda": "Fish, pollock, Alaska, cooked"
+  },
+  {
+    "name": "Brussels sprouts, raw",
+    "category": "Produce",
+    "fdcId": 170383,
+    "usda": "Brussels sprouts, raw"
+  },
+  {
+    "name": "Swiss chard, raw",
+    "category": "Produce",
+    "fdcId": 169991,
+    "usda": "Chard, swiss, raw"
+  },
+  {
+    "name": "Iceberg lettuce, raw",
+    "category": "Produce",
+    "fdcId": 169248,
+    "usda": "Lettuce, iceberg (includes crisphead types), raw"
+  },
+  {
+    "name": "Butternut squash, cooked",
+    "category": "Produce",
+    "fdcId": 169296,
+    "usda": "Squash, winter, butternut, cooked, baked, without salt"
+  },
+  {
+    "name": "Artichoke, cooked",
+    "category": "Produce",
+    "fdcId": 168386,
+    "usda": "Artichokes, (globe or french), cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Green onions, raw",
+    "category": "Produce",
+    "fdcId": 170005,
+    "usda": "Onions, spring or scallions (includes tops and bulb), raw"
+  },
+  {
+    "name": "Ginger root, raw",
+    "category": "Produce",
+    "fdcId": 169231,
+    "usda": "Ginger root, raw"
+  },
+  {
+    "name": "Green bell pepper, raw",
+    "category": "Produce",
+    "fdcId": 170427,
+    "usda": "Peppers, sweet, green, raw"
+  },
+  {
+    "name": "Plums, raw",
+    "category": "Produce",
+    "fdcId": 169949,
+    "usda": "Plums, raw"
+  },
+  {
+    "name": "Cherries, raw",
+    "category": "Produce",
+    "fdcId": 171719,
+    "usda": "Cherries, sweet, raw"
+  },
+  {
+    "name": "Watermelon, raw",
+    "category": "Produce",
+    "fdcId": 167765,
+    "usda": "Watermelon, raw"
+  },
+  {
+    "name": "Grapefruit, raw",
+    "category": "Produce",
+    "fdcId": 173033,
+    "usda": "Grapefruit, raw, pink and red and white, all areas"
+  },
+  {
+    "name": "Figs, raw",
+    "category": "Produce",
+    "fdcId": 173021,
+    "usda": "Figs, raw"
+  },
+  {
+    "name": "Olives, canned",
+    "category": "Produce",
+    "fdcId": 169094,
+    "usda": "Olives, ripe, canned (small-extra large)"
+  },
+  {
+    "name": "Spinach, cooked",
+    "category": "Produce",
+    "fdcId": 168463,
+    "usda": "Spinach, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Sauerkraut, canned",
+    "category": "Produce",
+    "fdcId": 169279,
+    "usda": "Sauerkraut, canned, solids and liquids"
+  },
+  {
+    "name": "Tomato paste",
+    "category": "Pantry",
+    "fdcId": 170459,
+    "usda": "Tomato products, canned, paste, without salt added (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "name": "Cream cheese",
+    "category": "Dairy",
+    "fdcId": 173418,
+    "usda": "Cheese, cream"
+  },
+  {
+    "name": "Sour cream",
+    "category": "Dairy",
+    "fdcId": 171257,
+    "usda": "Cream, sour, cultured"
+  },
+  {
+    "name": "Egg whites, raw",
+    "category": "Dairy",
+    "fdcId": 172183,
+    "usda": "Egg, white, raw, fresh"
+  },
+  {
+    "name": "Goat cheese, soft",
+    "category": "Dairy",
+    "fdcId": 173435,
+    "usda": "Cheese, goat, soft type"
+  },
+  {
+    "name": "Swiss cheese",
+    "category": "Dairy",
+    "fdcId": 171251,
+    "usda": "Cheese, swiss"
+  },
+  {
+    "name": "Ground turkey, cooked",
+    "category": "Protein",
+    "fdcId": 172851,
+    "usda": "Turkey, ground, 93% lean, 7% fat, pan-broiled crumbles"
+  },
+  {
+    "name": "Pork tenderloin, roasted",
+    "category": "Protein",
+    "fdcId": 168250,
+    "usda": "Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted"
+  },
+  {
+    "name": "Mackerel, cooked",
+    "category": "Protein",
+    "fdcId": 175120,
+    "usda": "Fish, mackerel, Atlantic, cooked, dry heat"
+  },
+  {
+    "name": "Trout, cooked",
+    "category": "Protein",
+    "fdcId": 173718,
+    "usda": "Fish, trout, rainbow, farmed, cooked, dry heat"
+  },
+  {
+    "name": "Tilapia, cooked",
+    "category": "Protein",
+    "fdcId": 175177,
+    "usda": "Fish, tilapia, cooked, dry heat"
+  },
+  {
+    "name": "Haddock, cooked",
+    "category": "Protein",
+    "fdcId": 174198,
+    "usda": "Fish, haddock, cooked, dry heat"
+  },
+  {
+    "name": "Mussels, cooked",
+    "category": "Protein",
+    "fdcId": 174217,
+    "usda": "Mollusks, mussel, blue, cooked, moist heat"
+  },
+  {
+    "name": "Tempeh",
+    "category": "Protein",
+    "fdcId": 174272,
+    "usda": "Tempeh"
+  },
+  {
+    "name": "Split peas, cooked",
+    "category": "Protein",
+    "fdcId": 172429,
+    "usda": "Peas, split, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "Pinto beans, cooked",
+    "category": "Protein",
+    "fdcId": 175200,
+    "usda": "Beans, pinto, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "Barley, cooked",
+    "category": "Pantry",
+    "fdcId": 170285,
+    "usda": "Barley, pearled, cooked"
+  },
+  {
+    "name": "Millet, cooked",
+    "category": "Pantry",
+    "fdcId": 168871,
+    "usda": "Millet, cooked"
+  },
+  {
+    "name": "Buckwheat groats, cooked",
+    "category": "Pantry",
+    "fdcId": 170686,
+    "usda": "Buckwheat groats, roasted, cooked"
+  },
+  {
+    "name": "Whole-wheat flour",
+    "category": "Pantry",
+    "fdcId": 168944,
+    "usda": "Wheat flour, whole-grain, soft wheat"
+  },
+  {
+    "name": "White flour",
+    "category": "Pantry",
+    "fdcId": 168894,
+    "usda": "Wheat flour, white, all-purpose, enriched, bleached"
+  },
+  {
+    "name": "Sugar",
+    "category": "Pantry",
+    "fdcId": 169655,
+    "usda": "Sugars, granulated"
+  },
+  {
+    "name": "Maple syrup",
+    "category": "Pantry",
+    "fdcId": 169661,
+    "usda": "Syrups, maple"
+  },
+  {
+    "name": "Coconut milk, canned",
+    "category": "Pantry",
+    "fdcId": 170173,
+    "usda": "Nuts, coconut milk, canned (liquid expressed from grated meat and water)"
+  },
+  {
+    "name": "Canola oil",
+    "category": "Pantry",
+    "fdcId": 172336,
+    "usda": "Oil, canola"
+  },
+  {
+    "name": "Tahini",
+    "category": "Pantry",
+    "fdcId": 168604,
+    "usda": "Seeds, sesame butter, tahini, type of kernels unspecified"
+  },
+  {
+    "name": "Pecans",
+    "category": "Pantry",
+    "fdcId": 170182,
+    "usda": "Nuts, pecans"
+  },
+  {
+    "name": "Pistachios",
+    "category": "Pantry",
+    "fdcId": 170184,
+    "usda": "Nuts, pistachio nuts, raw"
+  },
+  {
+    "name": "Hazelnuts",
+    "category": "Pantry",
+    "fdcId": 170581,
+    "usda": "Nuts, hazelnuts or filberts"
+  },
+  {
+    "name": "Pumpkin seeds",
+    "category": "Pantry",
+    "fdcId": 170556,
+    "usda": "Seeds, pumpkin and squash seed kernels, dried"
+  },
+  {
+    "name": "Dried apricots",
+    "category": "Pantry",
+    "fdcId": 173941,
+    "usda": "Apricots, dried, sulfured, uncooked"
+  },
+  {
+    "name": "Prunes, dried",
+    "category": "Pantry",
+    "fdcId": 168162,
+    "usda": "Plums, dried (prunes), uncooked"
+  },
+  {
+    "name": "Granola",
+    "category": "Pantry",
+    "fdcId": 171646,
+    "usda": "Cereals ready-to-eat, granola, homemade"
+  },
+  {
+    "name": "Pita bread, whole-wheat",
+    "category": "Pantry",
+    "fdcId": 174916,
+    "usda": "Bread, pita, whole-wheat"
+  },
+  {
+    "name": "Corn tortilla",
+    "category": "Pantry",
+    "fdcId": 175036,
+    "usda": "Tortillas, ready-to-bake or -fry, corn"
+  },
+  {
+    "name": "Flour tortilla",
+    "category": "Pantry",
+    "fdcId": 167535,
+    "usda": "Tortillas, ready-to-bake or -fry, flour, shelf stable"
+  },
+  {
+    "name": "Chocolate chip cookies",
+    "category": "Pantry",
+    "fdcId": 172715,
+    "usda": "Cookies, chocolate chip, commercially prepared, regular, lower fat"
+  },
+  {
+    "name": "Potato chips",
+    "category": "Pantry",
+    "fdcId": 169677,
+    "usda": "Snacks, potato chips, plain, salted"
+  },
+  {
+    "name": "Club soda",
+    "category": "Pantry",
+    "fdcId": 174842,
+    "usda": "Beverages, carbonated, club soda"
+  },
+  {
+    "name": "Coffee, brewed",
+    "category": "Pantry",
+    "fdcId": 171890,
+    "usda": "Beverages, coffee, brewed, prepared with tap water"
+  },
+  {
+    "name": "Tea, brewed",
+    "category": "Pantry",
+    "fdcId": 173227,
+    "usda": "Beverages, tea, black, brewed, prepared with tap water"
+  },
+  {
+    "name": "Ketchup",
+    "category": "Pantry",
+    "fdcId": 168556,
+    "usda": "Catsup"
+  },
+  {
+    "name": "Cauliflower, frozen, cooked",
+    "category": "Frozen",
+    "fdcId": 170399,
+    "usda": "Cauliflower, frozen, cooked, boiled, drained, without salt"
+  },
+  {
+    "name": "Green beans, frozen, cooked",
+    "category": "Frozen",
+    "fdcId": 169963,
+    "usda": "Beans, snap, green, frozen, cooked, boiled, drained without salt"
+  },
+  {
+    "name": "Corn, frozen, cooked",
+    "category": "Frozen",
+    "fdcId": 168399,
+    "usda": "Corn, sweet, yellow, frozen, kernels cut off cob, boiled, drained, without salt"
+  },
+  {
+    "name": "Crab, cooked",
+    "category": "Protein",
+    "fdcId": 174202,
+    "usda": "Crustaceans, crab, alaska king, cooked, moist heat"
+  },
+  {
+    "name": "Navy beans, cooked",
+    "category": "Protein",
+    "fdcId": 173746,
+    "usda": "Beans, navy, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "name": "Provolone cheese",
+    "category": "Dairy",
+    "fdcId": 170850,
+    "usda": "Cheese, provolone"
+  },
+  {
+    "name": "Yogurt, plain whole milk",
+    "category": "Dairy",
+    "fdcId": 171284,
+    "usda": "Yogurt, plain, whole milk"
+  },
+  {
+    "name": "Egg noodles, cooked",
+    "category": "Pantry",
+    "fdcId": 168926,
+    "usda": "Noodles, egg, unenriched, cooked, without added salt"
+  },
+  {
+    "name": "Wild rice, cooked",
+    "category": "Pantry",
+    "fdcId": 168897,
+    "usda": "Wild rice, cooked"
+  },
+  {
+    "name": "Wheat bran",
+    "category": "Pantry",
+    "fdcId": 169722,
+    "usda": "Wheat bran, crude"
+  },
+  {
+    "name": "Portobello mushrooms, raw",
+    "category": "Produce",
+    "fdcId": 169255,
+    "usda": "Mushrooms, portabella, raw"
+  },
+  {
+    "name": "Turnip, raw",
+    "category": "Produce",
+    "fdcId": 170465,
+    "usda": "Turnips, raw"
+  },
+  {
+    "name": "Okra, raw",
+    "category": "Produce",
+    "fdcId": 169260,
+    "usda": "Okra, raw"
+  },
+  {
+    "name": "Watercress, raw",
+    "category": "Produce",
+    "fdcId": 170068,
+    "usda": "Watercress, raw"
+  },
+  {
+    "name": "Collard greens, raw",
+    "category": "Produce",
+    "fdcId": 170406,
+    "usda": "Collards, raw"
+  },
+  {
+    "name": "Cranberries, raw",
+    "category": "Produce",
+    "fdcId": 171722,
+    "usda": "Cranberries, raw"
+  },
+  {
+    "name": "Blackberries, raw",
+    "category": "Produce",
+    "fdcId": 173946,
+    "usda": "Blackberries, raw"
+  },
+  {
+    "name": "Apricots, raw",
+    "category": "Produce",
+    "fdcId": 171697,
+    "usda": "Apricots, raw"
+  },
+  {
+    "name": "Nectarines, raw",
+    "category": "Produce",
+    "fdcId": 169914,
+    "usda": "Nectarines, raw"
+  },
+  {
+    "name": "Papaya, raw",
+    "category": "Produce",
+    "fdcId": 169926,
+    "usda": "Papayas, raw"
+  },
+  {
+    "name": "Lime juice",
+    "category": "Produce",
+    "fdcId": 168156,
+    "usda": "Lime juice, raw"
+  },
+  {
+    "name": "Pomegranate, raw",
+    "category": "Produce",
+    "fdcId": 169134,
+    "usda": "Pomegranates, raw"
+  },
+  {
+    "name": "Endive, raw",
+    "category": "Produce",
+    "fdcId": 168412,
+    "usda": "Endive, raw"
+  },
+  {
+    "name": "Radicchio, raw",
+    "category": "Produce",
+    "fdcId": 168564,
+    "usda": "Radicchio, raw"
+  },
+  {
+    "name": "Apple juice",
+    "category": "Pantry",
+    "fdcId": 173933,
+    "usda": "Apple juice, canned or bottled, unsweetened, without added ascorbic acid"
+  }
+]
