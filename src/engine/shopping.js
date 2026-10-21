@@ -5,18 +5,61 @@ import { todayIso } from './planner.js';
 
 const CATEGORY_ORDER = ['Produce', 'Protein', 'Dairy', 'Pantry', 'Frozen', 'Other'];
 
+export const SHOP_EVERY_OPTIONS = [2, 3, 5, 7];
+
+function pad(n) {
+  return String(n).padStart(2, '0');
+}
+
+/** Add days to a YYYY-MM-DD date without time-zone drift. */
+export function addDays(isoDate, days) {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  const d = new Date(Date.UTC(year, month - 1, day + days));
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+}
+
+/** Whole days from isoA to isoB (YYYY-MM-DD), without time-zone drift. */
+function dayDiff(isoA, isoB) {
+  const [ya, ma, da] = isoA.split('-').map(Number);
+  const [yb, mb, db] = isoB.split('-').map(Number);
+  return Math.round((Date.UTC(yb, mb - 1, db) - Date.UTC(ya, ma - 1, da)) / 86400000);
+}
+
 /**
- * Build a shopping list for meals on/after fromDate.
+ * Start of the shopping window that contains `today`. Trips repeat every `shopEvery` days from the
+ * saved start, so a window that has ended rolls forward instead of showing past meals.
+ */
+export function currentShopStart(shopStart, shopEvery, today) {
+  const every = Math.max(1, Number(shopEvery) || 7);
+  const gone = dayDiff(shopStart, today);
+  if (gone < every) return shopStart;
+  return addDays(shopStart, Math.floor(gone / every) * every);
+}
+
+/**
+ * Meals covered by one shopping trip: from the start date up to the day before
+ * the next trip. Seven days starting 2026-10-21 ends on 2026-10-27.
+ */
+export function shoppingWindow(fromDate, shopEvery = 7) {
+  const every = Math.max(1, Number(shopEvery) || 7);
+  return { from: fromDate, to: addDays(fromDate, every - 1), shopEvery: every };
+}
+
+/**
+ * Build a shopping list for meals inside [fromDate, toDate] (both inclusive).
  * Returns { toBuy: [{ foodId, name, category, grams }], atHome: same }.
  * Each foodId appears in at most one section.
  */
-export function buildShoppingList({ plan, recipes, foodsById, bought = [], fromDate = todayIso() }) {
+export function buildShoppingList({
+  plan, recipes, foodsById, bought = [], fromDate = todayIso(), toDate = null,
+}) {
   const recipesById = new Map(recipes.map((r) => [r.id, r]));
   const boughtSet = new Set(bought);
   const gramsByFood = new Map();
 
   for (const [date, meals] of Object.entries(plan?.days || {})) {
     if (date < fromDate) continue;
+    if (toDate && date > toDate) continue;
     for (const slot of ['breakfast', 'lunch', 'dinner', 'snack']) {
       const recipe = recipesById.get(meals[slot]);
       if (!recipe) continue;

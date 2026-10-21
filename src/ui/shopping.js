@@ -1,4 +1,4 @@
-import { buildShoppingList } from '../engine/shopping.js';
+import { buildShoppingList, shoppingWindow, currentShopStart, SHOP_EVERY_OPTIONS } from '../engine/shopping.js';
 import { todayIso } from '../engine/planner.js';
 import { el, escapeHtml } from './dom.js';
 
@@ -22,18 +22,46 @@ export function renderShopping(ctx) {
     return root;
   }
 
+  const shopEvery = SHOP_EVERY_OPTIONS.includes(state.shopEvery) ? state.shopEvery : 7;
+  const savedStart = state.shopStart || todayIso();
+  const shopStart = currentShopStart(savedStart, shopEvery, todayIso());
+  const window = shoppingWindow(shopStart, shopEvery);
+
+  const windowCard = el(`<section class="card shop-window">
+    <h2>Shopping window</h2>
+    <p class="shop-dates" data-window>Meals from ${window.from} to ${window.to}</p>
+    <p class="field-label">Shop every</p>
+    <div class="freq-options" role="group" aria-label="Shop every">
+      ${SHOP_EVERY_OPTIONS.map((n) => `<button type="button" class="freq-option${n === shopEvery ? ' is-active' : ''}" data-shop-every="${n}" aria-pressed="${n === shopEvery ? 'true' : 'false'}">${n} days</button>`).join('')}
+    </div>
+    <button type="button" class="btn-primary btn-small" data-action="shop-now">I'm shopping now</button>
+  </section>`);
+  root.appendChild(windowCard);
+
+  const pickFrequency = (nextEvery) => {
+    const next = { ...state, shopEvery: nextEvery, shopStart };
+    ctx.onChange(next);
+  };
+  windowCard.querySelectorAll('[data-shop-every]').forEach((btn) => {
+    btn.addEventListener('click', () => pickFrequency(Number(btn.dataset.shopEvery)));
+  });
+  windowCard.querySelector('[data-action="shop-now"]').addEventListener('click', () => {
+    ctx.onChange({ ...state, shopEvery, shopStart: todayIso() });
+  });
+
   const list = buildShoppingList({
     plan: state.plan,
     recipes,
     foodsById,
     bought: state.bought || [],
-    fromDate: todayIso(),
+    fromDate: window.from,
+    toDate: window.to,
   });
 
   const buyCard = el(`<section class="card"><h2>To buy</h2><div class="shop-groups" data-buy></div></section>`);
   const buyEl = buyCard.querySelector('[data-buy]');
   if (list.toBuyGrouped.length === 0) {
-    buyEl.appendChild(el(`<p class="muted">Everything for the rest of the month is already at home.</p>`));
+    buyEl.appendChild(el(`<p class="muted">Everything in this shopping window is already at home.</p>`));
   } else {
     for (const group of list.toBuyGrouped) {
       const block = el(`<div class="shop-group"><h3>${escapeHtml(group.category)}</h3><ul></ul></div>`);

@@ -9,6 +9,8 @@ const EMPTY = {
   log: [],
   bought: [],
   keptForBought: [],
+  shopEvery: 7,
+  shopStart: null,
 };
 
 let storageNotice = null;
@@ -34,6 +36,8 @@ export function loadState() {
       log: Array.isArray(data.log) ? data.log : [],
       bought: Array.isArray(data.bought) ? data.bought : [],
       keptForBought: Array.isArray(data.keptForBought) ? data.keptForBought : [],
+      shopEvery: [2, 3, 5, 7].includes(data.shopEvery) ? data.shopEvery : 7,
+      shopStart: typeof data.shopStart === 'string' ? data.shopStart : null,
     };
   } catch {
     storageNotice = 'Saved data could not be read; starting fresh for this session.';
@@ -57,6 +61,8 @@ export function saveState(state) {
         log: state.log,
         bought: state.bought,
         keptForBought: state.keptForBought || [],
+        shopEvery: state.shopEvery || 7,
+        shopStart: state.shopStart || null,
       }),
     );
     return true;

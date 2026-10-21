@@ -870,5 +870,121 @@
     "grams": 15
    }
   ]
+ },
+ {
+  "id": "athlete-oat-yogurt-bowl",
+  "name": "Oat, yogurt and banana bowl",
+  "slot": "breakfast",
+  "icon": "🥣",
+  "ingredients": [
+   {
+    "foodId": "rolled-oats-dry",
+    "grams": 100
+   },
+   {
+    "foodId": "milk-whole",
+    "grams": 250
+   },
+   {
+    "foodId": "greek-yogurt-plain-nonfat",
+    "grams": 200
+   },
+   {
+    "foodId": "banana-raw",
+    "grams": 120
+   },
+   {
+    "foodId": "peanut-butter-smooth",
+    "grams": 30
+   },
+   {
+    "foodId": "honey",
+    "grams": 15
+   }
+  ]
+ },
+ {
+  "id": "athlete-chicken-rice-bowl",
+  "name": "Chicken rice bowl with edamame",
+  "slot": "lunch",
+  "icon": "🍱",
+  "ingredients": [
+   {
+    "foodId": "chicken-breast-roasted",
+    "grams": 180
+   },
+   {
+    "foodId": "brown-rice-cooked",
+    "grams": 300
+   },
+   {
+    "foodId": "edamame-cooked",
+    "grams": 100
+   },
+   {
+    "foodId": "avocado-raw",
+    "grams": 80
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 10
+   }
+  ]
+ },
+ {
+  "id": "athlete-beef-rice-beans",
+  "name": "Beef, rice and bean plate",
+  "slot": "dinner",
+  "icon": "🥩",
+  "ingredients": [
+   {
+    "foodId": "beef-sirloin-cooked",
+    "grams": 180
+   },
+   {
+    "foodId": "brown-rice-cooked",
+    "grams": 250
+   },
+   {
+    "foodId": "black-beans-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 10
+   },
+   {
+    "foodId": "spinach-raw",
+    "grams": 50
+   }
+  ]
+ },
+ {
+  "id": "athlete-yogurt-granola-bowl",
+  "name": "Yogurt, granola and peanut bowl",
+  "slot": "snack",
+  "icon": "🥛",
+  "ingredients": [
+   {
+    "foodId": "greek-yogurt-plain-nonfat",
+    "grams": 250
+   },
+   {
+    "foodId": "granola",
+    "grams": 80
+   },
+   {
+    "foodId": "peanut-butter-smooth",
+    "grams": 25
+   },
+   {
+    "foodId": "banana-raw",
+    "grams": 100
+   },
+   {
+    "foodId": "honey",
+    "grams": 10
+   }
+  ]
  }
 ]

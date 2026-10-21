@@ -162,6 +162,30 @@ test('impossible targets return closest plan with unreachable flag', () => {
 
 const SLOT_NAMES = ['breakfast', 'lunch', 'dinner', 'snack'];
 
+test('athlete profile: high minimum targets and a reachable month', () => {
+  assert.equal(PROFILES.length, 4);
+  const profile = profileById('athlete');
+  assert.ok(profile, 'Athlete profile is missing');
+  assert.ok(profile.icon, 'Athlete needs an icon');
+  assert.ok(profile.blurb, 'Athlete needs a description');
+  const kcal = profile.targets.find((t) => t.nutrient === 'kcal');
+  const protein = profile.targets.find((t) => t.nutrient === 'protein');
+  assert.ok(kcal && kcal.kind === 'min' && kcal.daily >= 2500, 'Athlete calorie floor should be high');
+  assert.ok(protein && protein.kind === 'min' && protein.daily >= 150, 'Athlete protein floor should be high');
+
+  // The generic reachability and variety tests also run for every profile,
+  // including this one; here we check the Athlete floors directly.
+  const plan = buildPlan(profile.targets, recipes, month, foodsById);
+  const recipesById = new Map(recipes.map((r) => [r.id, r]));
+  const dates = Object.keys(plan.days);
+  for (const target of [kcal, protein]) {
+    let sum = 0;
+    for (const date of dates) sum += dayTotals(plan.days[date], recipesById, foodsById).totals[target.nutrient];
+    const avg = sum / dates.length;
+    assert.ok(avg >= target.daily * 0.95, `${target.nutrient} average ${avg.toFixed(1)} under ${target.daily}`);
+  }
+});
+
 test('variety: no recipe fills the same slot on more than 3 of 7 days, or a third of the month', () => {
   for (const profile of PROFILES) {
     const plan = buildPlan(profile.targets, recipes, month, foodsById);

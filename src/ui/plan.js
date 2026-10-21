@@ -35,6 +35,18 @@ export function renderPlan(ctx) {
     return root;
   }
 
+  const summaryCard = el(`<section class="card summary-cta">
+    <div class="row">
+      <div>
+        <h3>For your doctor</h3>
+        <p class="muted tiny">A printable page with your targets and the meals you logged.</p>
+      </div>
+      <button type="button" class="btn-secondary btn-small" data-action="summary">Summary for your doctor</button>
+    </div>
+  </section>`);
+  summaryCard.querySelector('[data-action="summary"]').addEventListener('click', () => ctx.navigate('summary'));
+  root.appendChild(summaryCard);
+
   const dates = Object.keys(state.plan.days).sort();
   const today = todayIso();
   let selected = ctx.selectedDate && state.plan.days[ctx.selectedDate] ? ctx.selectedDate : today;

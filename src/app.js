@@ -5,6 +5,7 @@ import { renderPlan } from './ui/plan.js';
 import { renderLog } from './ui/log.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
+import { renderSummary } from './ui/summary.js';
 
 const app = document.getElementById('app');
 
@@ -97,7 +98,7 @@ function navBar() {
   nav.setAttribute('aria-label', 'Main');
   for (const item of items) {
     const active = ctx.screen === item.id
-      || (item.id === 'plan' && (ctx.screen === 'log' || ctx.screen === 'updated'));
+      || (item.id === 'plan' && (ctx.screen === 'log' || ctx.screen === 'updated' || ctx.screen === 'summary'));
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = `nav-item${active ? ' is-active' : ''}`;
@@ -124,6 +125,7 @@ function render() {
   else if (ctx.screen === 'log') screen = renderLog(ctx);
   else if (ctx.screen === 'updated') screen = renderUpdated(ctx);
   else if (ctx.screen === 'shopping') screen = renderShopping(ctx);
+  else if (ctx.screen === 'summary') screen = renderSummary(ctx);
   else screen = renderTargets(ctx);
 
   app.appendChild(screen);
@@ -146,6 +148,13 @@ async function start() {
     ctx.recipes = recipes;
     ctx.foodsById = new Map(foods.map((f) => [f.id, f]));
     ctx.recipesById = new Map(recipes.map((r) => [r.id, r]));
+    // Keep one shopping window on record, starting today until you shop again.
+    ctx.state = {
+      ...ctx.state,
+      shopEvery: [2, 3, 5, 7].includes(ctx.state.shopEvery) ? ctx.state.shopEvery : 7,
+      shopStart: ctx.state.shopStart || todayIso(),
+    };
+    saveState(ctx.state);
     if (ctx.state.plan) ctx.screen = 'plan';
     else ctx.screen = 'targets';
     render();

@@ -66,8 +66,8 @@ test('public files: no absolute local paths', () => {
 
 test('copy: no health promises, no food photographs, disclaimer on every screen file', () => {
   const claims = /\b(improves?|heals?|cures?|lowers your cholesterol|reduces? (your )?risk|supports? (your )?heart|healthy range)\b/i;
-  const screens = fs.readdirSync(path.join(root, 'src/ui')).filter((f) => ['targets.js', 'plan.js', 'log.js', 'updated.js', 'shopping.js'].includes(f));
-  assert.equal(screens.length, 5);
+  const screens = fs.readdirSync(path.join(root, 'src/ui')).filter((f) => ['targets.js', 'plan.js', 'log.js', 'updated.js', 'shopping.js', 'summary.js'].includes(f));
+  assert.equal(screens.length, 6);
   for (const file of [path.join(root, 'index.html'), ...fs.readdirSync(path.join(root, 'src/ui')).map((f) => path.join(root, 'src/ui', f)), path.join(root, 'src/app.js')]) {
     const text = fs.readFileSync(file, 'utf8');
     assert.equal(claims.exec(text), null, `${path.relative(root, file)} makes a health claim`);

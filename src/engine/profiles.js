@@ -37,6 +37,18 @@ export const PROFILES = [
       { nutrient: 'fat', kind: 'min', daily: 60 },
     ],
   },
+  {
+    id: 'athlete',
+    name: 'Athlete',
+    icon: '🏃',
+    blurb: 'Higher calorie and protein floors for training days.',
+    targets: [
+      { nutrient: 'kcal', kind: 'min', daily: 2800 },
+      { nutrient: 'protein', kind: 'min', daily: 150 },
+      { nutrient: 'fibre', kind: 'min', daily: 30 },
+      { nutrient: 'fat', kind: 'min', daily: 80 },
+    ],
+  },
 ];
 
 export function profileById(id) {
