@@ -33,11 +33,13 @@ npm test
 2. Build a month plan and review today’s meals and progress bars.
 3. Tick shopping-list items you already have at home.
 4. Log a meal (from the plan or by searching a food with a portion).
-5. See **Plan updated**: before/after meals, a one-sentence reason from the real numbers, effect on targets, then keep or use the new plan.
+5. See **Plan updated**: an off-plan meal that goes over a daily maximum is made up over the next 4 days (the rest of the month stays as planned), with before/after meals, a one-sentence reason from the real numbers, the effect on your targets, and a choice to keep your original plan or use the new one.
 
 Everything is stored on this device only (browser localStorage). There are no accounts and no network calls while the app is running.
 
 ## Data
+
+Food data: [USDA FoodData Central](https://fdc.nal.usda.gov/) (SR Legacy), a public-domain dataset (CC0).
 
 - `data/foods.json` — curated USDA foods (nutrients per 100 g)
 - `data/recipes.json` — recipes built from those foods
