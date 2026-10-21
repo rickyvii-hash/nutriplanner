@@ -98,35 +98,56 @@ function boughtBonus(recipe, boughtSet) {
   return -hits * 0.35;
 }
 
-function pickRecipe(candidates, daySoFar, targets, foodsById, boughtSet) {
-  let best = null;
-  let bestScore = Infinity;
-  for (const recipe of candidates) {
-    const r = recipeNutrients(recipe, foodsById);
-    const trial = addTotals(daySoFar, r.totals);
-    const { score } = scoreAgainstTargets(trial, targets);
-    const total = score + boughtBonus(recipe, boughtSet);
-    if (total < bestScore) {
-      bestScore = total;
-      best = recipe;
-    }
-  }
-  return best;
+/** Days a recipe must rest before it can fill the same slot again (variety). */
+function cooldownDays(recipes, slot) {
+  const n = recipesForSlot(recipes, slot).length;
+  return Math.max(0, Math.min(3, n - 1));
 }
 
-function fillDay(recipes, targets, foodsById, boughtSet) {
-  const day = {};
-  let soFar = emptyTotals();
-  const recipesBySlot = {};
-  for (const slot of SLOTS) recipesBySlot[slot] = recipesForSlot(recipes, slot);
-  for (const slot of SLOTS) {
-    const pick = pickRecipe(recipesBySlot[slot], soFar, targets, foodsById, boughtSet);
-    if (!pick) throw new Error(`No recipes for slot ${slot}`);
-    day[slot] = pick.id;
-    const r = recipeNutrients(pick, foodsById);
-    soFar = addTotals(soFar, r.totals);
-  }
-  return day;
+/**
+ * Best combination of one recipe per slot for a day, judged on the whole day at once
+ * (a few thousand combinations, plain arithmetic).
+ * avoidBySlot: { slot: Set(recipeId) } recipes still "resting", skipped for variety.
+ */
+function fillDay(recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBySlot = {}) {
+  const options = SLOTS.map((slot) => {
+    const all = recipesForSlot(recipes, slot);
+    if (all.length === 0) throw new Error(`No recipes for slot ${slot}`);
+    // capBySlot: { slot: { nutrient: value } } a meal may only be swapped for one that
+    // does not have more of that nutrient than the meal it replaces.
+    const cap = capBySlot[slot];
+    const totalsOf = new Map(all.map((r) => [r.id, recipeNutrients(r, foodsById).totals]));
+    const allowed = cap
+      ? all.filter((r) => Object.entries(cap).every(([n, v]) => totalsOf.get(r.id)[n] <= v + 1e-9))
+      : all;
+    const pool = allowed.length > 0 ? allowed : all;
+    const avoid = avoidBySlot[slot];
+    const rested = avoid && avoid.size > 0 ? pool.filter((r) => !avoid.has(r.id)) : pool;
+    return (rested.length > 0 ? rested : pool).map((recipe) => ({
+      id: recipe.id,
+      totals: totalsOf.get(recipe.id),
+      bonus: boughtBonus(recipe, boughtSet),
+    }));
+  });
+  let best = null;
+  let bestScore = Infinity;
+  const picks = [];
+  const walk = (i, soFar, bonus) => {
+    if (i === options.length) {
+      const score = scoreAgainstTargets(soFar, targets).score + bonus;
+      if (score < bestScore) {
+        bestScore = score;
+        best = picks.slice();
+      }
+      return;
+    }
+    for (const o of options[i]) {
+      picks[i] = o.id;
+      walk(i + 1, addTotals(soFar, o.totals), bonus + o.bonus);
+    }
+  };
+  walk(0, emptyTotals(), 0);
+  return Object.fromEntries(SLOTS.map((slot, i) => [slot, best[i]]));
 }
 
 /**
@@ -136,8 +157,15 @@ function fillDay(recipes, targets, foodsById, boughtSet) {
 export function buildPlan(targets, recipes, month, foodsById, bought = []) {
   const boughtSet = new Set(bought);
   const days = {};
+  const recent = {};
+  for (const slot of SLOTS) recent[slot] = [];
   for (const date of daysInMonth(month.year, month.month)) {
-    days[date] = fillDay(recipes, targets, foodsById, boughtSet);
+    const avoid = {};
+    for (const slot of SLOTS) {
+      avoid[slot] = new Set(recent[slot].slice(-cooldownDays(recipes, slot)));
+    }
+    days[date] = fillDay(recipes, targets, foodsById, boughtSet, avoid);
+    for (const slot of SLOTS) recent[slot].push(days[date][slot]);
   }
   return {
     month: `${month.year}-${pad(month.month)}`,
@@ -154,95 +182,6 @@ export function consumedFromLog(log, foodsById, throughDate = null) {
     totals = addTotals(totals, r.totals);
   }
   return totals;
-}
-
-/** Sum planned nutrients for dates in range [from, to] inclusive, optional skip slots. */
-function plannedRangeTotals(plan, recipesById, foodsById, fromDate, toDate, skip = null) {
-  let totals = emptyTotals();
-  for (const [date, meals] of Object.entries(plan.days || {})) {
-    if (date < fromDate || date > toDate) continue;
-    for (const slot of SLOTS) {
-      if (skip && skip.date === date && skip.slots?.has(slot)) continue;
-      const id = meals[slot];
-      const recipe = recipesById.get(id);
-      if (!recipe) continue;
-      const r = recipeNutrients(recipe, foodsById);
-      totals = addTotals(totals, r.totals);
-    }
-  }
-  return totals;
-}
-
-function remainingDayCount(plan, fromDate) {
-  return Object.keys(plan.days || {}).filter((d) => d >= fromDate).length;
-}
-
-/**
- * Remaining daily targets after accounting for what was already eaten this month,
- * spread evenly over remaining days from `fromDate`.
- */
-export function remainingDailyTargets(targets, consumed, remainingDays) {
-  const days = Math.max(1, remainingDays);
-  return targets.map((t) => {
-    const eaten = consumed[t.nutrient] || 0;
-    // Month budget ≈ daily * days in the planned month portion we care about.
-    // We treat the original daily as the per-day goal for remaining days,
-    // adjusted by how far ahead/behind the log is relative to "expected so far".
-    // Simpler and clearer: remaining budget for the rest of the month =
-    // daily * remainingDays, minus any overshoot already logged beyond
-    // (daysElapsed * daily). For POC we adjust the remaining daily target:
-    if (t.kind === 'max') {
-      // If already high, push remaining days lower.
-      const overshoot = Math.max(0, eaten - t.daily); // crude: one-day worth reference
-      const adjusted = Math.max(t.daily * 0.4, t.daily - overshoot / days);
-      return { ...t, daily: adjusted, originalDaily: t.daily };
-    }
-    // min: if behind, raise remaining days
-    const shortfall = Math.max(0, t.daily - eaten);
-    // eaten is cumulative; better: compare to expected
-    // For a single off-plan day we want: if today blew a max, lower future days.
-    // Use: remaining daily = clamp(original ± (eaten_today_effect))
-    return { ...t, daily: t.daily + shortfall / days * 0, originalDaily: t.daily };
-  });
-}
-
-/**
- * Adjust per-day targets for the rest of the month.
- * Month budget keeps the long-run average on track; `recentTotals` (usually
- * today's log) applies an extra pull so a single off-plan meal visibly reshapes
- * the next days — e.g. a high-sat-fat meal lowers sat fat afterward.
- */
-export function adjustedTargetsForRest(
-  targets,
-  consumedMonth,
-  daysElapsed,
-  daysRemaining,
-  recentTotals = null,
-) {
-  const rem = Math.max(1, daysRemaining);
-  const elapsed = Math.max(0, daysElapsed);
-  return targets.map((t) => {
-    const monthBudget = t.daily * (elapsed + rem);
-    const eaten = consumedMonth[t.nutrient] || 0;
-    const left = monthBudget - eaten;
-    let daily = left / rem;
-    if (t.kind === 'max') {
-      const recent = recentTotals ? (recentTotals[t.nutrient] || 0) : 0;
-      // Today's overshoot beyond one daily allowance is spread over remaining days.
-      const spike = Math.max(0, recent - t.daily);
-      if (spike > 0) daily = Math.min(daily, t.daily - spike / rem);
-      const expectedSoFar = t.daily * Math.max(1, elapsed);
-      const overshoot = Math.max(0, eaten - expectedSoFar);
-      daily = Math.min(daily, t.daily - overshoot / rem);
-      daily = Math.max(t.daily * 0.2, daily);
-    } else {
-      const recent = recentTotals ? (recentTotals[t.nutrient] || 0) : 0;
-      const short = Math.max(0, t.daily - recent);
-      if (recentTotals && recent < t.daily) daily = Math.max(daily, t.daily + short / rem);
-      else daily = Math.max(t.daily * 0.5, daily);
-    }
-    return { ...t, daily, originalDaily: t.daily };
-  });
 }
 
 function effectOnTargets(oldDayAvg, newDayAvg, targets) {
@@ -277,8 +216,7 @@ function effectOnTargets(oldDayAvg, newDayAvg, targets) {
   });
 }
 
-function averageDailyTotals(plan, recipesById, foodsById, fromDate) {
-  const dates = Object.keys(plan.days || {}).filter((d) => d >= fromDate);
+function averageDailyTotals(plan, recipesById, foodsById, dates) {
   if (dates.length === 0) return emptyTotals();
   let sum = emptyTotals();
   for (const date of dates) {
@@ -317,61 +255,54 @@ function buildReason({
   if (nothingToChange) {
     return 'No changes needed — the rest of the month still meets your targets.';
   }
-  const parts = [];
-  if (unreachable) {
-    parts.push('Not every target can be met with the available recipes; this is the closest plan');
-  }
+  const daysTouched = new Set(changed.map((c) => c.date)).size;
+  const keptNote = keptForBought.length > 0 ? ' Meals that use food already bought were kept.' : '';
+  const closestNote = unreachable
+    ? 'Not every target can be met with the available recipes; this is the closest plan. '
+    : '';
 
-  // Prefer the target the recent log most violated (relative to its daily),
-  // then the largest plan delta. Relative scale keeps mg-sodium from drowning g-fat.
-  let focus = null;
-  let focusScore = -Infinity;
+  // The maximum that today's log went furthest over (relative to its daily limit).
+  let over = null;
   for (const t of targets) {
-    const e = effects.find((x) => x.nutrient === t.nutrient);
-    if (!e) continue;
+    if (t.kind !== 'max') continue;
     const recent = recentTotals ? (recentTotals[t.nutrient] || 0) : 0;
-    let score = Math.abs(e.delta) / Math.max(1, t.daily);
-    if (t.kind === 'max' && recent > t.daily) {
-      score += ((recent - t.daily) / t.daily) * 4;
-    }
-    if (t.kind === 'min' && recentTotals && recent < t.daily) {
-      score += ((t.daily - recent) / t.daily) * 4;
-    }
-    if (t.kind === 'max' && e.delta < -0.2) score += 0.5;
-    if (t.kind === 'min' && e.delta > 0.2) score += 0.5;
-    if (score > focusScore) {
-      focusScore = score;
-      focus = { t, e };
-    }
+    if (recent <= t.daily) continue;
+    const ratio = (recent - t.daily) / t.daily;
+    if (!over || ratio > over.ratio) over = { t, recent, ratio };
+  }
+  if (over) {
+    const e = effects.find((x) => x.nutrient === over.t.nutrient);
+    const less = e && e.delta < -0.05 ? ` (about ${formatAmount(over.t.nutrient, Math.abs(e.delta))} less per day on average)` : '';
+    return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
+      + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so the next ${daysTouched} days are lower in `
+      + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
   }
 
-  if (focus && Math.abs(focus.e.delta) >= 0.3) {
-    const daysTouched = new Set(changed.map((c) => c.date)).size;
-    const daysNote = daysTouched > 0 ? ` for the next ${Math.min(7, daysTouched)} days` : '';
-    if (focus.t.kind === 'max' && focus.e.delta <= 0) {
-      parts.push(`lowered ${nutrientWords(focus.t.nutrient)}${daysNote} (about ${formatDelta(focus.t.nutrient, Math.abs(focus.e.delta))} per day on average)`);
-    } else if (focus.t.kind === 'min' && focus.e.delta >= 0) {
-      parts.push(`raised ${nutrientWords(focus.t.nutrient)}${daysNote} (about ${formatDelta(focus.t.nutrient, Math.abs(focus.e.delta))} per day on average)`);
-    } else {
-      parts.push(`adjusted ${nutrientWords(focus.t.nutrient)}${daysNote} (about ${formatDelta(focus.t.nutrient, Math.abs(focus.e.delta))} per day on average)`);
-    }
-  } else if (changed.length > 0) {
+  // No maximum was exceeded: the change comes from food already bought.
+  const parts = [];
+  if (changed.length > 0) {
     parts.push(`updated ${changed.length} meal${changed.length === 1 ? '' : 's'} to stay closer to your targets`);
   }
-
-  if (keptForBought.length > 0) {
-    parts.push('kept meals that use food already bought');
-  }
-
-  if (parts.length === 0) {
-    return 'Small adjustments to stay closer to your targets.';
-  }
-  const text = parts.join(', ');
+  if (keptForBought.length > 0) parts.push('kept meals that use food already bought');
+  if (parts.length === 0) return `${closestNote}Small adjustments to stay closer to your targets.`.trim();
+  const text = closestNote + parts.join(', ');
   return text.charAt(0).toUpperCase() + text.slice(1) + '.';
 }
 
+/** Days after the log date that can change: a short, visible compensation window. */
+export const WINDOW_DAYS = 4;
+
+function formatAmount(key, v) {
+  if (key === 'kcal') return `${Math.round(v)} kcal`;
+  if (key === 'sodium') return `${Math.round(v)} mg`;
+  return `${v.toFixed(1)} g`;
+}
+
 /**
- * Replan the rest of the month after a log.
+ * Replan the days right after a log.
+ * An off-plan meal that goes over a daily maximum is made up over the next
+ * WINDOW_DAYS days (not spread thinly over the whole month); every other day
+ * of the month stays exactly as it was.
  * state: { targets, recipes, plan, log, bought, foodsById, fromDate? }
  */
 export function replan(state) {
@@ -390,25 +321,20 @@ export function replan(state) {
   const allDates = Object.keys(plan.days || {}).sort();
   const remainingDates = allDates.filter((d) => d >= fromDate);
   const elapsedDates = allDates.filter((d) => d < fromDate);
-  const daysRemaining = remainingDates.length;
-  const daysElapsed = elapsedDates.length;
 
-  // Prefer real log for dates that have entries; otherwise assume past planned days were eaten.
+  // Nutrients eaten this month: the real log where there is one, otherwise the plan.
   const loggedDates = new Set((log || []).map((e) => e.date));
   let consumedMonth = emptyTotals();
   for (const date of elapsedDates) {
     if (loggedDates.has(date)) {
-      const dayLog = (log || []).filter((e) => e.date === date);
-      for (const entry of dayLog) {
-        const r = loggedNutrients(entry.items, foodsById);
-        consumedMonth = addTotals(consumedMonth, r.totals);
+      for (const entry of (log || []).filter((e) => e.date === date)) {
+        consumedMonth = addTotals(consumedMonth, loggedNutrients(entry.items, foodsById).totals);
       }
     } else {
-      const { totals } = dayTotals(plan.days[date], recipesById, foodsById);
-      consumedMonth = addTotals(consumedMonth, totals);
+      consumedMonth = addTotals(consumedMonth, dayTotals(plan.days[date], recipesById, foodsById).totals);
     }
   }
-  // Today's log (the meal that triggered replan).
+  // What was logged on the log date (the meal that triggered this replan).
   let recentTotals = emptyTotals();
   for (const entry of log || []) {
     if (entry.date === fromDate) {
@@ -418,62 +344,79 @@ export function replan(state) {
     }
   }
 
-  const adjTargets = adjustedTargetsForRest(
-    targets,
-    consumedMonth,
-    daysElapsed,
-    daysRemaining,
-    recentTotals,
-  );
+  const windowDates = allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS);
+  const windowSet = new Set(windowDates);
 
-  // Slots already logged today stay fixed (user ate them); others may change.
-  const loggedTodaySlots = new Set();
-  // We do not track slot on log entries; treat today's planned slots as open
-  // except we rebuild all remaining days including today for simplicity,
-  // since the log is additive nutrients, not a slot replacement.
+  // Over a maximum today: make it up over the window by lowering each window day
+  // below what it had planned, by overshoot / window length.
+  const overshoot = {};
+  for (const t of targets) {
+    const recent = recentTotals[t.nutrient] || 0;
+    if (t.kind === 'max' && recent > t.daily) overshoot[t.nutrient] = recent - t.daily;
+  }
+  const adjusted = windowDates.length > 0 && Object.keys(overshoot).length > 0;
+  const targetsForDay = (date) => targets.map((t) => {
+    const out = { ...t, originalDaily: t.daily };
+    if (adjusted && overshoot[t.nutrient]) {
+      const planned = dayTotals(plan.days[date], recipesById, foodsById).totals[t.nutrient];
+      out.daily = Math.max(t.daily * 0.4, Math.min(t.daily, planned) - overshoot[t.nutrient] / windowDates.length);
+    }
+    return out;
+  });
 
   const newPlan = {
     month: plan.month,
-    days: { ...Object.fromEntries(Object.entries(plan.days).map(([d, m]) => [d, { ...m }])) },
+    days: Object.fromEntries(Object.entries(plan.days).map(([d, m]) => [d, { ...m }])),
   };
-
   const keptForBought = [];
 
-  for (const date of remainingDates) {
-    // If today has a log, still replan the meal slots (the log is extra /
-    // replacement nutrients already in consumedMonth). Rebuild the day.
-    const day = fillDay(recipes, adjTargets, foodsById, boughtSet);
-    // Prefer keeping previous recipes that use bought food when score is close.
-    const prev = plan.days[date];
-    const merged = { ...day };
-    for (const slot of SLOTS) {
-      const prevId = prev?.[slot];
-      const prevRecipe = recipesById.get(prevId);
-      if (prevRecipe && recipeUsesBought(prevRecipe, boughtSet)) {
-        // Keep if it does not worsen score much versus the fresh pick.
+  if (windowDates.length > 0 && (adjusted || boughtSet.size > 0)) {
+    for (const date of windowDates) {
+      const idx = allDates.indexOf(date);
+      const avoid = {};
+      for (const slot of SLOTS) {
+        const k = cooldownDays(recipes, slot);
+        const before = allDates.slice(Math.max(0, idx - k), idx).map((d) => newPlan.days[d][slot]);
+        const after = allDates.slice(idx + 1, idx + 1 + k).filter((d) => !windowSet.has(d)).map((d) => newPlan.days[d][slot]);
+        avoid[slot] = new Set([...before, ...after]);
+      }
+      const dayTargets = targetsForDay(date);
+      // Only swap towards less of the nutrient that went over (never more than the old meal had).
+      const caps = {};
+      if (adjusted) {
+        for (const slot of SLOTS) {
+          const old = recipesById.get(plan.days[date]?.[slot]);
+          if (!old) continue;
+          const totals = recipeNutrients(old, foodsById).totals;
+          caps[slot] = Object.fromEntries(Object.keys(overshoot).map((n) => [n, totals[n]]));
+        }
+      }
+      const day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps);
+      const prev = plan.days[date];
+      const merged = { ...day };
+      for (const slot of SLOTS) {
+        const prevRecipe = recipesById.get(prev?.[slot]);
+        if (!prevRecipe || !recipeUsesBought(prevRecipe, boughtSet) || avoid[slot].has(prevRecipe.id)) continue;
+        // Keep the old meal when it uses bought food and does not worsen the score much.
         let soFar = emptyTotals();
         for (const s of SLOTS) {
           if (s === slot) break;
-          const id = merged[s];
-          const rec = recipesById.get(id);
+          const rec = recipesById.get(merged[s]);
           if (rec) soFar = addTotals(soFar, recipeNutrients(rec, foodsById).totals);
         }
-        const keepTotals = addTotals(soFar, recipeNutrients(prevRecipe, foodsById).totals);
-        const pickRecipeObj = recipesById.get(day[slot]);
-        const pickTotals = addTotals(soFar, recipeNutrients(pickRecipeObj, foodsById).totals);
-        const keepScore = scoreAgainstTargets(keepTotals, adjTargets).score;
-        const pickScore = scoreAgainstTargets(pickTotals, adjTargets).score;
+        const keepScore = scoreAgainstTargets(addTotals(soFar, recipeNutrients(prevRecipe, foodsById).totals), dayTargets).score;
+        const pickScore = scoreAgainstTargets(addTotals(soFar, recipeNutrients(recipesById.get(day[slot]), foodsById).totals), dayTargets).score;
         if (keepScore <= pickScore + 0.5) {
-          merged[slot] = prevId;
-          keptForBought.push({ date, slot, recipeId: prevId });
+          merged[slot] = prevRecipe.id;
+          keptForBought.push({ date, slot, recipeId: prevRecipe.id });
         }
       }
+      newPlan.days[date] = merged;
     }
-    newPlan.days[date] = merged;
   }
 
   const changed = [];
-  for (const date of remainingDates) {
+  for (const date of windowDates) {
     for (const slot of SLOTS) {
       const before = plan.days[date]?.[slot];
       const after = newPlan.days[date]?.[slot];
@@ -492,25 +435,22 @@ export function replan(state) {
     }
   }
 
-  const oldAvg = averageDailyTotals(plan, recipesById, foodsById, fromDate);
-  const newAvg = averageDailyTotals(newPlan, recipesById, foodsById, fromDate);
-  const effects = effectOnTargets(oldAvg, newAvg, adjTargets.map((t, i) => ({
-    ...t,
-    originalDaily: targets[i].daily,
-  })));
+  // Averages over the days that can change (fall back to the rest of the month on the last day).
+  const compareDates = windowDates.length > 0 ? windowDates : remainingDates;
+  const oldAvg = averageDailyTotals(plan, recipesById, foodsById, compareDates);
+  const newAvg = averageDailyTotals(newPlan, recipesById, foodsById, compareDates);
+  const effects = effectOnTargets(oldAvg, newAvg, targets.map((t) => ({ ...t, originalDaily: t.daily })));
 
-  // Unreachable: any adjusted target still badly unmet on the new average.
+  // Unreachable: a target is still badly missed on the new average.
   let unreachable = false;
-  for (const t of adjTargets) {
+  for (const t of targets) {
     const v = newAvg[t.nutrient] ?? 0;
     if (t.kind === 'max' && v > t.daily * 1.15) unreachable = true;
     if (t.kind === 'min' && v < t.daily * 0.85) unreachable = true;
   }
-  // Also: if original targets are impossible even on a fresh build for one day
   const sampleDay = fillDay(recipes, targets, foodsById, boughtSet);
   const sample = dayTotals(sampleDay, recipesById, foodsById);
-  const sampleScore = scoreAgainstTargets(sample.totals, targets);
-  if (sampleScore.unmet >= targets.length) unreachable = true;
+  if (scoreAgainstTargets(sample.totals, targets).unmet >= targets.length) unreachable = true;
 
   const nothingToChange = changed.length === 0;
 
@@ -532,9 +472,10 @@ export function replan(state) {
     unreachable,
     nothingToChange,
     keptForBought,
-    adjustedTargets: adjTargets,
+    adjustedTargets: windowDates.length > 0 ? targetsForDay(windowDates[0]) : targets,
     consumedMonth,
     recentTotals,
+    windowDates,
   };
 }
 

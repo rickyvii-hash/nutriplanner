@@ -1,53 +1,874 @@
 [
- { "id": "greek-yogurt-bowl", "name": "Greek yogurt bowl", "slot": "breakfast", "icon": "🥣",
-   "ingredients": [ {"foodId":"greek-yogurt-plain-nonfat","grams":200}, {"foodId":"blueberries-raw","grams":80}, {"foodId":"rolled-oats-dry","grams":30}, {"foodId":"chia-seeds","grams":10}, {"foodId":"honey","grams":10} ] },
- { "id": "oats-banana-peanut-butter", "name": "Oats with banana and peanut butter", "slot": "breakfast", "icon": "🍌",
-   "ingredients": [ {"foodId":"rolled-oats-dry","grams":50}, {"foodId":"milk-2-fat","grams":200}, {"foodId":"banana-raw","grams":100}, {"foodId":"peanut-butter-smooth","grams":15} ] },
- { "id": "veggie-omelette", "name": "Veggie omelette", "slot": "breakfast", "icon": "🍳",
-   "ingredients": [ {"foodId":"egg-raw","grams":150}, {"foodId":"spinach-raw","grams":40}, {"foodId":"red-bell-pepper-raw","grams":50}, {"foodId":"olive-oil","grams":5} ] },
- { "id": "toast-cottage-cheese-tomato", "name": "Toast with cottage cheese and tomato", "slot": "breakfast", "icon": "🍞",
-   "ingredients": [ {"foodId":"whole-wheat-bread","grams":70}, {"foodId":"cottage-cheese-low-fat","grams":100}, {"foodId":"tomatoes-ripe-raw","grams":80} ] },
- { "id": "fruit-yogurt-granola", "name": "Strawberry yogurt with granola", "slot": "breakfast", "icon": "🍓",
-   "ingredients": [ {"foodId":"yogurt-plain-low-fat","grams":200}, {"foodId":"strawberries-raw","grams":100}, {"foodId":"granola","grams":30} ] },
-
- { "id": "lentil-salad-feta", "name": "Lentil salad with feta", "slot": "lunch", "icon": "🥗",
-   "ingredients": [ {"foodId":"lentils-cooked","grams":150}, {"foodId":"cucumber-raw","grams":80}, {"foodId":"tomatoes-ripe-raw","grams":80}, {"foodId":"feta-cheese","grams":30}, {"foodId":"olive-oil","grams":8}, {"foodId":"parsley-fresh","grams":5} ] },
- { "id": "chickpea-bulgur-salad", "name": "Chickpea bulgur salad", "slot": "lunch", "icon": "🥙",
-   "ingredients": [ {"foodId":"chickpeas-cooked","grams":120}, {"foodId":"bulgur-cooked","grams":100}, {"foodId":"cucumber-raw","grams":60}, {"foodId":"tomatoes-ripe-raw","grams":60}, {"foodId":"olive-oil","grams":8}, {"foodId":"lemon-juice","grams":10} ] },
- { "id": "tuna-pasta", "name": "Tuna pasta", "slot": "lunch", "icon": "🍝",
-   "ingredients": [ {"foodId":"pasta-cooked","grams":180}, {"foodId":"tuna-canned-in-water","grams":80}, {"foodId":"tomatoes-ripe-raw","grams":100}, {"foodId":"olive-oil","grams":8}, {"foodId":"spinach-raw","grams":30} ] },
- { "id": "chicken-rice-bowl", "name": "Chicken and brown rice bowl", "slot": "lunch", "icon": "🍚",
-   "ingredients": [ {"foodId":"chicken-breast-roasted","grams":120}, {"foodId":"brown-rice-cooked","grams":150}, {"foodId":"broccoli-frozen-cooked","grams":100}, {"foodId":"olive-oil","grams":6} ] },
- { "id": "broth-rice-egg", "name": "Chicken broth with rice and egg", "slot": "lunch", "icon": "🍲",
-   "ingredients": [ {"foodId":"chicken-broth","grams":300}, {"foodId":"white-rice-cooked","grams":100}, {"foodId":"egg-hard-boiled","grams":50} ] },
- { "id": "hummus-pita-plate", "name": "Hummus and pita plate", "slot": "lunch", "icon": "🫓",
-   "ingredients": [ {"foodId":"pita-bread-whole-wheat","grams":60}, {"foodId":"hummus","grams":60}, {"foodId":"carrots-raw","grams":80}, {"foodId":"cucumber-raw","grams":60} ] },
-
- { "id": "salmon-quinoa-greens", "name": "Salmon, quinoa and greens", "slot": "dinner", "icon": "🐟",
-   "ingredients": [ {"foodId":"salmon-cooked","grams":120}, {"foodId":"quinoa-cooked","grams":150}, {"foodId":"spinach-cooked","grams":100}, {"foodId":"olive-oil","grams":5} ] },
- { "id": "herb-chicken-broccoli", "name": "Herb chicken with broccoli", "slot": "dinner", "icon": "🍗",
-   "ingredients": [ {"foodId":"chicken-breast-roasted","grams":150}, {"foodId":"broccoli-frozen-cooked","grams":150}, {"foodId":"potato-baked","grams":150}, {"foodId":"olive-oil","grams":8} ] },
- { "id": "chickpea-curry-rice", "name": "Chickpea curry with rice", "slot": "dinner", "icon": "🍛",
-   "ingredients": [ {"foodId":"chickpeas-canned","grams":150}, {"foodId":"tomato-sauce-canned","grams":100}, {"foodId":"coconut-milk-canned","grams":40}, {"foodId":"white-rice-cooked","grams":150}, {"foodId":"spinach-raw","grams":40} ] },
- { "id": "cod-sweet-potato", "name": "Cod with sweet potato", "slot": "dinner", "icon": "🐠",
-   "ingredients": [ {"foodId":"cod-cooked","grams":150}, {"foodId":"sweet-potato-baked","grams":150}, {"foodId":"green-beans-raw","grams":100}, {"foodId":"olive-oil","grams":6} ] },
- { "id": "turkey-veg-stir-fry", "name": "Turkey and vegetable stir-fry", "slot": "dinner", "icon": "🥘",
-   "ingredients": [ {"foodId":"ground-turkey-cooked","grams":120}, {"foodId":"mixed-vegetables-frozen-cooked","grams":150}, {"foodId":"brown-rice-cooked","grams":150}, {"foodId":"soy-sauce","grams":10}, {"foodId":"canola-oil","grams":6} ] },
- { "id": "white-bean-soup", "name": "White bean and vegetable soup", "slot": "dinner", "icon": "🍜",
-   "ingredients": [ {"foodId":"white-beans-cooked","grams":150}, {"foodId":"carrots-raw","grams":60}, {"foodId":"celery-raw","grams":40}, {"foodId":"onion-raw","grams":50}, {"foodId":"tomatoes-canned","grams":100}, {"foodId":"olive-oil","grams":6}, {"foodId":"vegetable-broth","grams":250} ] },
- { "id": "whole-wheat-pasta-tomato", "name": "Whole-wheat pasta with tomato and parmesan", "slot": "dinner", "icon": "🍅",
-   "ingredients": [ {"foodId":"whole-wheat-pasta-cooked","grams":200}, {"foodId":"tomato-sauce-canned","grams":120}, {"foodId":"parmesan-grated","grams":15}, {"foodId":"olive-oil","grams":5}, {"foodId":"zucchini-raw","grams":80} ] },
-
- { "id": "apple-almonds", "name": "Apple and almonds", "slot": "snack", "icon": "🍎",
-   "ingredients": [ {"foodId":"apple-raw","grams":150}, {"foodId":"almonds","grams":20} ] },
- { "id": "yogurt-berries", "name": "Greek yogurt and berries", "slot": "snack", "icon": "🫐",
-   "ingredients": [ {"foodId":"greek-yogurt-plain-nonfat","grams":150}, {"foodId":"blueberries-raw","grams":60} ] },
- { "id": "hummus-carrots", "name": "Hummus and carrots", "slot": "snack", "icon": "🥕",
-   "ingredients": [ {"foodId":"hummus","grams":50}, {"foodId":"carrots-raw","grams":100} ] },
- { "id": "banana-peanut-butter", "name": "Banana with peanut butter", "slot": "snack", "icon": "🍌",
-   "ingredients": [ {"foodId":"banana-raw","grams":100}, {"foodId":"peanut-butter-smooth","grams":15} ] },
- { "id": "cottage-cheese-pear", "name": "Cottage cheese and pear", "slot": "snack", "icon": "🍐",
-   "ingredients": [ {"foodId":"cottage-cheese-low-fat","grams":100}, {"foodId":"pear-raw","grams":120} ] },
- { "id": "ricotta-rice-cake", "name": "Rice cakes with ricotta and honey", "slot": "snack", "icon": "🍯",
-   "ingredients": [ {"foodId":"ricotta-part-skim","grams":60}, {"foodId":"rice-cakes","grams":20}, {"foodId":"honey","grams":5} ] }
+ {
+  "id": "greek-yogurt-bowl",
+  "name": "Greek yogurt bowl",
+  "slot": "breakfast",
+  "icon": "🥣",
+  "ingredients": [
+   {
+    "foodId": "greek-yogurt-plain-nonfat",
+    "grams": 200
+   },
+   {
+    "foodId": "blueberries-raw",
+    "grams": 80
+   },
+   {
+    "foodId": "rolled-oats-dry",
+    "grams": 30
+   },
+   {
+    "foodId": "chia-seeds",
+    "grams": 10
+   },
+   {
+    "foodId": "honey",
+    "grams": 10
+   }
+  ]
+ },
+ {
+  "id": "oats-banana-peanut-butter",
+  "name": "Oats with banana and peanut butter",
+  "slot": "breakfast",
+  "icon": "🍌",
+  "ingredients": [
+   {
+    "foodId": "rolled-oats-dry",
+    "grams": 50
+   },
+   {
+    "foodId": "milk-2-fat",
+    "grams": 200
+   },
+   {
+    "foodId": "banana-raw",
+    "grams": 100
+   },
+   {
+    "foodId": "peanut-butter-smooth",
+    "grams": 15
+   }
+  ]
+ },
+ {
+  "id": "veggie-omelette",
+  "name": "Veggie omelette",
+  "slot": "breakfast",
+  "icon": "🍳",
+  "ingredients": [
+   {
+    "foodId": "egg-raw",
+    "grams": 150
+   },
+   {
+    "foodId": "spinach-raw",
+    "grams": 40
+   },
+   {
+    "foodId": "red-bell-pepper-raw",
+    "grams": 50
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 5
+   }
+  ]
+ },
+ {
+  "id": "toast-cottage-cheese-tomato",
+  "name": "Toast with cottage cheese and tomato",
+  "slot": "breakfast",
+  "icon": "🍞",
+  "ingredients": [
+   {
+    "foodId": "whole-wheat-bread",
+    "grams": 70
+   },
+   {
+    "foodId": "cottage-cheese-low-fat",
+    "grams": 100
+   },
+   {
+    "foodId": "tomatoes-ripe-raw",
+    "grams": 80
+   }
+  ]
+ },
+ {
+  "id": "fruit-yogurt-granola",
+  "name": "Strawberry yogurt with granola",
+  "slot": "breakfast",
+  "icon": "🍓",
+  "ingredients": [
+   {
+    "foodId": "yogurt-plain-low-fat",
+    "grams": 200
+   },
+   {
+    "foodId": "strawberries-raw",
+    "grams": 100
+   },
+   {
+    "foodId": "granola",
+    "grams": 30
+   }
+  ]
+ },
+ {
+  "id": "lentil-salad-feta",
+  "name": "Lentil salad with feta",
+  "slot": "lunch",
+  "icon": "🥗",
+  "ingredients": [
+   {
+    "foodId": "lentils-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "cucumber-raw",
+    "grams": 80
+   },
+   {
+    "foodId": "tomatoes-ripe-raw",
+    "grams": 80
+   },
+   {
+    "foodId": "feta-cheese",
+    "grams": 30
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 8
+   },
+   {
+    "foodId": "parsley-fresh",
+    "grams": 5
+   }
+  ]
+ },
+ {
+  "id": "chickpea-bulgur-salad",
+  "name": "Chickpea bulgur salad",
+  "slot": "lunch",
+  "icon": "🥙",
+  "ingredients": [
+   {
+    "foodId": "chickpeas-cooked",
+    "grams": 120
+   },
+   {
+    "foodId": "bulgur-cooked",
+    "grams": 100
+   },
+   {
+    "foodId": "cucumber-raw",
+    "grams": 60
+   },
+   {
+    "foodId": "tomatoes-ripe-raw",
+    "grams": 60
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 8
+   },
+   {
+    "foodId": "lemon-juice",
+    "grams": 10
+   }
+  ]
+ },
+ {
+  "id": "tuna-pasta",
+  "name": "Tuna pasta",
+  "slot": "lunch",
+  "icon": "🍝",
+  "ingredients": [
+   {
+    "foodId": "pasta-cooked",
+    "grams": 180
+   },
+   {
+    "foodId": "tuna-canned-in-water",
+    "grams": 80
+   },
+   {
+    "foodId": "tomatoes-ripe-raw",
+    "grams": 100
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 8
+   },
+   {
+    "foodId": "spinach-raw",
+    "grams": 30
+   }
+  ]
+ },
+ {
+  "id": "chicken-rice-bowl",
+  "name": "Chicken and brown rice bowl",
+  "slot": "lunch",
+  "icon": "🍚",
+  "ingredients": [
+   {
+    "foodId": "chicken-breast-roasted",
+    "grams": 120
+   },
+   {
+    "foodId": "brown-rice-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "broccoli-frozen-cooked",
+    "grams": 100
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 6
+   }
+  ]
+ },
+ {
+  "id": "broth-rice-egg",
+  "name": "Chicken broth with rice and egg",
+  "slot": "lunch",
+  "icon": "🍲",
+  "ingredients": [
+   {
+    "foodId": "chicken-broth",
+    "grams": 300
+   },
+   {
+    "foodId": "white-rice-cooked",
+    "grams": 100
+   },
+   {
+    "foodId": "egg-hard-boiled",
+    "grams": 50
+   }
+  ]
+ },
+ {
+  "id": "hummus-pita-plate",
+  "name": "Hummus and pita plate",
+  "slot": "lunch",
+  "icon": "🫓",
+  "ingredients": [
+   {
+    "foodId": "pita-bread-whole-wheat",
+    "grams": 60
+   },
+   {
+    "foodId": "hummus",
+    "grams": 60
+   },
+   {
+    "foodId": "carrots-raw",
+    "grams": 80
+   },
+   {
+    "foodId": "cucumber-raw",
+    "grams": 60
+   }
+  ]
+ },
+ {
+  "id": "salmon-quinoa-greens",
+  "name": "Salmon, quinoa and greens",
+  "slot": "dinner",
+  "icon": "🐟",
+  "ingredients": [
+   {
+    "foodId": "salmon-cooked",
+    "grams": 120
+   },
+   {
+    "foodId": "quinoa-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "spinach-cooked",
+    "grams": 100
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 5
+   }
+  ]
+ },
+ {
+  "id": "herb-chicken-broccoli",
+  "name": "Herb chicken with broccoli",
+  "slot": "dinner",
+  "icon": "🍗",
+  "ingredients": [
+   {
+    "foodId": "chicken-breast-roasted",
+    "grams": 150
+   },
+   {
+    "foodId": "broccoli-frozen-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "potato-baked",
+    "grams": 150
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 8
+   }
+  ]
+ },
+ {
+  "id": "chickpea-curry-rice",
+  "name": "Chickpea curry with rice",
+  "slot": "dinner",
+  "icon": "🍛",
+  "ingredients": [
+   {
+    "foodId": "chickpeas-canned",
+    "grams": 150
+   },
+   {
+    "foodId": "tomato-sauce-canned",
+    "grams": 100
+   },
+   {
+    "foodId": "coconut-milk-canned",
+    "grams": 40
+   },
+   {
+    "foodId": "white-rice-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "spinach-raw",
+    "grams": 40
+   }
+  ]
+ },
+ {
+  "id": "cod-sweet-potato",
+  "name": "Cod with sweet potato",
+  "slot": "dinner",
+  "icon": "🐠",
+  "ingredients": [
+   {
+    "foodId": "cod-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "sweet-potato-baked",
+    "grams": 150
+   },
+   {
+    "foodId": "green-beans-raw",
+    "grams": 100
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 6
+   }
+  ]
+ },
+ {
+  "id": "turkey-veg-stir-fry",
+  "name": "Turkey and vegetable stir-fry",
+  "slot": "dinner",
+  "icon": "🥘",
+  "ingredients": [
+   {
+    "foodId": "ground-turkey-cooked",
+    "grams": 120
+   },
+   {
+    "foodId": "mixed-vegetables-frozen-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "brown-rice-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "soy-sauce",
+    "grams": 10
+   },
+   {
+    "foodId": "canola-oil",
+    "grams": 6
+   }
+  ]
+ },
+ {
+  "id": "white-bean-soup",
+  "name": "White bean and vegetable soup",
+  "slot": "dinner",
+  "icon": "🍜",
+  "ingredients": [
+   {
+    "foodId": "white-beans-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "carrots-raw",
+    "grams": 60
+   },
+   {
+    "foodId": "celery-raw",
+    "grams": 40
+   },
+   {
+    "foodId": "onion-raw",
+    "grams": 50
+   },
+   {
+    "foodId": "tomatoes-canned",
+    "grams": 100
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 6
+   },
+   {
+    "foodId": "vegetable-broth",
+    "grams": 250
+   }
+  ]
+ },
+ {
+  "id": "whole-wheat-pasta-tomato",
+  "name": "Whole-wheat pasta with tomato and parmesan",
+  "slot": "dinner",
+  "icon": "🍅",
+  "ingredients": [
+   {
+    "foodId": "whole-wheat-pasta-cooked",
+    "grams": 200
+   },
+   {
+    "foodId": "tomato-sauce-canned",
+    "grams": 120
+   },
+   {
+    "foodId": "parmesan-grated",
+    "grams": 15
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 5
+   },
+   {
+    "foodId": "zucchini-raw",
+    "grams": 80
+   }
+  ]
+ },
+ {
+  "id": "apple-almonds",
+  "name": "Apple and almonds",
+  "slot": "snack",
+  "icon": "🍎",
+  "ingredients": [
+   {
+    "foodId": "apple-raw",
+    "grams": 150
+   },
+   {
+    "foodId": "almonds",
+    "grams": 20
+   }
+  ]
+ },
+ {
+  "id": "yogurt-berries",
+  "name": "Greek yogurt and berries",
+  "slot": "snack",
+  "icon": "🫐",
+  "ingredients": [
+   {
+    "foodId": "greek-yogurt-plain-nonfat",
+    "grams": 150
+   },
+   {
+    "foodId": "blueberries-raw",
+    "grams": 60
+   }
+  ]
+ },
+ {
+  "id": "hummus-carrots",
+  "name": "Hummus and carrots",
+  "slot": "snack",
+  "icon": "🥕",
+  "ingredients": [
+   {
+    "foodId": "hummus",
+    "grams": 50
+   },
+   {
+    "foodId": "carrots-raw",
+    "grams": 100
+   }
+  ]
+ },
+ {
+  "id": "banana-peanut-butter",
+  "name": "Banana with peanut butter",
+  "slot": "snack",
+  "icon": "🍌",
+  "ingredients": [
+   {
+    "foodId": "banana-raw",
+    "grams": 100
+   },
+   {
+    "foodId": "peanut-butter-smooth",
+    "grams": 15
+   }
+  ]
+ },
+ {
+  "id": "cottage-cheese-pear",
+  "name": "Cottage cheese and pear",
+  "slot": "snack",
+  "icon": "🍐",
+  "ingredients": [
+   {
+    "foodId": "cottage-cheese-low-fat",
+    "grams": 100
+   },
+   {
+    "foodId": "pear-raw",
+    "grams": 120
+   }
+  ]
+ },
+ {
+  "id": "ricotta-rice-cake",
+  "name": "Rice cakes with ricotta and honey",
+  "slot": "snack",
+  "icon": "🍯",
+  "ingredients": [
+   {
+    "foodId": "ricotta-part-skim",
+    "grams": 60
+   },
+   {
+    "foodId": "rice-cakes",
+    "grams": 20
+   },
+   {
+    "foodId": "honey",
+    "grams": 5
+   }
+  ]
+ },
+ {
+  "id": "big-oat-bowl",
+  "name": "Big oat bowl with banana, peanut butter and honey",
+  "slot": "breakfast",
+  "icon": "🥣",
+  "ingredients": [
+   {
+    "foodId": "rolled-oats-dry",
+    "grams": 90
+   },
+   {
+    "foodId": "milk-whole",
+    "grams": 250
+   },
+   {
+    "foodId": "banana-raw",
+    "grams": 120
+   },
+   {
+    "foodId": "peanut-butter-smooth",
+    "grams": 30
+   },
+   {
+    "foodId": "honey",
+    "grams": 15
+   }
+  ]
+ },
+ {
+  "id": "egg-avocado-toast-plate",
+  "name": "Eggs, cheese and avocado toast",
+  "slot": "breakfast",
+  "icon": "🥑",
+  "ingredients": [
+   {
+    "foodId": "whole-wheat-bread",
+    "grams": 100
+   },
+   {
+    "foodId": "egg-raw",
+    "grams": 150
+   },
+   {
+    "foodId": "cheddar-cheese",
+    "grams": 30
+   },
+   {
+    "foodId": "avocado-raw",
+    "grams": 80
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 8
+   }
+  ]
+ },
+ {
+  "id": "yogurt-granola-honey-bowl",
+  "name": "Yogurt, granola and honey bowl",
+  "slot": "breakfast",
+  "icon": "🍯",
+  "ingredients": [
+   {
+    "foodId": "greek-yogurt-plain-nonfat",
+    "grams": 250
+   },
+   {
+    "foodId": "granola",
+    "grams": 70
+   },
+   {
+    "foodId": "honey",
+    "grams": 15
+   },
+   {
+    "foodId": "walnuts",
+    "grams": 20
+   },
+   {
+    "foodId": "banana-raw",
+    "grams": 100
+   }
+  ]
+ },
+ {
+  "id": "chicken-pasta-olive-oil",
+  "name": "Chicken pasta with olive oil and parmesan",
+  "slot": "lunch",
+  "icon": "🍝",
+  "ingredients": [
+   {
+    "foodId": "pasta-cooked",
+    "grams": 280
+   },
+   {
+    "foodId": "chicken-breast-roasted",
+    "grams": 130
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 15
+   },
+   {
+    "foodId": "parmesan-grated",
+    "grams": 15
+   },
+   {
+    "foodId": "tomato-sauce-canned",
+    "grams": 80
+   }
+  ]
+ },
+ {
+  "id": "salmon-rice-avocado-bowl",
+  "name": "Salmon rice bowl with avocado",
+  "slot": "lunch",
+  "icon": "🍣",
+  "ingredients": [
+   {
+    "foodId": "brown-rice-cooked",
+    "grams": 250
+   },
+   {
+    "foodId": "salmon-cooked",
+    "grams": 130
+   },
+   {
+    "foodId": "avocado-raw",
+    "grams": 80
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 10
+   },
+   {
+    "foodId": "edamame-cooked",
+    "grams": 80
+   }
+  ]
+ },
+ {
+  "id": "lentil-rice-egg-plate",
+  "name": "Lentils, rice and egg plate",
+  "slot": "lunch",
+  "icon": "🍛",
+  "ingredients": [
+   {
+    "foodId": "lentils-cooked",
+    "grams": 200
+   },
+   {
+    "foodId": "white-rice-cooked",
+    "grams": 200
+   },
+   {
+    "foodId": "egg-hard-boiled",
+    "grams": 100
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 12
+   }
+  ]
+ },
+ {
+  "id": "beef-potato-beans",
+  "name": "Beef with baked potato and green beans",
+  "slot": "dinner",
+  "icon": "🥩",
+  "ingredients": [
+   {
+    "foodId": "beef-sirloin-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "potato-baked",
+    "grams": 250
+   },
+   {
+    "foodId": "green-beans-raw",
+    "grams": 100
+   },
+   {
+    "foodId": "butter-unsalted",
+    "grams": 10
+   }
+  ]
+ },
+ {
+  "id": "creamy-chickpea-curry-rice",
+  "name": "Creamy chickpea curry with extra rice",
+  "slot": "dinner",
+  "icon": "🍲",
+  "ingredients": [
+   {
+    "foodId": "chickpeas-canned",
+    "grams": 200
+   },
+   {
+    "foodId": "coconut-milk-canned",
+    "grams": 100
+   },
+   {
+    "foodId": "white-rice-cooked",
+    "grams": 250
+   },
+   {
+    "foodId": "spinach-raw",
+    "grams": 60
+   }
+  ]
+ },
+ {
+  "id": "salmon-pasta-spinach",
+  "name": "Salmon pasta with spinach",
+  "slot": "dinner",
+  "icon": "🐟",
+  "ingredients": [
+   {
+    "foodId": "salmon-cooked",
+    "grams": 150
+   },
+   {
+    "foodId": "pasta-cooked",
+    "grams": 280
+   },
+   {
+    "foodId": "spinach-cooked",
+    "grams": 100
+   },
+   {
+    "foodId": "olive-oil",
+    "grams": 12
+   },
+   {
+    "foodId": "parmesan-grated",
+    "grams": 15
+   }
+  ]
+ },
+ {
+  "id": "pb-toast-and-milk",
+  "name": "Peanut butter toast with a glass of milk",
+  "slot": "snack",
+  "icon": "🥜",
+  "ingredients": [
+   {
+    "foodId": "whole-wheat-bread",
+    "grams": 70
+   },
+   {
+    "foodId": "peanut-butter-smooth",
+    "grams": 30
+   },
+   {
+    "foodId": "milk-whole",
+    "grams": 250
+   }
+  ]
+ },
+ {
+  "id": "nut-and-fruit-mix",
+  "name": "Nut and dried fruit mix",
+  "slot": "snack",
+  "icon": "🌰",
+  "ingredients": [
+   {
+    "foodId": "almonds",
+    "grams": 30
+   },
+   {
+    "foodId": "walnuts",
+    "grams": 20
+   },
+   {
+    "foodId": "raisins",
+    "grams": 30
+   },
+   {
+    "foodId": "dates",
+    "grams": 40
+   }
+  ]
+ },
+ {
+  "id": "yogurt-granola-snack",
+  "name": "Yogurt with granola and honey",
+  "slot": "snack",
+  "icon": "🥛",
+  "ingredients": [
+   {
+    "foodId": "greek-yogurt-plain-nonfat",
+    "grams": 200
+   },
+   {
+    "foodId": "granola",
+    "grams": 60
+   },
+   {
+    "foodId": "honey",
+    "grams": 15
+   }
+  ]
+ }
 ]

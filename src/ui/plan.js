@@ -126,8 +126,12 @@ export function renderPlan(ctx) {
     const up = el(`<section class="card"><h3>Upcoming days</h3><ul class="upcoming"></ul></section>`);
     const ul = up.querySelector('.upcoming');
     for (const date of upcoming) {
-      const dinner = recipesById.get(state.plan.days[date].dinner);
-      ul.appendChild(el(`<li><span class="muted">${date}</span> · ${dinner?.icon || ''} ${escapeHtml(dinner?.name || '')}</li>`));
+      const meals = ['breakfast', 'lunch', 'dinner', 'snack']
+        .map((slot) => recipesById.get(state.plan.days[date][slot]))
+        .filter(Boolean)
+        .map((r) => `<li>${r.icon || ''} ${escapeHtml(r.name)}</li>`)
+        .join('');
+      ul.appendChild(el(`<li class="upcoming-day"><span class="muted">${date}</span><ul>${meals}</ul></li>`));
     }
     root.appendChild(up);
   }

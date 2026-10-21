@@ -2,13 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { profileById, PROFILES } from '../src/engine/profiles.js';
+import { recipeNutrients } from '../src/engine/nutrients.js';
 import {
   buildPlan,
   replan,
   dayTotals,
   daysInMonth,
   scoreAgainstTargets,
-  adjustedTargetsForRest,
 } from '../src/engine/planner.js';
 
 const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
@@ -54,62 +54,47 @@ test('buildPlan stays reasonably near the targets on an average day', () => {
   assert.ok(score < 20, `mid-month day score too high: ${score}`);
 });
 
-test('worked example: high saturated-fat meal lowers sat fat in following days', () => {
-  const cholesterol = profileById('cholesterol').targets;
-  // Seed a high-sat-fat plan so there is headroom to replan downward.
-  const plan = buildPlan([{ nutrient: 'kcal', kind: 'min', daily: 1800 }], recipes, month, foodsById);
-  const highDay = {
-    breakfast: 'veggie-omelette',
-    lunch: 'lentil-salad-feta',
-    dinner: 'chickpea-curry-rice',
-    snack: 'banana-peanut-butter',
-  };
-  const fromDate = '2026-10-10';
-  for (const date of Object.keys(plan.days)) {
-    if (date >= fromDate) plan.days[date] = { ...highDay };
-  }
+test('pizza and ice cream on Cholesterol: the next days change, the rest of the month does not', () => {
+  const targets = profileById('cholesterol').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
   const recipesById = new Map(recipes.map((r) => [r.id, r]));
-
+  const fromDate = '2026-10-21';
   const log = [{
     date: fromDate,
     time: '20:00',
     items: [
       { foodId: 'pizza-cheese', grams: 350 },
-      { foodId: 'ice-cream-vanilla', grams: 200 },
+      { foodId: 'ice-cream-vanilla', grams: 100 },
     ],
   }];
+  const result = replan({ targets, recipes, plan, log, bought: [], foodsById, fromDate });
 
-  const beforeAvg = (() => {
-    const dates = Object.keys(plan.days).filter((d) => d > fromDate);
-    let sum = 0;
-    for (const d of dates) sum += dayTotals(plan.days[d], recipesById, foodsById).totals.satFat;
-    return sum / dates.length;
-  })();
-
-  const result = replan({
-    targets: cholesterol,
-    recipes,
-    plan,
-    log,
-    bought: [],
-    foodsById,
-    fromDate,
-  });
-
-  const afterAvg = (() => {
-    const dates = Object.keys(result.plan.days).filter((d) => d > fromDate);
-    let sum = 0;
-    for (const d of dates) sum += dayTotals(result.plan.days[d], recipesById, foodsById).totals.satFat;
-    return sum / dates.length;
-  })();
-
-  assert.ok(afterAvg < beforeAvg - 1, `expected lower sat fat after replan: before ${beforeAvg}, after ${afterAvg}`);
-  const satEffect = result.effects.find((e) => e.nutrient === 'satFat');
-  assert.ok(satEffect, 'missing satFat effect');
-  assert.ok(satEffect.after < satEffect.before - 1, `effect after ${satEffect.after} before ${satEffect.before}`);
-  assert.match(result.reason.toLowerCase(), /saturat/);
-  assert.ok(result.changed.length > 0);
-  assert.ok(result.adjustedTargets.find((t) => t.nutrient === 'satFat').daily < 13);
+  assert.equal(result.nothingToChange, false, 'the screen must not say "No changes needed"');
+  const changedDays = [...new Set(result.changed.map((c) => c.date))];
+  assert.ok(changedDays.length >= 3 && changedDays.length <= 5, `changed days: ${changedDays.length}`);
+  // Every changed day is after the log date; everything else is untouched.
+  for (const d of changedDays) assert.ok(d > fromDate);
+  for (const [date, meals] of Object.entries(plan.days)) {
+    if (changedDays.includes(date)) continue;
+    assert.deepEqual(result.plan.days[date], meals, `${date} should be unchanged`);
+  }
+  // Changed days have less saturated fat than before.
+  for (const d of changedDays) {
+    const before = dayTotals(plan.days[d], recipesById, foodsById).totals.satFat;
+    const after = dayTotals(result.plan.days[d], recipesById, foodsById).totals.satFat;
+    assert.ok(after < before, `${d}: ${after} should be below ${before}`);
+  }
+  // Every swapped meal has less saturated fat than the meal it replaces.
+  for (const c of result.changed) {
+    const before = recipeNutrients(recipesById.get(c.before), foodsById).totals.satFat;
+    const after = recipeNutrients(recipesById.get(c.after), foodsById).totals.satFat;
+    assert.ok(after < before, `${c.date} ${c.slot}: ${c.beforeName} (${before.toFixed(1)} g) -> ${c.afterName} (${after.toFixed(1)} g)`);
+  }
+  const sat = result.effects.find((e) => e.nutrient === 'satFat');
+  assert.ok(sat.after < sat.before);
+  // The reason quotes the real numbers.
+  assert.match(result.reason, /logged \d+\.\d g of saturated fat today \(goal: max 13\.0 g\)/);
+  assert.match(result.reason, /next \d days/);
 });
 
 test('nothing to change when the log is already on track', () => {
@@ -175,9 +160,36 @@ test('impossible targets return closest plan with unreachable flag', () => {
   assert.match(result.reason.toLowerCase(), /not every target|closest|cannot/);
 });
 
-test('adjustedTargetsForRest lowers max after a high day', () => {
-  const targets = [{ nutrient: 'satFat', kind: 'max', daily: 13 }];
-  const consumed = { satFat: 40 };
-  const adj = adjustedTargetsForRest(targets, consumed, 1, 20);
-  assert.ok(adj[0].daily < 13, `expected lower remaining daily, got ${adj[0].daily}`);
+const SLOT_NAMES = ['breakfast', 'lunch', 'dinner', 'snack'];
+
+test('variety: no recipe fills the same slot on more than 3 of 7 days, or a third of the month', () => {
+  for (const profile of PROFILES) {
+    const plan = buildPlan(profile.targets, recipes, month, foodsById);
+    const dates = Object.keys(plan.days).sort();
+    for (const slot of SLOT_NAMES) {
+      const counts = new Map();
+      for (const d of dates) counts.set(plan.days[d][slot], (counts.get(plan.days[d][slot]) || 0) + 1);
+      for (const [id, n] of counts) assert.ok(n <= dates.length / 3, `${profile.id} ${slot} ${id} used ${n} days`);
+      for (let i = 0; i + 7 <= dates.length; i += 1) {
+        const week = new Map();
+        for (const d of dates.slice(i, i + 7)) week.set(plan.days[d][slot], (week.get(plan.days[d][slot]) || 0) + 1);
+        for (const [id, n] of week) assert.ok(n <= 3, `${profile.id} ${slot} ${id} ${n} times in 7 days from ${dates[i]}`);
+      }
+    }
+  }
+});
+
+test('every profile is reachable: the month average meets each default target', () => {
+  const recipesById = new Map(recipes.map((r) => [r.id, r]));
+  for (const profile of PROFILES) {
+    const plan = buildPlan(profile.targets, recipes, month, foodsById);
+    const dates = Object.keys(plan.days);
+    for (const t of profile.targets) {
+      let sum = 0;
+      for (const d of dates) sum += dayTotals(plan.days[d], recipesById, foodsById).totals[t.nutrient];
+      const avg = sum / dates.length;
+      if (t.kind === 'max') assert.ok(avg <= t.daily * 1.05, `${profile.id} ${t.nutrient} avg ${avg.toFixed(1)} over max ${t.daily}`);
+      else assert.ok(avg >= t.daily * 0.95, `${profile.id} ${t.nutrient} avg ${avg.toFixed(1)} under min ${t.daily}`);
+    }
+  }
 });
