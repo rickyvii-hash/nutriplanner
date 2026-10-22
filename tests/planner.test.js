@@ -9,6 +9,7 @@ import {
   dayTotals,
   daysInMonth,
   scoreAgainstTargets,
+  localTime,
 } from '../src/engine/planner.js';
 
 const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
@@ -16,6 +17,14 @@ const recipes = JSON.parse(fs.readFileSync(new URL('../data/recipes.json', impor
 const foodsById = new Map(foods.map((f) => [f.id, f]));
 
 const month = { year: 2026, month: 10 };
+
+test('localTime returns the local clock time as HH:MM', () => {
+  assert.equal(localTime(new Date(2026, 9, 21, 14, 5)), '14:05');
+});
+
+test('localTime zero-pads hours and minutes after midnight', () => {
+  assert.equal(localTime(new Date(2026, 9, 21, 0, 7)), '00:07');
+});
 
 test('buildPlan fills every slot of every day for each profile', () => {
   for (const profile of PROFILES) {

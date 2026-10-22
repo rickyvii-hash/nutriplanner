@@ -1,5 +1,7 @@
 import { loadState, saveState, getStorageNotice } from './store.js';
-import { buildPlan, replan, todayIso } from './engine/planner.js';
+import {
+  buildPlan, replan, todayIso, localTime,
+} from './engine/planner.js';
 import { renderTargets } from './ui/targets.js';
 import { renderPlan } from './ui/plan.js';
 import { renderLog } from './ui/log.js';
@@ -51,7 +53,7 @@ const ctx = {
     if (!items?.length || !ctx.state.plan) return;
     const entry = {
       date: todayIso(),
-      time: new Date().toISOString().slice(11, 16),
+      time: localTime(),
       items,
     };
     const log = [...(ctx.state.log || []), entry];

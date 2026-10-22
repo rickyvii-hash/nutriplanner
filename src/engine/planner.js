@@ -23,6 +23,11 @@ export function todayIso(now = new Date()) {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
+/** Local wall-clock time as HH:MM (never UTC, so the logged time matches the phone clock). */
+export function localTime(now = new Date()) {
+  return `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
 function emptyTotals() {
   const t = {};
   for (const k of NUTRIENT_KEYS) t[k] = 0;
