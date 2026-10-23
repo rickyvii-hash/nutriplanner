@@ -244,3 +244,22 @@ test('pizza and ice cream still change the next days when every food is already 
   assert.ok(sat.after < sat.before, 'saturated fat should go down');
 });
 
+test('regression: pizza and ice cream on Cholesterol is NOT reported as unreachable', () => {
+  const targets = profileById('cholesterol').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  const fromDate = '2026-10-21';
+  const log = [{
+    date: fromDate,
+    time: '20:00',
+    items: [{ foodId: 'pizza-cheese', grams: 350 }, { foodId: 'ice-cream-vanilla', grams: 100 }],
+  }];
+  const result = replan({ targets, recipes, plan, log, bought: [], foodsById, fromDate });
+  assert.equal(result.unreachable, false, 'the targets are reachable with the recipes we have');
+  assert.doesNotMatch(result.reason, /closest plan|cannot be met/i);
+  for (const profile of PROFILES) {
+    const p = buildPlan(profile.targets, recipes, month, foodsById);
+    const r = replan({ targets: profile.targets, recipes, plan: p, log, bought: [], foodsById, fromDate });
+    assert.equal(r.unreachable, false, `${profile.id} should not be flagged unreachable after a normal off-plan meal`);
+  }
+});
+

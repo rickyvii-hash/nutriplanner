@@ -488,7 +488,7 @@ export function replan(state) {
   // Unreachable: a target is still badly missed on the new average.
   let unreachable = false;
   for (const t of targets) {
-    const v = newAvg[t.nutrient] ?? 0;
+    const v = newAvg.totals[t.nutrient] ?? 0;
     if (t.kind === 'max' && v > t.daily * 1.15) unreachable = true;
     if (t.kind === 'min' && v < t.daily * 0.85) unreachable = true;
   }
