@@ -40,22 +40,34 @@ function addTotals(a, b) {
   return out;
 }
 
-/** Day nutrient totals from recipe ids. Skips missing recipes; null nutrients count as 0 for scoring only. */
+/**
+ * Day nutrient totals from recipe ids. Skips missing recipes; null nutrients count as 0 for scoring only.
+ * Returns { totals, incomplete, unknown }: incomplete[key] marks a partial sum (some meal had no value),
+ * unknown[key] marks a nutrient no meal of the day knows at all (the screen shows "n/a").
+ */
 export function dayTotals(dayMeals, recipesById, foodsById) {
-  let totals = emptyTotals();
+  const totals = emptyTotals();
   const incomplete = {};
+  const known = {};
+  let hasMeal = false;
   for (const slot of SLOTS) {
     const id = dayMeals?.[slot];
     if (!id) continue;
     const recipe = recipesById.get(id);
     if (!recipe) continue;
+    hasMeal = true;
     const r = recipeNutrients(recipe, foodsById);
     for (const k of NUTRIENT_KEYS) {
       if (r.unknown[k] || r.incomplete[k]) incomplete[k] = true;
-      if (!r.unknown[k]) totals[k] += r.totals[k];
+      if (!r.unknown[k]) {
+        totals[k] += r.totals[k];
+        known[k] = true;
+      }
     }
   }
-  return { totals, incomplete };
+  const unknown = {};
+  for (const k of NUTRIENT_KEYS) unknown[k] = hasMeal && !known[k];
+  return { totals, incomplete, unknown };
 }
 
 /**
@@ -195,8 +207,8 @@ export function consumedFromLog(log, foodsById, throughDate = null) {
 
 function effectOnTargets(oldDayAvg, newDayAvg, targets) {
   return targets.map((t) => {
-    const before = oldDayAvg[t.nutrient] ?? 0;
-    const after = newDayAvg[t.nutrient] ?? 0;
+    const before = oldDayAvg.totals[t.nutrient] ?? 0;
+    const after = newDayAvg.totals[t.nutrient] ?? 0;
     const delta = after - before;
     let status = 'Closer to target';
     const goal = t.originalDaily ?? t.daily;
@@ -221,20 +233,35 @@ function effectOnTargets(oldDayAvg, newDayAvg, targets) {
       after,
       delta,
       status,
+      // A partial average is marked so the screen never prints it as certain.
+      beforeIncomplete: Boolean(oldDayAvg.incomplete?.[t.nutrient]),
+      beforeUnknown: Boolean(oldDayAvg.unknown?.[t.nutrient]),
+      afterIncomplete: Boolean(newDayAvg.incomplete?.[t.nutrient]),
+      afterUnknown: Boolean(newDayAvg.unknown?.[t.nutrient]),
     };
   });
 }
 
 function averageDailyTotals(plan, recipesById, foodsById, dates) {
-  if (dates.length === 0) return emptyTotals();
+  if (dates.length === 0) return { totals: emptyTotals(), incomplete: {}, unknown: {} };
   let sum = emptyTotals();
+  const incomplete = {};
+  const unknownCount = {};
   for (const date of dates) {
-    const { totals } = dayTotals(plan.days[date], recipesById, foodsById);
-    sum = addTotals(sum, totals);
+    const day = dayTotals(plan.days[date], recipesById, foodsById);
+    sum = addTotals(sum, day.totals);
+    for (const k of NUTRIENT_KEYS) {
+      if (day.unknown[k]) unknownCount[k] = (unknownCount[k] || 0) + 1;
+      if (day.unknown[k] || day.incomplete[k]) incomplete[k] = true;
+    }
   }
-  const avg = emptyTotals();
-  for (const k of NUTRIENT_KEYS) avg[k] = sum[k] / dates.length;
-  return avg;
+  const totals = emptyTotals();
+  const unknown = {};
+  for (const k of NUTRIENT_KEYS) {
+    totals[k] = sum[k] / dates.length;
+    unknown[k] = (unknownCount[k] || 0) === dates.length;
+  }
+  return { totals, incomplete, unknown };
 }
 
 function nutrientWords(key) {
@@ -296,6 +323,13 @@ function buildReason({
 
 /** Days after the log date that can change: a short, visible compensation window. */
 export const WINDOW_DAYS = 4;
+
+/**
+ * Shown when the log lands on the last planned day and went over a maximum:
+ * there are no days left to adjust, and the next month starts fresh.
+ */
+export const LAST_DAY_REASON = 'This is the last planned day of the month, so there is nothing left to adjust. '
+  + 'Your plan for the next month will start fresh.';
 
 function formatAmount(key, v) {
   if (key === 'kcal') return `${Math.round(v)} kcal`;
@@ -359,6 +393,8 @@ export function replan(state) {
     const recent = recentTotals[t.nutrient] || 0;
     if (t.kind === 'max' && recent > t.daily) overshoot[t.nutrient] = recent - t.daily;
   }
+  // Logged on the last planned day and over a maximum: no window is left to adjust.
+  const lastDayOverMax = windowDates.length === 0 && Object.keys(overshoot).length > 0;
   const adjusted = windowDates.length > 0 && Object.keys(overshoot).length > 0;
   const targetsForDay = (date) => targets.map((t) => {
     const out = { ...t, originalDaily: t.daily };
@@ -462,15 +498,17 @@ export function replan(state) {
 
   const nothingToChange = changed.length === 0;
 
-  const reason = buildReason({
-    effects,
-    changed,
-    keptForBought,
-    unreachable,
-    nothingToChange,
-    targets,
-    recentTotals,
-  });
+  const reason = lastDayOverMax
+    ? LAST_DAY_REASON
+    : buildReason({
+      effects,
+      changed,
+      keptForBought,
+      unreachable,
+      nothingToChange,
+      targets,
+      recentTotals,
+    });
 
   return {
     plan: newPlan,

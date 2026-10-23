@@ -2,6 +2,41 @@ import { PROFILES } from '../engine/profiles.js';
 import { NUTRIENTS } from '../engine/nutrients.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit, formatKind } from './dom.js';
 
+/** Sensible starting value for a custom target, never 0. */
+export const CUSTOM_TARGET_DEFAULTS = {
+  kcal: 2000,
+  protein: 70,
+  fat: 70,
+  satFat: 20,
+  carbs: 250,
+  fibre: 25,
+  sugars: 50,
+  sodium: 2300,
+};
+
+export function defaultTargetDaily(nutrient) {
+  return CUSTOM_TARGET_DEFAULTS[nutrient] ?? null;
+}
+
+/**
+ * Next target to add: the first nutrient not used yet, with its default value.
+ * Returns null when all nutrients already have a target (no duplicates).
+ */
+export function nextCustomTarget(targets) {
+  const used = new Set((targets || []).map((t) => t.nutrient));
+  const nutrient = NUTRIENTS.find((n) => !used.has(n.key));
+  if (!nutrient) return null;
+  return { nutrient: nutrient.key, kind: 'min', daily: defaultTargetDaily(nutrient.key) };
+}
+
+/** A target value must be a number greater than 0. Returns the number, or null when invalid. */
+export function parseTargetDaily(raw) {
+  if (raw === null || raw === undefined || String(raw).trim() === '') return null;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return value;
+}
+
 export function renderTargets(ctx) {
   const { state, onChange } = ctx;
   const root = el(`<div class="screen screen-targets"></div>`);
@@ -65,9 +100,10 @@ export function renderTargets(ctx) {
         <option value="max">Max</option>
       </select>
       <label class="sr-only" for="val-${index}">Daily value</label>
-      <input id="val-${index}" type="number" min="0" step="1" data-i="${index}" data-field="daily" value="${t.daily}">
+      <input id="val-${index}" type="number" min="1" step="1" data-i="${index}" data-field="daily" value="${t.daily}">
       <span class="unit">${nutrientUnit(t.nutrient)}</span>
       <button type="button" class="btn-icon" data-remove="${index}" aria-label="Remove target">×</button>
+      <p class="field-error" data-error hidden>Enter a number greater than 0</p>
     </div>`);
     const nutSel = row.querySelector('[data-field="nutrient"]');
     for (const n of NUTRIENTS) {
@@ -93,7 +129,6 @@ export function renderTargets(ctx) {
   const syncField = (i, field, value) => {
     const next = state.targets.map((t, idx) => {
       if (idx !== i) return { ...t };
-      if (field === 'daily') return { ...t, daily: Number(value) || 0 };
       return { ...t, [field]: value };
     });
     onChange({ ...state, targets: next });
@@ -101,7 +136,22 @@ export function renderTargets(ctx) {
 
   root.querySelectorAll('[data-field]').forEach((input) => {
     input.addEventListener('change', () => {
-      syncField(Number(input.dataset.i), input.dataset.field, input.value);
+      const i = Number(input.dataset.i);
+      const field = input.dataset.field;
+      if (field === 'daily') {
+        const error = input.closest('.target-row')?.querySelector('[data-error]');
+        const daily = parseTargetDaily(input.value);
+        if (daily === null) {
+          // Keep the previous value and explain, instead of storing 0.
+          input.value = state.targets[i]?.daily ?? '';
+          if (error) error.hidden = false;
+          return;
+        }
+        if (error) error.hidden = true;
+        syncField(i, field, daily);
+        return;
+      }
+      syncField(i, field, input.value);
     });
   });
 
@@ -116,14 +166,18 @@ export function renderTargets(ctx) {
     onChange({ ...state, profileId: null, targets: [], plan: null });
   });
 
-  root.querySelector('[data-action="add-target"]')?.addEventListener('click', () => {
-    const used = new Set(state.targets.map((t) => t.nutrient));
-    const nextNut = NUTRIENTS.find((n) => !used.has(n.key)) || NUTRIENTS[0];
-    onChange({
-      ...state,
-      targets: [...state.targets, { nutrient: nextNut.key, kind: 'min', daily: 0 }],
+  const addTargetBtn = root.querySelector('[data-action="add-target"]');
+  if (addTargetBtn) {
+    if (!nextCustomTarget(state.targets)) {
+      addTargetBtn.disabled = true;
+      addTargetBtn.textContent = 'All nutrients already have a target';
+    }
+    addTargetBtn.addEventListener('click', () => {
+      const target = nextCustomTarget(state.targets);
+      if (!target) return;
+      onChange({ ...state, targets: [...state.targets, target] });
     });
-  });
+  }
 
   root.querySelector('[data-action="build"]')?.addEventListener('click', () => {
     ctx.buildPlan();

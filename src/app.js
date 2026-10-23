@@ -8,6 +8,7 @@ import { renderLog } from './ui/log.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
+import { shouldShowNav } from './ui/nav.js';
 
 const app = document.getElementById('app');
 
@@ -131,7 +132,7 @@ function render() {
   else screen = renderTargets(ctx);
 
   app.appendChild(screen);
-  app.appendChild(navBar());
+  if (shouldShowNav(ctx.state)) app.appendChild(navBar());
 }
 
 async function loadJson(path) {

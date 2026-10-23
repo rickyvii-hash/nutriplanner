@@ -143,6 +143,8 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .mode-tab.is-active { background: var(--green-soft); color: var(--green); border-color: var(--sage); }
 .field { display: block; margin-bottom: 10px; }
 .field span { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+.field-error { color: #9a6b2f; font-size: 0.82rem; margin: 4px 0 8px; }
+.target-row .field-error { grid-column: 1 / -1; margin: 0; }
 .search-results { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
 .search-hit {
   text-align: left; font: inherit; padding: 8px 10px; border-radius: 10px;

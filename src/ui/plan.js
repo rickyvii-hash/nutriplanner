@@ -1,6 +1,15 @@
 import { dayTotals, todayIso, SLOTS } from '../engine/planner.js';
-import { foodNutrients } from '../engine/nutrients.js';
+import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
+
+/**
+ * Text for a daily nutrient value: "n/a" when nothing is known, "≥12.2" when a meal
+ * of the day has no value for it (a partial sum is never printed as certain).
+ */
+export function dayValueText(result, nutrient) {
+  const decimals = nutrient === 'kcal' || nutrient === 'sodium' ? 0 : 1;
+  return formatNutrient(result, nutrient, decimals);
+}
 
 function progressClass(kind, value, daily) {
   if (daily <= 0) return '';
@@ -93,24 +102,18 @@ export function renderPlan(ctx) {
   root.appendChild(mealCard);
 
   const dayLog = (state.log || []).filter((e) => e.date === selected);
-  const { totals: plannedTotals, incomplete: plannedIncomplete } = dayTotals(meals, recipesById, foodsById);
-  let displayTotals = { ...plannedTotals };
-  let incomplete = { ...plannedIncomplete };
+  let display = dayTotals(meals, recipesById, foodsById);
 
   if (dayLog.length > 0) {
-    displayTotals = Object.fromEntries(Object.keys(plannedTotals).map((k) => [k, 0]));
-    incomplete = {};
+    // The plan's own recipes are replaced by what was actually logged: sum it the same way.
+    const parts = [];
     for (const entry of dayLog) {
       for (const it of entry.items) {
         const food = foodsById.get(it.foodId);
-        if (!food) continue;
-        const n = foodNutrients(food, it.grams);
-        for (const k of Object.keys(displayTotals)) {
-          if (n[k] === null || n[k] === undefined) incomplete[k] = true;
-          else displayTotals[k] += n[k];
-        }
+        if (food) parts.push(foodNutrients(food, it.grams));
       }
     }
+    display = sumNutrients(parts);
   }
 
   const bars = el(`<section class="card"><h3>Daily progress</h3><div class="progress-list"></div>
@@ -118,11 +121,11 @@ export function renderPlan(ctx) {
   </section>`);
   const progressList = bars.querySelector('.progress-list');
   for (const t of state.targets) {
-    const value = displayTotals[t.nutrient] ?? 0;
+    const value = display.totals[t.nutrient] ?? 0;
     const daily = t.daily;
     const pct = daily > 0 ? Math.min(100, Math.round((value / daily) * 100)) : 0;
     const cls = progressClass(t.kind, value, daily);
-    const valueText = incomplete[t.nutrient] && !(value > 0) ? 'n/a' : value.toFixed(t.nutrient === 'kcal' || t.nutrient === 'sodium' ? 0 : 1);
+    const valueText = dayValueText(display, t.nutrient);
     progressList.appendChild(el(`<div class="progress-row">
       <div class="progress-meta">
         <span>${nutrientLabel(t.nutrient)}</span>

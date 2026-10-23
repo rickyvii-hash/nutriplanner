@@ -1,6 +1,19 @@
 import { todayIso, SLOTS } from '../engine/planner.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
 
+export const MAX_PORTION_GRAMS = 5000;
+
+/**
+ * A portion is a real number of grams greater than 0 and at most 5000.
+ * Returns the number, or null when the field is empty, not a number, zero, negative or too large.
+ */
+export function parsePortion(raw) {
+  if (raw === null || raw === undefined || String(raw).trim() === '') return null;
+  const grams = Number(raw);
+  if (!Number.isFinite(grams) || grams <= 0 || grams > MAX_PORTION_GRAMS) return null;
+  return grams;
+}
+
 export function renderLog(ctx) {
   const { state, recipesById, foods } = ctx;
   const root = el(`<div class="screen screen-log"></div>`);
@@ -35,7 +48,10 @@ export function renderLog(ctx) {
   </section>`);
 
   const planBody = mode.querySelector('[data-body="plan"]');
-  const todayMeals = state.plan.days[today] || state.plan.days[Object.keys(state.plan.days).sort()[0]];
+  // This mode always lists today, not the day selected on the Plan screen: say which date it is.
+  const planDate = state.plan.days[today] ? today : Object.keys(state.plan.days).sort()[0];
+  const todayMeals = state.plan.days[planDate];
+  planBody.appendChild(el(`<p class="field-label" data-plan-date>Today's planned meals (${planDate})</p>`));
   for (const slot of SLOTS) {
     const recipe = recipesById.get(todayMeals[slot]);
     const row = el(`<div class="plan-meal-row">
@@ -55,9 +71,10 @@ export function renderLog(ctx) {
   </label>
   <div class="search-results" data-results></div>
   <label class="field">
-    <span>Portion (g or ml)</span>
-    <input type="number" min="1" step="1" value="100" data-portion>
+    <span>Portion (grams)</span>
+    <input type="number" min="1" max="5000" step="1" placeholder="e.g. 150" value="100" data-portion>
   </label>
+  <p class="field-error" data-portion-error hidden>Enter a portion between 1 and 5000 g</p>
   <button type="button" class="btn-secondary" data-add-search disabled>Add food</button>`);
 
   root.appendChild(mode);
@@ -92,7 +109,14 @@ export function renderLog(ctx) {
     saveBtn.disabled = draft.items.length === 0;
     ul.querySelectorAll('[data-edit]').forEach((input) => {
       input.addEventListener('change', () => {
-        draft.items[Number(input.dataset.edit)].grams = Number(input.value) || 1;
+        const index = Number(input.dataset.edit);
+        const grams = parsePortion(input.value);
+        if (grams === null) {
+          input.value = draft.items[index].grams;
+          return;
+        }
+        draft.items[index].grams = grams;
+        paintItems();
       });
     });
     ul.querySelectorAll('[data-del]').forEach((btn) => {
@@ -150,9 +174,21 @@ export function renderLog(ctx) {
     }
   };
   searchInput.addEventListener('input', runSearch);
+
+  const portionInput = root.querySelector('[data-portion]');
+  const portionError = root.querySelector('[data-portion-error]');
+  portionInput.addEventListener('input', () => {
+    portionError.hidden = true;
+  });
   addSearchBtn.addEventListener('click', () => {
     if (!selectedFoodId) return;
-    const grams = Number(root.querySelector('[data-portion]').value) || 100;
+    const grams = parsePortion(portionInput.value);
+    if (grams === null) {
+      portionError.hidden = false;
+      portionInput.focus();
+      return;
+    }
+    portionError.hidden = true;
     addFood(selectedFoodId, grams);
   });
 
