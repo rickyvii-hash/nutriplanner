@@ -28,13 +28,16 @@ Not established yet. Should feel calm and reassuring, not guilt-inducing. To be 
 Born from managing cholesterol through food for a family member, and from a recovery period when it mattered how much energy every spoonful of broth provided. Intended as a support tool alongside a doctor, never a replacement.
 
 ## What "Working" Looks Like
-A person sets targets, gets a month plan and a tickable shopping list, logs a meal that goes off-plan, and sees a clear message: "Plan updated", with the changed meals shown and the reason. Nutrient values come from public USDA FoodData Central data, and a missing value is shown as missing, never as zero. A visible health disclaimer says it is not medical advice.
+A person sets targets, gets a month plan and a tickable shopping list, logs a meal that goes off-plan (or skips or replaces a planned meal), and sees a clear message: "Plan updated", with the changed meals shown and the reason. They can open a meal detail for ingredients and target nutrients, and use honest outside web searches for a full recipe, nearby places or delivery — NutriPlanner never takes orders. Nutrient values come from public USDA FoodData Central data, and a missing value is shown as missing, never as zero. A visible health disclaimer says it is not medical advice.
 
 ## The POC Boundary
 - Small curated set of foods (about 250) from USDA FoodData Central
 - Recipes whose nutrients are the sum of their ingredients
 - Monthly targets and a proposed plan
-- Logging actual meals and recalculating the rest of the month
+- Logging actual meals and recalculating the rest of the month (4-day make-up window)
+- Grouped "Add as eaten" blocks on the log screen (recipe name with indented ingredients)
+- Skip a planned meal; replace a planned meal with another recipe for the same slot, with Plan updated preview before keeping or using the change
+- Recipe detail panel: ingredients, nutrients for the current targets, and three outside-search links (full recipe, find nearby, order delivery) that open a new browser tab only when tapped, with the note "Opens a web search. NutriPlanner does not take orders."
 - Tickable shopping list; tick what has been bought, and the plan uses what is in stock
 - Health disclaimer
 - Example profiles: weight loss, cholesterol, recovery, athlete
@@ -43,10 +46,10 @@ A person sets targets, gets a month plan and a tickable shopping list, logs a me
 
 ## Later
 - Entering results after the first period (for example weight) to recalibrate targets
-- Summary to share with a doctor
+- In-app cooking steps written for every recipe
 
 ## Explicitly Cut
 - Blood test history and lab-value tracking: health claims are risky and out of reach for a proof of concept
-- Supermarket integration and delivery: needs commercial partners
+- Real supermarket integration, partner APIs, scraping, or a fake delivery cart inside the app (outside search links only)
 - Gamification and family profiles: not needed to prove the kernel
 - Professional dashboards for nutritionists: a separate product

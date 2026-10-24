@@ -13,9 +13,10 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 2. They review the **targets** (each a nutrient with a Min or Max and a daily value) and optionally add a custom target for any nutrient. They tap **Build my month plan**.
 3. They land on the **Month plan**: a day strip, today's meals, and daily progress against each target. A **Shopping list** is generated from the plan.
 4. They tick what they have already bought. Items already at home leave the "to buy" list.
-5. During the month they **log a meal**, from the plan or by searching a food and entering a portion.
-6. After saving, they see **Plan updated**: which upcoming meals changed (before and after), one sentence explaining why, and the effect on each target. They choose **Use updated plan** or **Keep my original plan**.
+5. During the month they **log a meal**, from the plan or by searching a food and entering a portion. From the plan they can **Add as eaten** (one grouped block per recipe), **Replace** with another recipe for the same slot, or mark a meal **Skipped**.
+6. After saving (or after Replace), they see **Plan updated**: which upcoming meals changed (before and after), one sentence explaining why, and the effect on each target. They choose **Use updated plan** or **Keep my original plan**.
 7. The plan for the rest of the month is updated, favouring recipes that use food already bought or prepared. The shopping list updates to match.
+8. They can open a **recipe detail** from a planned meal or an eaten block to see ingredients, nutrients for their targets, and three outside web-search links.
 
 Success: the user logs an off-plan meal (for example pizza and ice cream) and sees a clear, calm, explained update to the rest of the month.
 
@@ -24,9 +25,10 @@ Five screens, mobile-first, reached through a bottom bar with three items: **Pla
 
 1. **Targets** (choose profile, edit targets): three profile cards, a list of targets, "Add custom target", and the button "Build my month plan".
 2. **Month plan**: a strip of days (today highlighted), today's meals, daily target progress bars, and a short "Upcoming days" preview. A "Log a meal" button.
-3. **Log a meal**: two modes, "From plan" (today's planned meal with "Add as eaten") and "Free search" (search a food, set the portion in g or ml). A list of logged items with editable portions, and the button "Save and update plan".
+3. **Log a meal**: two modes, "From plan" (today's planned meals with "Add as eaten", "Replace" and "Skipped") and "Free search" (search a food, set the portion in g or ml). "This meal" shows grouped eaten blocks (`Eaten · [slot] · [recipe name]` with indented ingredients) plus any free-search foods; then "Save and update plan".
 4. **Plan updated**: success banner, "What changed" (before and after per meal), "Reason" in one sentence, "Effect on targets", and the buttons "Keep my original plan" and "Use updated plan".
 5. **Shopping list**: items grouped by category with tickable checkboxes, a section "Already at home", and a note explaining when a recipe was kept because its ingredients are already bought.
+6. **Recipe detail** (overlay from Plan or Log): dish name, ingredients with grams, nutrient totals for the current targets, and three links that open a new browser tab — Full recipe, Find nearby, Order delivery — each a Google search or Maps search built from the dish name, with the note "Opens a web search. NutriPlanner does not take orders."
 
 A reference mockup for each screen is in `devpost/design/` (`targets.webp`, `month-plan.webp`, `log-meal.webp`, `plan-updated.webp`, `shopping-list.webp`).
 
@@ -52,13 +54,20 @@ Established from the mockups the learner chose:
 - Daily progress shows consumed versus target for each nutrient.
 
 ### Logging a meal
-- The user can mark a planned meal as eaten, or search a food and enter a portion in grams or millilitres.
+- The user can mark a planned meal as eaten, replace it with another recipe for the same slot, skip it, or search a food and enter a portion in grams or millilitres.
+- "Add as eaten" keeps one grouped block per recipe (name and indented ingredients with editable portions). Removing the block clears that meal from the draft.
+- "Replace" opens a picker of other recipes for that slot, then goes straight to Plan updated (same preview as after a log).
 - Several items can be logged together as one meal.
 
+### Recipe detail
+- Tapping a planned meal, or the header of an eaten block, opens a detail panel.
+- The panel shows ingredients with grams and the nutrient totals that match the user's current targets (missing values as "n/a").
+- Three link buttons open a new tab only when the user taps them: a Google search for the dish plus "recipe", a Google Maps search for the dish plus "near me", and a Google search for the dish plus "delivery near me". The dish name is URL-encoded. A shared note says the app opens a web search and does not take orders. No API keys, no scraped content, no fake cart.
+
 ### Plan updated
-- After a log, the rest of the month is recalculated so the targets are still met as closely as possible.
+- After a log, skip or replace, the next few days are recalculated so the targets are still met as closely as possible (the rest of the month stays as planned).
 - Recipes whose ingredients are already bought or prepared are kept where they still fit the targets.
-- The screen shows before and after for each changed meal, a one-sentence reason, and the effect on each target.
+- The screen shows before and after for each changed meal, a one-sentence reason that quotes the same rounded numbers as the Effect rows, and the effect on each target. A change that makes a target worse is said plainly, not framed as an improvement.
 - "Keep my original plan" leaves the plan unchanged.
 
 ### Shopping by frequency
@@ -96,8 +105,9 @@ Established from the mockups the learner chose:
 - Profile selection and editable monthly targets, including a custom target
 - A curated set of about 250 USDA foods and a set of recipes built from them
 - Month plan with daily meals and progress against targets
-- Logging a meal, from plan or by searching a food with a portion
-- Plan recalculation after a log, with the Plan updated screen (before and after, reason, effect, keep or use)
+- Logging a meal, from plan or by searching a food with a portion; grouped eaten blocks; skip; replace with preview
+- Plan recalculation after a log, skip or replace, with the Plan updated screen (before and after, reason, effect, keep or use)
+- Recipe detail with ingredients, target nutrients and three honest outside-search links (full recipe, find nearby, order delivery)
 - Tickable shopping list with "Already at home", feeding the recalculation
 - Shopping by frequency: the user chooses how often they shop (every 2, 3, 5 or 7 days); the list covers only the meals until the next shop, and "I'm shopping now" starts a new list from today
 - A printable summary for the user's doctor (targets, what was eaten, averages against the targets), with the disclaimer
@@ -106,15 +116,15 @@ Established from the mockups the learner chose:
 
 ## Deferred From the POC
 - Entering results after the first period (for example weight) to recalibrate targets — second feedback loop
-- Recipes, Progress and Profile areas — not needed to prove the kernel
+- Written in-app cooking steps for every recipe — outside "Full recipe" search covers how to cook for now
 
 ## Possible Later Enhancements
-Other target profiles; family profiles; supermarket links; richer progress charts.
+Other target profiles; family profiles; richer progress charts; optional in-app cooking copy.
 
 ## Non-Goals
 - No blood test or lab-value tracking: health claims are out of reach for a proof of concept.
 - No medical advice or treatment recommendations.
-- No supermarket integration or delivery.
+- No partner supermarket or delivery APIs, no scraping, and no fake in-app order cart (outside search links only).
 - No gamification and no professional dashboards.
 - No accounts or cloud sync.
 

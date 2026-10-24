@@ -93,4 +93,6 @@ Activity mode: not started
 - 2026-10-24: Pending plan-update proposal is stored with the rest of the state so a reload still opens Plan updated; Use/Keep clear it, and a stale month drops it.
 - 2026-10-24: Skipped meals ("I ate less"). From plan, each meal can be Skipped; shortfalls on minimum targets raise the next 4 days (capped at +25%), swaps need more of that nutrient, and the doctor summary lists skips without counting them as eaten.
 - 2026-10-24: Control pass fixes. Month-plan progress no longer crashes on skip-only log entries; skip reason quotes the intended daily make-up; bottom padding and meal action layout keep Save/Use clear of the nav on phones.
+- 2026-10-24: Grouped "Add as eaten" blocks on the log screen; Replace next to Skipped with Plan updated preview (reason quotes Effect rounding).
+- 2026-10-24: v2 — Recipe detail panel from Plan and Log (ingredients, target nutrients) with three honest outside-search links (Full recipe, Find nearby, Order delivery); no API keys, no fake cart. Planning docs updated to match.
 

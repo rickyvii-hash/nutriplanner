@@ -24,10 +24,11 @@ PRD ref: `prd.md > The Core Journey`.
 2. The user picks a profile and edits targets. Targets are saved. "Build my month plan" calls the planner, which assigns a recipe to each meal slot of each day of the month and saves the plan.
 3. The Month plan screen reads the plan and the food data and shows today's meals and the progress bars.
 4. The Shopping list is derived from the plan: all ingredients of the planned meals, grouped by category, minus items ticked as bought. Ticks are saved.
-5. The user logs a meal. The portions are converted to nutrients using the food data, and the entry is saved in the log.
-6. The planner is called with the targets, the log, the ticked items and the current plan. It returns a proposed new plan, the list of changed meals and a reason built from the numbers.
+5. The user logs a meal (grouped eaten block, free search, skip, or replace). Portions are converted to nutrients using the food data, and the entry is saved in the log.
+6. The planner is called with the targets, the log, the ticked items and the current plan. It returns a proposed new plan, the list of changed meals and a reason built from the numbers (same rounding as the Effect rows).
 7. The Plan updated screen shows before and after. "Use updated plan" saves the proposal as the plan, and "Keep my original plan" discards it.
 8. The Shopping list and Month plan redraw from the new saved plan.
+9. Tapping a meal opens the recipe detail overlay (`recipe_detail.js`). The three link buttons are ordinary `<a target="_blank" rel="noopener noreferrer">` tags; the app never opens them itself.
 
 ## Stack
 - **HTML, CSS and plain JavaScript (ES modules)**, no framework. Rationale: fewest moving parts for a five-day build, and no build step to break.
@@ -80,15 +81,23 @@ PRD ref: `prd.md > Shopping list`.
 PRD ref: `prd.md > States and Boundaries` (persistence).
 
 ### Screens
-`src/ui/`: `targets.js`, `plan.js`, `log.js`, `updated.js`, `shopping.js`, plus `app.js` as a small router with the bottom bar (Plan, Shopping, Targets).
+`src/ui/`: `targets.js`, `plan.js`, `log.js`, `updated.js`, `shopping.js`, `summary.js`, `recipe_detail.js`, plus `app.js` as a small router with the bottom bar (Plan, Shopping, Targets).
 PRD ref: `prd.md > Screens and Layout`.
+
+### Recipe detail and outside links
+`src/ui/recipe_detail.js`. Pure helpers build three URLs from the dish name with `encodeURIComponent`:
+- Full recipe: `https://www.google.com/search?q=<name>+recipe`
+- Find nearby: `https://www.google.com/maps/search/?api=1&query=<name>+near+me`
+- Order delivery: `https://www.google.com/search?q=<name>+delivery+near+me`
+Empty names fall back to `meal`. The panel lists ingredients (grams), nutrients for the current targets via `recipeNutrients` (missing values as "n/a"), and the shared note that NutriPlanner does not take orders. No API keys, no backend, no scraping.
+PRD ref: `prd.md > Recipe detail`.
 
 ## Data Model
 - **Food**: `{ id, name, category, per100g: { kcal, protein, fat, satFat, carbs, fibre, sugars, sodium }, unitGrams? }`. Lives in `foods.json`, fixed.
-- **Recipe**: `{ id, name, slot (breakfast/lunch/dinner/snack), ingredients: [{ foodId, grams }] }`. Lives in `recipes.json`, fixed.
+- **Recipe**: `{ id, name, slot (breakfast/lunch/dinner/snack), icon?, ingredients: [{ foodId, grams }] }`. Lives in `recipes.json`, fixed.
 - **Targets**: `[{ nutrient, kind: "min" | "max", daily }]`. Live in localStorage, change when the user edits.
 - **Plan**: `{ month, days: { "YYYY-MM-DD": { breakfast: recipeId, lunch, dinner, snack } } }`. In localStorage, replaced on "Use updated plan".
-- **Log**: `[{ date, time, items: [{ foodId, grams }] }]`. In localStorage, appended on "Save and update plan".
+- **Log**: `[{ date, time, items: [{ foodId, grams }], skipped?, replaced? }]`. In localStorage, appended on "Save and update plan" or Replace.
 - **Bought**: `[foodId]`. In localStorage, changed by ticking items.
 All user data survives closing and reopening the browser. Fixed data is read from the files each time.
 
@@ -105,21 +114,21 @@ nutriplanner_hackathon/
 │   │   ├── nutrients.js  # sums and missing values
 │   │   ├── planner.js    # buildPlan, replan
 │   │   └── shopping.js   # shopping list
-│   └── ui/               # one file per screen
+│   └── ui/               # one file per screen, including recipe_detail.js
 ├── data/
 │   ├── foods.json        # about 250 USDA foods
-│   ├── recipes.json      # about 20 recipes
+│   ├── recipes.json      # recipes (36+) built from those foods
 │   └── curated_foods.json  # list of USDA ids chosen for the data build
 ├── scripts/
 │   └── build-foods.js    # one-off: USDA download -> foods.json
-├── tests/                # node --test for the engine
+├── tests/                # node --test for the engine and UI helpers
 ├── devpost/              # Devpost learning workspace and design mockups
 ├── LICENSE
 └── README.md
 ```
 
 ## External Services and Dependencies
-- **USDA FoodData Central** download (not a live API): https://fdc.nal.usda.gov/download-datasets.html. Public domain (CC0), no key, no rate limit. Used once, by `scripts/build-foods.js`. The app itself makes no network calls.
+- **USDA FoodData Central** download (not a live API): https://fdc.nal.usda.gov/download-datasets.html. Public domain (CC0), no key, no rate limit. Used once, by `scripts/build-foods.js`. While the app is running it does not call USDA; the only network use is when the person taps an outside-search link and the browser opens Google or Maps.
 - **serve** (local web server, dev only): https://www.npmjs.com/package/serve
 - No other dependencies, no accounts and no cost.
 
