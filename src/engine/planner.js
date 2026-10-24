@@ -130,9 +130,17 @@ function cooldownDays(recipes, slot) {
  * (a few thousand combinations, plain arithmetic).
  * avoidBySlot: { slot: Set(recipeId) } recipes still "resting", skipped for variety.
  * capBySlot: { slot: { nutrient: value } } swap only for a meal with less of that nutrient (maxima).
- * floorBySlot: { slot: { nutrient: value } } swap only for a meal with more of that nutrient (minima).
+ * floorBySlot: { slot: { nutrient: value, keepId } } a meal that differs from keepId must have
+ * more of that nutrient than it had; keepId itself (the planned meal) may stay unchanged (minima).
+ * upperBounds: { nutrient: maxDayTotal } optional ceiling on the summed day totals; combinations
+ * that exceed any bound are skipped. When given and nothing fits, returns null.
+ * lowerBounds: { nutrient: minDayTotal } optional floor on the summed day totals, so a swapped
+ * day never drops below what it had before.
  */
-function fillDay(recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBySlot = {}, floorBySlot = {}) {
+export function fillDay(
+  recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBySlot = {}, floorBySlot = {},
+  upperBounds = null, lowerBounds = null,
+) {
   const options = SLOTS.map((slot) => {
     const all = recipesForSlot(recipes, slot);
     if (all.length === 0) throw new Error(`No recipes for slot ${slot}`);
@@ -144,12 +152,14 @@ function fillDay(recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBy
       allowed = allowed.filter((r) => Object.entries(cap).every(([n, v]) => totalsOf.get(r.id)[n] <= v + 1e-9));
     }
     if (floor) {
-      allowed = allowed.filter((r) => Object.entries(floor).every(([n, v]) => totalsOf.get(r.id)[n] >= v - 1e-9));
-    }
-    // Prefer a meal with strictly more of a shortfall nutrient when a floor is set.
-    if (floor && allowed.length > 0) {
-      const stricter = allowed.filter((r) => Object.entries(floor).every(([n, v]) => totalsOf.get(r.id)[n] > v + 1e-9));
-      if (stricter.length > 0) allowed = stricter;
+      // Keeping the same meal is not a swap, so it may stay; any other recipe must
+      // carry strictly more of the shortfall nutrient to be worth the change.
+      const keepId = floor.keepId;
+      allowed = allowed.filter((r) => Object.entries(floor).every(([n, v]) => {
+        if (n === 'keepId') return true;
+        const value = totalsOf.get(r.id)[n];
+        return r.id === keepId ? value >= v - 1e-9 : value > v + 1e-9;
+      }));
     }
     const pool = allowed.length > 0 ? allowed : all;
     const avoid = avoidBySlot[slot];
@@ -163,8 +173,13 @@ function fillDay(recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBy
   let best = null;
   let bestScore = Infinity;
   const picks = [];
+  const withinBounds = (totals) => !upperBounds
+    || Object.entries(upperBounds).every(([n, max]) => totals[n] <= max + 1e-9);
+  const aboveFloors = (totals) => !lowerBounds
+    || Object.entries(lowerBounds).every(([n, min]) => totals[n] >= min - 1e-9);
   const walk = (i, soFar, bonus) => {
     if (i === options.length) {
+      if (!withinBounds(soFar) || !aboveFloors(soFar)) return;
       const score = scoreAgainstTargets(soFar, targets).score + bonus;
       if (score < bestScore) {
         bestScore = score;
@@ -178,6 +193,7 @@ function fillDay(recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBy
     }
   };
   walk(0, emptyTotals(), 0);
+  if (best === null) return null;
   return Object.fromEntries(SLOTS.map((slot, i) => [slot, best[i]]));
 }
 
@@ -303,9 +319,14 @@ function formatDelta(key, absDelta) {
 /** Shown when the user skips a meal but the profile has no minimum targets to raise. */
 export const SKIP_NO_MIN_REASON = 'Skipping a meal does not affect your maximum targets.';
 
+/** "the next 1 day is" / "the next 3 days are": the verb and the noun agree. */
+function nextDaysPhrase(n) {
+  return n === 1 ? 'the next 1 day is' : `the next ${n} days are`;
+}
+
 function buildReason({
   effects, changed, keptForBought, unreachable, nothingToChange, targets, recentTotals,
-  skippedNames = [], shortfall = {}, skipNoMin = false,
+  skippedNames = [], shortfall = {}, skipNoMin = false, windowDayCount = 0,
 }) {
   if (skipNoMin) return SKIP_NO_MIN_REASON;
   if (nothingToChange) {
@@ -330,7 +351,7 @@ function buildReason({
     const e = effects.find((x) => x.nutrient === over.t.nutrient);
     const less = e && e.delta < -0.05 ? ` (about ${formatAmount(over.t.nutrient, Math.abs(e.delta))} less per day on average)` : '';
     return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
-      + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so the next ${daysTouched} days are lower in `
+      + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so ${nextDaysPhrase(daysTouched)} lower in `
       + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
   }
 
@@ -348,19 +369,23 @@ function buildReason({
     if (!under || score > under.score) under = { t, missed, ratio, score };
   }
   if (under && skippedNames.length > 0) {
-    // Quote the intended daily make-up (shortfall / window, capped at +25%), not the
-    // raw before/after delta — recipe swaps can move further than the bump alone.
-    const days = Math.max(1, daysTouched);
-    const bump = Math.min(under.missed / days, under.t.daily * 0.25);
-    const more = bump > 0.05
-      ? ` (about ${formatAmount(under.t.nutrient, bump)} more per day on average)`
+    // Quote the real change shown in the effects (after - before), not the intended
+    // make-up: the numbers on the same screen must agree.
+    const dayEffect = effects.find((e) => e.nutrient === under.t.nutrient);
+    const delta = dayEffect ? dayEffect.delta : 0;
+    const more = delta > 0.05
+      ? ` (about ${formatAmount(under.t.nutrient, delta)} more per day on average)`
       : '';
     const names = skippedNames.length === 1
       ? skippedNames[0]
       : `${skippedNames.slice(0, -1).join(', ')} and ${skippedNames[skippedNames.length - 1]}`;
+    // Honest about a shortfall the window could not absorb: say how many days had room.
+    const notSpread = windowDayCount > 0 && daysTouched < windowDayCount / 2
+      ? ` Only ${daysTouched} of the next ${windowDayCount} days had room for a bigger meal, so part of the shortfall is not made up.`
+      : '';
     return `${closestNote}You skipped ${names} today `
       + `(about ${formatAmount(under.t.nutrient, under.missed)} of your ${formatAmount(under.t.nutrient, under.t.daily)} minimum), `
-      + `so the next ${daysTouched} days are higher in ${nutrientWords(under.t.nutrient)}${more}.${keptNote}`;
+      + `so ${nextDaysPhrase(daysTouched)} higher in ${nutrientWords(under.t.nutrient)}${more}.${notSpread}${keptNote}`;
   }
 
   // No maximum was exceeded: the change comes from food already bought.
@@ -463,6 +488,18 @@ export function replan(state) {
     }
     if (sum > 0) shortfall[t.nutrient] = sum;
   }
+  // The shortfall nutrient a swap must improve: calories when they fell short,
+  // otherwise the minimum that fell furthest short relative to its daily value.
+  let floorNutrient = null;
+  let floorScore = -Infinity;
+  for (const t of targets) {
+    if (t.kind !== 'min' || !shortfall[t.nutrient]) continue;
+    const score = shortfall[t.nutrient] / t.daily + (t.nutrient === 'kcal' ? 2 : 0);
+    if (score > floorScore) {
+      floorScore = score;
+      floorNutrient = t.nutrient;
+    }
+  }
   const hasMinTarget = targets.some((t) => t.kind === 'min');
   const skipNoMin = skippedIds.length > 0
     && Object.keys(shortfall).length === 0
@@ -496,6 +533,22 @@ export function replan(state) {
 
   const windowDates = allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS);
   const windowSet = new Set(windowDates);
+
+  // The primary raised minimum: the one whose skipped shortfall is the largest relative
+  // to its daily value. Only this nutrient gets an upper bound; the others must simply
+  // not go down (one ceiling is easy to meet, four at once almost never are).
+  let primaryNutrient = null;
+  let primaryTarget = null;
+  let primaryRatio = -Infinity;
+  for (const t of targets) {
+    if (t.kind !== 'min' || !shortfall[t.nutrient]) continue;
+    const ratio = shortfall[t.nutrient] / t.daily;
+    if (ratio > primaryRatio) {
+      primaryRatio = ratio;
+      primaryNutrient = t.nutrient;
+      primaryTarget = t;
+    }
+  }
 
   // Over a maximum today: make it up over the window by lowering each window day
   // below what it had planned, by overshoot / window length.
@@ -552,17 +605,58 @@ export function replan(state) {
           caps[slot] = Object.fromEntries(Object.keys(overshoot).map((n) => [n, totals[n]]));
         }
       }
-      if (adjustedMin) {
+      if (adjustedMin && floorNutrient) {
+        // A swapped meal must have more of the shortfall nutrient the reason names
+        // (calories when that fell short), never less than the meal it replaces.
         for (const slot of SLOTS) {
           const old = recipesById.get(plan.days[date]?.[slot]);
           if (!old) continue;
           const totals = recipeNutrients(old, foodsById).totals;
-          floors[slot] = Object.fromEntries(Object.keys(shortfall).map((n) => [n, totals[n]]));
+          floors[slot] = { [floorNutrient]: totals[floorNutrient], keepId: old.id };
         }
       }
-      const day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors);
+      // Raised minimums: a changed day must not go below what it had planned for any
+      // of them, and only the primary one gets a ceiling (the ceiling is the day's
+      // planned total, or the raised minimum if higher, plus a multiple of the day
+      // bump; the multiple is widened only if nothing fits). Bounding all four at
+      // once left almost no day changeable; the others just must not go down.
+      const plannedTotals = adjustedMin
+        ? dayTotals(plan.days[date], recipesById, foodsById).totals
+        : null;
+      const lowerBounds = {};
+      if (adjustedMin) {
+        for (const t of targets) {
+          if (t.kind !== 'min' || !shortfall[t.nutrient]) continue;
+          // The primary nutrient must really rise; the others must only not fall.
+          lowerBounds[t.nutrient] = t.nutrient === primaryNutrient
+            ? (plannedTotals[t.nutrient] ?? 0) + 1e-6
+            : (plannedTotals[t.nutrient] ?? 0);
+        }
+      }
+      let day = null;
+      let primaryCeiling = null;
+      if (adjustedMin && primaryNutrient) {
+        const bump = Math.min(shortfall[primaryNutrient] / windowDates.length, primaryTarget.daily * 0.25);
+        const base = Math.max(plannedTotals[primaryNutrient] ?? 0, primaryTarget.daily + bump);
+        for (const factor of [1.5, 3, 6, 12]) {
+          const ceiling = base + factor * bump;
+          day = fillDay(
+            recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors,
+            { [primaryNutrient]: ceiling }, lowerBounds,
+          );
+          if (day) {
+            primaryCeiling = ceiling;
+            break;
+          }
+        }
+      } else {
+        day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors);
+      }
+      // No combination fits even after the retries: leave this day as it was.
+      if (!day) continue;
       const prev = plan.days[date];
-      const merged = { ...day };
+      let merged = { ...day };
+      const keptHere = [];
       for (const slot of SLOTS) {
         const prevRecipe = recipesById.get(prev?.[slot]);
         if (!prevRecipe || avoid[slot].has(prevRecipe.id)) continue;
@@ -580,8 +674,20 @@ export function replan(state) {
         const pickScore = scoreAgainstTargets(addTotals(soFar, recipeNutrients(recipesById.get(day[slot]), foodsById).totals), dayTargets).score;
         if (keepScore <= pickScore + 0.15) {
           merged[slot] = prevRecipe.id;
-          keptForBought.push({ date, slot, recipeId: prevRecipe.id });
+          keptHere.push({ date, slot, recipeId: prevRecipe.id });
         }
+      }
+      // Keeping a bought meal must not undo the raised minimums or break the ceiling.
+      if (adjustedMin) {
+        const totals = dayTotals(merged, recipesById, foodsById).totals;
+        const breaksMinimum = Object.entries(lowerBounds)
+          .some(([n, min]) => totals[n] < min - 1e-9);
+        const breaksCeiling = primaryCeiling !== null
+          && totals[primaryNutrient] > primaryCeiling + 1e-9;
+        if (breaksMinimum || breaksCeiling) merged = { ...day };
+        else keptForBought.push(...keptHere);
+      } else {
+        keptForBought.push(...keptHere);
       }
       newPlan.days[date] = merged;
     }
@@ -609,14 +715,19 @@ export function replan(state) {
 
   // Averages over the days that can change (fall back to the rest of the month on the last day).
   const compareDates = windowDates.length > 0 ? windowDates : remainingDates;
-  const oldAvg = averageDailyTotals(plan, recipesById, foodsById, compareDates);
-  const newAvg = averageDailyTotals(newPlan, recipesById, foodsById, compareDates);
+  // Effects are averaged over the days that really changed, so the "per day on average"
+  // number on the same screen can agree with the reason and not be diluted by days left alone.
+  const changedDates = [...new Set(changed.map((c) => c.date))].sort();
+  const effectDates = changedDates.length > 0 ? changedDates : compareDates;
+  const oldAvg = averageDailyTotals(plan, recipesById, foodsById, effectDates);
+  const newAvg = averageDailyTotals(newPlan, recipesById, foodsById, effectDates);
   const effects = effectOnTargets(oldAvg, newAvg, targets.map((t) => ({ ...t, originalDaily: t.daily })));
 
-  // Unreachable: a target is still badly missed on the new average.
+  // Unreachable: a target is still badly missed on the new average over the whole window.
+  const windowAvg = averageDailyTotals(newPlan, recipesById, foodsById, compareDates);
   let unreachable = false;
   for (const t of targets) {
-    const v = newAvg.totals[t.nutrient] ?? 0;
+    const v = windowAvg.totals[t.nutrient] ?? 0;
     if (t.kind === 'max' && v > t.daily * 1.15) unreachable = true;
     if (t.kind === 'min' && v < t.daily * 0.85) unreachable = true;
   }
@@ -639,6 +750,7 @@ export function replan(state) {
       skippedNames,
       shortfall,
       skipNoMin: false,
+      windowDayCount: windowDates.length,
     });
 
   return {

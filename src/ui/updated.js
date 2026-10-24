@@ -32,9 +32,13 @@ export function renderUpdated(ctx) {
       <p>${escapeHtml(proposal.reason)}</p>
     </section>`));
   } else {
+    const changedDays = new Set((proposal.changed || []).map((c) => c.date)).size;
+    const adjusted = changedDays === 1
+      ? 'The next 1 day was adjusted'
+      : `The next ${changedDays} days were adjusted`;
     root.appendChild(el(`<section class="card success-banner">
       <h2>${proposal.unreachable ? 'Closest plan ready' : 'Plan updated'}</h2>
-      <p class="muted">${proposal.unreachable ? 'Not every target can be met with the available recipes. Here is the closest option.' : `The next ${new Set((proposal.changed || []).map((c) => c.date)).size} days were adjusted from your targets and what you logged. The rest of the month is unchanged.`}</p>
+      <p class="muted">${proposal.unreachable ? 'Not every target can be met with the available recipes. Here is the closest option.' : `${adjusted} from your targets and what you logged. The rest of the month is unchanged.`}</p>
     </section>`));
   }
 

@@ -10,8 +10,23 @@ import {
   daysInMonth,
   scoreAgainstTargets,
   localTime,
+  fillDay,
   SKIP_NO_MIN_REASON,
 } from '../src/engine/planner.js';
+
+const RECOVERY_KCAL_MIN = 2200;
+const LUNCH_RECIPE = 'chicken-rice-bowl';
+const FIXED_DATE = '2026-10-21';
+
+/** Average day bump used by the replan for a skipped shortfall over the 4-day window. */
+function dayBump(shortfall, dailyMin) {
+  return Math.min(shortfall / 4, dailyMin * 0.25);
+}
+
+function reasonAverage(reason, unit) {
+  const match = reason.match(new RegExp(`about ([\\d.]+) ${unit} more per day on average`));
+  return match ? Number(match[1]) : null;
+}
 
 const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
 const recipes = JSON.parse(fs.readFileSync(new URL('../data/recipes.json', import.meta.url), 'utf8'));
@@ -300,6 +315,122 @@ test('Recovery: skipping lunch and dinner raises calories on the next 3–5 days
   assert.match(result.reason, /skipped/i);
   assert.match(result.reason, /minimum/i);
   assert.match(result.reason, /higher in calories/i);
+});
+
+function skipLunchResult(fromDate = FIXED_DATE) {
+  const targets = profileById('recovery').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  // Fixed lunch so the shortfall does not depend on what buildPlan chose that day.
+  plan.days[fromDate].lunch = LUNCH_RECIPE;
+  const log = [{ date: fromDate, time: '13:00', skipped: [LUNCH_RECIPE] }];
+  return {
+    targets,
+    plan,
+    result: replan({ targets, recipes, plan, log, bought: [], foodsById, fromDate }),
+  };
+}
+
+/** Shared checks for a raised-minimum replan over the 4-day window. */
+function assertSpreadOverWindow({ plan, result, bump }) {
+  const recipesById = new Map(recipes.map((r) => [r.id, r]));
+  const raised = Object.keys(result.shortfall || {});
+  assert.ok(raised.includes('kcal'), 'calories should be part of the shortfall');
+  assert.equal(result.windowDates.length, 4);
+
+  const changedDays = [...new Set(result.changed.map((c) => c.date))].sort();
+  for (const d of changedDays) assert.ok(result.windowDates.includes(d), `${d} is outside the window`);
+  assert.ok(changedDays.length >= 3, `only ${changedDays.length} of 4 window days changed`);
+
+  const deltas = [];
+  for (const d of changedDays) {
+    const before = dayTotals(plan.days[d], recipesById, foodsById).totals;
+    const after = dayTotals(result.plan.days[d], recipesById, foodsById).totals;
+    const delta = after.kcal - before.kcal;
+    assert.ok(delta > 0, `${d}: calories ${before.kcal} -> ${after.kcal}, must rise`);
+    assert.ok(delta <= 3 * bump + 1e-6,
+      `${d}: calories rose by ${delta.toFixed(1)}, more than 3 bumps (${(3 * bump).toFixed(1)})`);
+    deltas.push(delta);
+    for (const n of raised) {
+      assert.ok(after[n] >= before[n] - 1e-6,
+        `${d}: raised ${n} went down, ${before[n]} -> ${after[n]}`);
+    }
+  }
+
+  // The reason quotes the average change over the days that really changed, and the
+  // effects show that same average.
+  const avg = deltas.reduce((a, b) => a + b, 0) / deltas.length;
+  const kcal = result.effects.find((e) => e.nutrient === 'kcal');
+  assert.equal(reasonAverage(result.reason, 'kcal'), Math.round(avg));
+  assert.equal(Math.round(kcal.after - kcal.before), Math.round(avg));
+
+  // The day count in the reason is the number of days that really changed, with the right plural.
+  const match = result.reason.match(/next (\d+) (days?)/);
+  assert.ok(match, result.reason);
+  assert.equal(Number(match[1]), changedDays.length, result.reason);
+  assert.equal(match[2], changedDays.length === 1 ? 'day' : 'days', result.reason);
+  assert.match(result.reason, /higher in calories/i);
+  return changedDays;
+}
+
+test('Recovery: a skipped lunch is spread over the window and the reason quotes the real change', () => {
+  const { result, plan } = skipLunchResult();
+  const recipesById = new Map(recipes.map((r) => [r.id, r]));
+  const lunchKcal = recipeNutrients(recipesById.get(LUNCH_RECIPE), foodsById).totals.kcal;
+  const bump = dayBump(lunchKcal, RECOVERY_KCAL_MIN);
+
+  assertSpreadOverWindow({ plan, result, bump });
+  assert.match(result.reason, /skipped/i);
+  // With at least half of the window changed there is no "could not spread" note.
+  assert.doesNotMatch(result.reason, /part of the shortfall is not made up/);
+});
+
+test('Recovery: skipping lunch and dinner together keeps the same bounds with the combined shortfall', () => {
+  const targets = profileById('recovery').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  const recipesById = new Map(recipes.map((r) => [r.id, r]));
+  plan.days[FIXED_DATE].lunch = LUNCH_RECIPE;
+  const dinnerId = plan.days[FIXED_DATE].dinner;
+  const combinedKcal = recipeNutrients(recipesById.get(LUNCH_RECIPE), foodsById).totals.kcal
+    + recipeNutrients(recipesById.get(dinnerId), foodsById).totals.kcal;
+  const bump = dayBump(combinedKcal, RECOVERY_KCAL_MIN);
+  const log = [{ date: FIXED_DATE, time: '20:00', skipped: [LUNCH_RECIPE, dinnerId] }];
+  const result = replan({ targets, recipes, plan, log, bought: [], foodsById, fromDate: FIXED_DATE });
+
+  assertSpreadOverWindow({ plan, result, bump });
+  assert.match(result.reason, /higher in calories/i);
+});
+
+test('a reason for exactly one changed day says "next 1 day"', () => {
+  const targets = profileById('recovery').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  // Only one day is left in the month after this log, so at most one day can change.
+  const fromDate = '2026-10-30';
+  plan.days[fromDate].lunch = LUNCH_RECIPE;
+  const log = [{ date: fromDate, time: '13:00', skipped: [LUNCH_RECIPE] }];
+  const result = replan({ targets, recipes, plan, log, bought: [], foodsById, fromDate });
+
+  const changedDays = [...new Set(result.changed.map((c) => c.date))];
+  assert.equal(changedDays.length, 1, `changed days: ${changedDays.length}`);
+  assert.match(result.reason, /the next 1 day is higher in calories/i);
+  assert.doesNotMatch(result.reason, /the next 1 days/);
+  assert.doesNotMatch(result.reason, /part of the shortfall is not made up/);
+});
+
+test('fillDay returns null when no combination fits the upper bounds', () => {
+  const targets = profileById('recovery').targets;
+  const anyDay = fillDay(recipes, targets, foodsById, new Set());
+  assert.ok(anyDay && anyDay.lunch, 'without bounds fillDay still returns a day');
+
+  assert.equal(
+    fillDay(recipes, targets, foodsById, new Set(), {}, {}, {}, { kcal: 1 }),
+    null,
+    'absurdly small bounds must leave no possible combination',
+  );
+  assert.equal(
+    fillDay(recipes, targets, foodsById, new Set(), {}, {}, {}, { protein: 1, fat: 1 }),
+    null,
+    'any single impossible nutrient floor is enough to return null',
+  );
 });
 
 test('skipping with only maximum targets does not change the plan', () => {
