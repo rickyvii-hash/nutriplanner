@@ -2,6 +2,16 @@ import { todayIso, SLOTS } from '../engine/planner.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
 
+// Saved meals can be corrected later from the Plan screen.
+export {
+  removeLogEntry,
+  updateLogEntryItems,
+  convertLogEntryToSkipped,
+  convertSkippedEntryToEaten,
+  findPlannedRecipeForEntry,
+  applyLogCorrection,
+} from '../log_corrections.js';
+
 export const MAX_PORTION_GRAMS = 5000;
 
 /**
@@ -505,6 +515,9 @@ export function renderLog(ctx) {
     ctx.saveLogAndReplan({
       items: flatDraftItems(draft),
       skipped: draftSkippedIds(draft),
+      // Remember which planned meals were eaten, so the saved log can be corrected
+      // back to Skipped for that same recipe.
+      eaten: draft.groups.map((g) => ({ recipeId: g.recipeId, slot: g.slot })),
     });
   });
   root.querySelector('[data-back]').addEventListener('click', () => ctx.navigate('plan'));

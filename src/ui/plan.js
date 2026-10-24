@@ -2,6 +2,21 @@ import { dayTotals, todayIso, SLOTS } from '../engine/planner.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
+import { parsePortion } from './log.js';
+import {
+  removeLogEntry,
+  updateLogEntryItems,
+  convertLogEntryToSkipped,
+  convertSkippedEntryToEaten,
+  findPlannedRecipeForEntry,
+  applyLogCorrection,
+} from '../log_corrections.js';
+
+/** True when a saved entry only records skipped planned meals. */
+function isSkippedEntry(entry) {
+  return Array.isArray(entry?.skipped) && entry.skipped.length > 0
+    && (!entry.items || entry.items.length === 0);
+}
 
 /**
  * Text for a daily nutrient value: "n/a" when nothing is known, "≥12.2" when a meal
@@ -40,6 +55,14 @@ export function renderPlan(ctx) {
     header.appendChild(reset);
   }
   root.appendChild(header);
+
+  // A one-line note after a log correction that needed no plan change.
+  if (ctx.logNotice) {
+    root.appendChild(el(`<section class="card notice-card" data-log-notice>
+      <p>${escapeHtml(ctx.logNotice)}</p>
+    </section>`));
+    ctx.logNotice = null;
+  }
 
   if (!state.plan) {
     root.appendChild(el(`<section class="card empty-state">
@@ -154,6 +177,122 @@ export function renderPlan(ctx) {
     </div>`));
   }
   root.appendChild(bars);
+
+  // Logged meals for this day can be corrected in place. Every saved entry shows
+  // controls to remove it, change an eaten meal into skipped (and back), or edit
+  // the portions of the food it holds.
+  const dayEntries = (state.log || [])
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => entry.date === selected);
+  const planDay = state.plan.days[selected];
+  const loggedCard = el(`<section class="card">
+    <h3>Logged meals</h3>
+    <p class="muted tiny">Correct a mistake here and the plan is recalculated from the corrected log.</p>
+    <ul class="log-edits"></ul>
+  </section>`);
+  const editList = loggedCard.querySelector('.log-edits');
+  if (dayEntries.length === 0) {
+    editList.appendChild(el(`<li class="muted tiny" data-no-log>Nothing logged for this day yet.</li>`));
+  }
+  for (const { entry, index } of dayEntries) {
+    const skipped = isSkippedEntry(entry);
+    const replaced = Array.isArray(entry.replaced) ? entry.replaced[0] : null;
+    const recipe = skipped
+      ? recipesById.get(entry.skipped[0]) || null
+      : findPlannedRecipeForEntry(entry, planDay, recipesById);
+    const kind = skipped ? 'Skipped' : (replaced ? 'Eaten · replaced' : 'Eaten');
+    const when = [entry.date, entry.time].filter(Boolean).join(' · ');
+    const li = el(`<li class="log-edit" data-entry="${index}">
+      <div class="log-edit-head">
+        <span class="log-edit-kind">${escapeHtml(kind)}</span>
+        <span class="muted tiny">${escapeHtml(when)}</span>
+      </div>
+    </li>`);
+
+    if (replaced) {
+      const plannedName = recipesById.get(replaced.fromRecipeId)?.name || replaced.fromRecipeId;
+      li.appendChild(el(`<p class="muted tiny log-edit-note">You ate ${escapeHtml(recipe?.name || 'another meal')}
+        instead of the planned ${escapeHtml(replaced.slot)} (${escapeHtml(plannedName)}).
+        Remove this entry to choose another meal with Replace.</p>`));
+    }
+
+    if (skipped) {
+      li.appendChild(el(`<p class="log-edit-skipped">Skipped · ${escapeHtml(recipe?.name || entry.skipped[0])}</p>`));
+    } else if ((entry.items || []).length > 0) {
+      const items = el(`<ul class="log-edit-items"></ul>`);
+      entry.items.forEach((it, itemIndex) => {
+        const food = foodsById.get(it.foodId);
+        const name = food?.name || it.foodId;
+        items.appendChild(el(`<li class="log-edit-item">
+          <span>${escapeHtml(name)}</span>
+          <input type="number" min="1" max="5000" step="1" value="${it.grams}"
+            data-correct-entry="${index}" data-correct-item="${itemIndex}"
+            aria-label="${escapeHtml(name)} grams">
+          <span class="muted">g</span>
+        </li>`));
+      });
+      li.appendChild(items);
+    }
+
+    const actions = el(`<div class="log-edit-actions">
+      <button type="button" class="btn-secondary btn-small" data-correct-remove="${index}">Remove entry</button>
+    </div>`);
+    if (replaced) {
+      // A replaced meal is removed and re-done through Replace, never turned into a skip.
+    } else if (skipped && recipe) {
+      actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-eat="${index}" data-recipe="${escapeHtml(recipe.id)}">Add as eaten</button>`));
+    } else if (!skipped && recipe) {
+      actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-skip="${index}" data-recipe="${escapeHtml(recipe.id)}">Mark as skipped</button>`));
+    }
+    li.appendChild(actions);
+    editList.appendChild(li);
+  }
+  root.appendChild(loggedCard);
+
+  const updateAfterCorrection = (nextState, entry) => {
+    applyLogCorrection(ctx, nextState, { fromDate: entry?.date });
+  };
+
+  editList.querySelectorAll('[data-correct-entry]').forEach((input) => {
+    input.addEventListener('change', () => {
+      const index = Number(input.dataset.correctEntry);
+      const itemIndex = Number(input.dataset.correctItem);
+      const entry = ctx.state.log?.[index];
+      if (!entry) return;
+      const grams = parsePortion(input.value);
+      if (grams === null) {
+        input.value = entry.items[itemIndex]?.grams ?? '';
+        return;
+      }
+      const items = entry.items.map((it, i) => (i === itemIndex ? { ...it, grams } : it));
+      updateAfterCorrection(updateLogEntryItems(ctx.state, index, items), entry);
+    });
+  });
+  editList.querySelectorAll('[data-correct-remove]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const index = Number(btn.dataset.correctRemove);
+      const entry = ctx.state.log?.[index];
+      if (!entry) return;
+      updateAfterCorrection(removeLogEntry(ctx.state, index), entry);
+    });
+  });
+  editList.querySelectorAll('[data-correct-skip]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const index = Number(btn.dataset.correctSkip);
+      const entry = ctx.state.log?.[index];
+      if (!entry) return;
+      updateAfterCorrection(convertLogEntryToSkipped(ctx.state, index, btn.dataset.recipe), entry);
+    });
+  });
+  editList.querySelectorAll('[data-correct-eat]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const index = Number(btn.dataset.correctEat);
+      const entry = ctx.state.log?.[index];
+      const recipe = recipesById.get(btn.dataset.recipe);
+      if (!entry || !recipe) return;
+      updateAfterCorrection(convertSkippedEntryToEaten(ctx.state, index, recipe), entry);
+    });
+  });
 
   const upcoming = dates.filter((d) => d > selected).slice(0, 3);
   if (upcoming.length) {

@@ -182,6 +182,25 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .logged-group-item { border-bottom: none; padding: 4px 0; }
 .logged-item.is-skipped { opacity: 0.72; }
 
+/* Correcting a saved log entry from the Plan screen. */
+.log-edits { list-style: none; margin: 0; padding: 0; }
+.log-edit { padding: 10px 0; border-bottom: 1px solid var(--line); }
+.log-edit:last-child { border-bottom: none; }
+.log-edit-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.log-edit-kind { font-size: 0.85rem; font-weight: 600; }
+.log-edit-note { margin: 4px 0; }
+.log-edit-skipped { margin: 6px 0; opacity: 0.8; }
+.log-edit-items { list-style: none; margin: 6px 0; padding: 0 0 0 10px; border-left: 2px solid var(--sage); }
+.log-edit-item {
+  display: grid; grid-template-columns: 1fr 76px auto; gap: 8px; align-items: center;
+  padding: 3px 0;
+}
+.log-edit-item input { min-height: 44px; }
+.log-edit-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.log-edit-actions .btn-small { min-height: 44px; }
+.notice-card { border-left: 3px solid var(--green); }
+.notice-card p { margin: 0; font-size: 0.9rem; }
+
 /* The plan row of a meal already in "This meal". */
 .plan-meal-row.is-in-draft { background: var(--green-soft); border-radius: 12px; padding: 10px 8px; }
 .badge-in-draft {

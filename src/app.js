@@ -66,10 +66,19 @@ const ctx = {
     const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
     // A replacement records which planned meal was swapped, so the reason can name it.
     const replaced = Array.isArray(payload) ? [] : (payload?.replaced || []);
+    // Planned meals eaten in this save, so a correction can turn them into Skipped.
+    const eaten = Array.isArray(payload) ? [] : (payload?.eaten || []);
     if (!items.length && !skipped.length) return;
     const log = [...(ctx.state.log || [])];
     const when = { date: todayIso(), time: localTime() };
-    if (items.length) log.push({ ...when, items, ...(replaced.length ? { replaced: [...replaced] } : {}) });
+    if (items.length) {
+      log.push({
+        ...when,
+        items,
+        ...(replaced.length ? { replaced: [...replaced] } : {}),
+        ...(eaten.length ? { eaten: [...eaten] } : {}),
+      });
+    }
     // Always include items: [] on skips so older progress code never iterates undefined.
     if (skipped.length) log.push({ ...when, skipped: [...skipped], items: [] });
     const result = replan({
