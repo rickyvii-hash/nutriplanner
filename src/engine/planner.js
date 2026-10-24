@@ -354,6 +354,7 @@ function buildReason({
   effects, changed, keptForBought, unreachable, nothingToChange, targets, recentTotals,
   skippedNames = [], shortfall = {}, skipNoMin = false, windowDayCount = 0,
   replacements = [], replacementOver = {}, replacementUnder = {}, replacementPrimary = null,
+  overshoot = {}, logDayCount = 1, logIsPast = false,
 }) {
   if (skipNoMin) return SKIP_NO_MIN_REASON;
   if (nothingToChange) {
@@ -396,20 +397,24 @@ function buildReason({
     return `${closestNote}${what}, which has ${amount}, so ${nextDaysPhrase(daysTouched)} ${replacementPrimary.kind === 'max' ? 'lower' : 'higher'} in ${nutrientWords(key)} (${quoted}).${otherNote}${keptNote}`;
   }
 
-  // The maximum that today's log went furthest over (relative to its daily limit).
+  // The maximum the logged days went furthest over (relative to its daily limit).
   let over = null;
   for (const t of targets) {
     if (t.kind !== 'max') continue;
-    const recent = recentTotals ? (recentTotals[t.nutrient] || 0) : 0;
-    if (recent <= t.daily) continue;
-    const ratio = (recent - t.daily) / t.daily;
-    if (!over || ratio > over.ratio) over = { t, recent, ratio };
+    const excess = overshoot[t.nutrient] || 0;
+    if (excess <= 0) continue;
+    const ratio = excess / t.daily;
+    if (!over || ratio > over.ratio) over = { t, excess, ratio };
   }
+  const logWhen = logDayCount > 1 ? 'across the days you logged' : (logIsPast ? 'on a past day' : 'today');
   if (over) {
     const e = effects.find((x) => x.nutrient === over.t.nutrient);
     const change = effectChange(over.t.nutrient, e);
     const less = change < 0 ? ` (about ${formatAmount(over.t.nutrient, Math.abs(change))} less per day on average)` : '';
-    return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
+    const logged = logDayCount > 1
+      ? `You went about ${formatAmount(over.t.nutrient, over.excess)} over your ${nutrientWords(over.t.nutrient)} maximum`
+      : `You logged ${formatAmount(over.t.nutrient, recentTotals ? (recentTotals[over.t.nutrient] || 0) : 0)} of ${nutrientWords(over.t.nutrient)}`;
+    return `${closestNote}${logged} ${logWhen} `
       + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so ${nextDaysPhrase(daysTouched)} lower in `
       + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
   }
@@ -442,7 +447,7 @@ function buildReason({
     const notSpread = windowDayCount > 0 && daysTouched < windowDayCount / 2
       ? ` Only ${daysTouched} of the next ${windowDayCount} days had room for a bigger meal, so part of the shortfall is not made up.`
       : '';
-    return `${closestNote}You skipped ${names} today `
+    return `${closestNote}You skipped ${names} ${logWhen} `
       + `(about ${formatAmount(under.t.nutrient, under.missed)} of your ${formatAmount(under.t.nutrient, under.t.daily)} minimum), `
       + `so ${nextDaysPhrase(daysTouched)} higher in ${nutrientWords(under.t.nutrient)}${more}.${notSpread}${keptNote}`;
   }
@@ -498,7 +503,11 @@ export function effectChange(key, effect) {
  * An off-plan meal that goes over a daily maximum is made up over the next
  * WINDOW_DAYS days (not spread thinly over the whole month); every other day
  * of the month stays exactly as it was.
- * state: { targets, recipes, plan, log, bought, foodsById, fromDate? }
+ * state: { targets, recipes, plan, log, bought, foodsById, fromDate?, logFromDate? }
+ * `fromDate` is the first day that may change. `logFromDate` is the earliest day
+ * whose log feeds the replan; it defaults to `fromDate`, and differs only when a
+ * correction on a past day is recalculated from today: the past days cannot change
+ * but every entry logged since then still counts in the totals.
  */
 export function replan(state) {
   const {
@@ -509,6 +518,7 @@ export function replan(state) {
     bought = [],
     foodsById,
     fromDate = todayIso(),
+    logFromDate = fromDate,
   } = state;
 
   const recipesById = new Map(recipes.map((r) => [r.id, r]));
@@ -534,21 +544,32 @@ export function replan(state) {
       consumedMonth = addTotals(consumedMonth, dayTotals(plan.days[date], recipesById, foodsById).totals);
     }
   }
-  // What was logged on the log date (food eaten — skipped meals add nothing here).
-  let recentTotals = emptyTotals();
+  // Food eaten between the logged day and the first changeable day, one total per day.
+  // A normal log saved now covers just that day; a correction on a past day covers
+  // every later entry too, so the full corrected log drives the replan.
+  const loggedDayTotals = new Map();
   for (const entry of log || []) {
-    if (entry.date !== fromDate || isSkipEntry(entry)) continue;
+    const date = entry?.date;
+    if (!date || date < logFromDate || date > fromDate || isSkipEntry(entry)) continue;
     const items = entry.items || [];
     if (items.length === 0) continue;
     const r = loggedNutrients(items, foodsById);
-    recentTotals = addTotals(recentTotals, r.totals);
-    consumedMonth = addTotals(consumedMonth, r.totals);
+    loggedDayTotals.set(date, addTotals(loggedDayTotals.get(date) || emptyTotals(), r.totals));
   }
+  let recentTotals = emptyTotals();
+  for (const [date, totals] of loggedDayTotals) {
+    recentTotals = addTotals(recentTotals, totals);
+    // Days before the first changeable day are already part of consumedMonth.
+    if (date >= fromDate) consumedMonth = addTotals(consumedMonth, totals);
+  }
+  const logDayCount = loggedDayTotals.size;
+  const logIsPast = logFromDate < fromDate;
 
-  // Planned meals marked skipped today: their known nutrients are the shortfall for minima.
+  // Planned meals marked skipped on the logged days: their known nutrients are the shortfall for minima.
   const skippedIds = [];
   for (const entry of log || []) {
-    if (entry.date !== fromDate || !Array.isArray(entry.skipped)) continue;
+    if (!entry?.date || entry.date < logFromDate || entry.date > fromDate) continue;
+    if (!Array.isArray(entry.skipped)) continue;
     for (const id of entry.skipped) {
       if (id && !skippedIds.includes(id)) skippedIds.push(id);
     }
@@ -567,7 +588,7 @@ export function replan(state) {
     if (sum > 0) shortfall[t.nutrient] = sum;
   }
 
-  // Meals replaced on the log date: what was eaten instead of the planned meal.
+  // Meals replaced on the logged days: what was eaten instead of the planned meal.
   // The difference from the plan feeds the same window rules as an off-plan meal,
   // so a richer swap is made up for on the next days and a lighter one is topped up.
   // A replacement can be another recipe or free-search foods ("I ate something else");
@@ -576,9 +597,10 @@ export function replan(state) {
   const replacementOver = {};
   const replacementUnder = {};
   for (const entry of log || []) {
-    if (entry.date !== fromDate || !Array.isArray(entry.replaced)) continue;
+    if (!entry?.date || entry.date < logFromDate || entry.date > fromDate) continue;
+    if (!Array.isArray(entry.replaced)) continue;
     for (const r of entry.replaced) {
-      const planned = recipesById.get(plan.days?.[fromDate]?.[r?.slot]);
+      const planned = recipesById.get(plan.days?.[entry.date]?.[r?.slot]);
       if (!planned) continue;
       const isCustom = !r?.recipeId || r.recipeId === 'custom';
       const recipe = isCustom ? null : recipesById.get(r.recipeId);
@@ -674,12 +696,18 @@ export function replan(state) {
     }
   }
 
-  // Over a maximum today: make it up over the window by lowering each window day
-  // below what it had planned, by overshoot / window length.
+  // Over a maximum on the logged days: make it up over the window by lowering each
+  // window day below what it had planned, by overshoot / window length. The excess is
+  // counted per day, so two normal days never add up to one overshoot.
   const overshoot = {};
   for (const t of targets) {
-    const recent = recentTotals[t.nutrient] || 0;
-    if (t.kind === 'max' && recent > t.daily) overshoot[t.nutrient] = recent - t.daily;
+    if (t.kind !== 'max') continue;
+    let excess = 0;
+    for (const totals of loggedDayTotals.values()) {
+      const day = totals[t.nutrient] || 0;
+      if (day > t.daily) excess += day - t.daily;
+    }
+    if (excess > 0) overshoot[t.nutrient] = excess;
   }
   // A swap richer than the planned meal also lowers the following days.
   // Take the larger of the daily-max overshoot and the plan-relative excess — never
@@ -907,6 +935,9 @@ export function replan(state) {
       replacementOver,
       replacementUnder,
       replacementPrimary,
+      overshoot,
+      logDayCount,
+      logIsPast,
     });
 
   return {

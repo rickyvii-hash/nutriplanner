@@ -115,6 +115,10 @@ export function correctionFromDate(state, entry) {
  * Opens Plan updated when the plan would change; otherwise keeps the corrected
  * log and goes back to the Plan with a calm note. `ctx` provides recipes,
  * foodsById, navigate and the in-memory state.
+ *
+ * A correction on a past day never rewrites days that are already over: the
+ * replan starts today. The corrected day is still passed as the first logged
+ * day, so every later entry counts in the totals the replan uses.
  */
 export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   const state = correctedState || ctx?.state;
@@ -123,6 +127,9 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   const recipes = Array.isArray(ctx.recipes) && ctx.recipes.length > 0
     ? ctx.recipes
     : (ctx.recipesById ? [...ctx.recipesById.values()] : []);
+  const logDate = fromDate || correctionFromDate(state);
+  const today = todayIso();
+  const replanFrom = logDate > today ? logDate : today;
   const result = replan({
     targets: state.targets || [],
     recipes,
@@ -130,7 +137,8 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
     log: state.log || [],
     bought: state.bought || [],
     foodsById: ctx.foodsById || new Map(),
-    fromDate: fromDate || correctionFromDate(state),
+    fromDate: replanFrom,
+    logFromDate: logDate,
   });
   const planChanged = result.changed.length > 0;
   const next = {
