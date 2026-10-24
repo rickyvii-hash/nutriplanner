@@ -60,13 +60,15 @@ const ctx = {
   },
   saveLogAndReplan: (payload) => {
     if (!ctx.state.plan) return;
-    // Accept either a food-item array (older callers) or { items, skipped }.
+    // Accept either a food-item array (older callers) or { items, skipped, replaced }.
     const items = Array.isArray(payload) ? payload : (payload?.items || []);
     const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
+    // A replacement records which planned meal was swapped, so the reason can name it.
+    const replaced = Array.isArray(payload) ? [] : (payload?.replaced || []);
     if (!items.length && !skipped.length) return;
     const log = [...(ctx.state.log || [])];
     const when = { date: todayIso(), time: localTime() };
-    if (items.length) log.push({ ...when, items });
+    if (items.length) log.push({ ...when, items, ...(replaced.length ? { replaced: [...replaced] } : {}) });
     // Always include items: [] on skips so older progress code never iterates undefined.
     if (skipped.length) log.push({ ...when, skipped: [...skipped], items: [] });
     const result = replan({

@@ -324,9 +324,36 @@ function nextDaysPhrase(n) {
   return n === 1 ? 'the next 1 day is' : `the next ${n} days are`;
 }
 
+/**
+ * A target moved the wrong way when a maximum went up or a minimum went down.
+ * Used to keep the reason honest about a replacement that is not an improvement.
+ */
+function movedAway(effect) {
+  const change = effectChange(effect.nutrient, effect);
+  if (change === 0) return 0;
+  if (effect.kind === 'max') return change > 0 ? change : 0;
+  return change < 0 ? change : 0;
+}
+
+/** The target (other than the named one) that moved furthest the wrong way, or null. */
+function worstOtherTarget(effects, targets, exceptNutrient) {
+  let worst = null;
+  for (const e of effects) {
+    if (e.nutrient === exceptNutrient) continue;
+    const away = movedAway(e);
+    if (away === 0) continue;
+    const target = targets.find((t) => t.nutrient === e.nutrient);
+    const daily = target?.daily || e.daily || 1;
+    const score = Math.abs(away) / daily;
+    if (!worst || score > worst.score) worst = { effect: e, change: away, score };
+  }
+  return worst;
+}
+
 function buildReason({
   effects, changed, keptForBought, unreachable, nothingToChange, targets, recentTotals,
   skippedNames = [], shortfall = {}, skipNoMin = false, windowDayCount = 0,
+  replacements = [], replacementOver = {}, replacementUnder = {}, replacementPrimary = null,
 }) {
   if (skipNoMin) return SKIP_NO_MIN_REASON;
   if (nothingToChange) {
@@ -354,6 +381,36 @@ function buildReason({
     return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
       + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so ${nextDaysPhrase(daysTouched)} lower in `
       + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
+  }
+
+  // A planned meal was swapped for another recipe: say what the swap did, quoting the
+  // same rounded per-day numbers the Effect rows show. If it moved a target the wrong
+  // way, the reason says so plainly instead of calling it an improvement.
+  if (replacements.length > 0 && replacementPrimary) {
+    const key = replacementPrimary.nutrient;
+    const effect = effects.find((x) => x.nutrient === key);
+    const change = effectChange(key, effect);
+    const first = replacements[0];
+    const what = replacements.length === 1
+      ? `You swapped ${first.slot} for ${first.name}`
+      : `You swapped ${replacements.length} meals`;
+    const than = replacements.length === 1 ? `the planned ${first.slot}` : 'the planned meals';
+    const amount = replacementPrimary.kind === 'max'
+      ? `about ${formatAmount(key, replacementOver[key] || 0)} more ${nutrientWords(key)} than ${than}`
+      : `about ${formatAmount(key, replacementUnder[key] || 0)} less than ${than}`;
+    const quoted = `about ${formatAmount(key, Math.abs(change))} ${change < 0 ? 'less' : 'more'} per day on average`;
+    const worseOther = worstOtherTarget(effects, targets, key);
+    const otherNote = worseOther
+      ? ` ${nutrientWords(worseOther.effect.nutrient)} also moves about ${formatAmount(worseOther.effect.nutrient, Math.abs(worseOther.change))} ${worseOther.change > 0 ? 'more' : 'less'} per day on average, which is worse for that ${worseOther.effect.kind === 'max' ? 'maximum' : 'minimum'}.`
+      : '';
+    if (change === 0) {
+      return `${closestNote}${what}, which has ${amount}. The next ${daysTouched} day${daysTouched === 1 ? '' : 's'} changed, but they average the same on that target.${keptNote}`;
+    }
+    const improves = replacementPrimary.kind === 'max' ? change < 0 : change > 0;
+    if (!improves) {
+      return `${closestNote}${what}, which has ${amount}. The next ${daysTouched} day${daysTouched === 1 ? '' : 's'} changed, but they average ${quoted}, which is worse for that ${replacementPrimary.kind === 'max' ? 'maximum' : 'minimum'}.${otherNote}${keptNote}`;
+    }
+    return `${closestNote}${what}, which has ${amount}, so ${nextDaysPhrase(daysTouched)} ${replacementPrimary.kind === 'max' ? 'lower' : 'higher'} in ${nutrientWords(key)} (${quoted}).${otherNote}${keptNote}`;
   }
 
   // Skipped meals under a minimum: raise the next days and quote the real numbers.
@@ -430,7 +487,7 @@ function effectValue(key, v) {
  * Change quoted in the reason: rounded(after) - rounded(before), i.e. exactly the
  * arithmetic of the two numbers the Effect row shows, never a separately rounded float.
  */
-function effectChange(key, effect) {
+export function effectChange(key, effect) {
   if (!effect) return 0;
   return effectValue(key, effect.after) - effectValue(key, effect.before);
 }
@@ -508,6 +565,42 @@ export function replan(state) {
     }
     if (sum > 0) shortfall[t.nutrient] = sum;
   }
+
+  // Meals replaced on the log date: what was eaten instead of the planned meal.
+  // The difference from the plan feeds the same window rules as an off-plan meal,
+  // so a richer swap is made up for on the next days and a lighter one is topped up.
+  const replacements = [];
+  const replacementOver = {};
+  const replacementUnder = {};
+  for (const entry of log || []) {
+    if (entry.date !== fromDate || !Array.isArray(entry.replaced)) continue;
+    for (const r of entry.replaced) {
+      const recipe = recipesById.get(r?.recipeId);
+      const planned = recipesById.get(plan.days?.[fromDate]?.[r?.slot]);
+      if (!recipe || !planned) continue;
+      replacements.push({
+        slot: r.slot,
+        recipeId: recipe.id,
+        name: recipe.name,
+        plannedId: planned.id,
+        plannedName: planned.name,
+      });
+      const before = recipeNutrients(planned, foodsById);
+      const after = recipeNutrients(recipe, foodsById);
+      for (const t of targets) {
+        const n = t.nutrient;
+        // An unknown value is never treated as a difference of zero.
+        if (before.unknown[n] || after.unknown[n]) continue;
+        const delta = after.totals[n] - before.totals[n];
+        if (t.kind === 'max' && delta > 0) replacementOver[n] = (replacementOver[n] || 0) + delta;
+        if (t.kind === 'min' && delta < 0) replacementUnder[n] = (replacementUnder[n] || 0) - delta;
+      }
+    }
+  }
+  // A swap that leaves the day lower on a minimum raises the next days like a skip.
+  for (const [n, v] of Object.entries(replacementUnder)) {
+    shortfall[n] = (shortfall[n] || 0) + v;
+  }
   // The shortfall nutrient a swap must improve: calories when they fell short,
   // otherwise the minimum that fell furthest short relative to its daily value.
   let floorNutrient = null;
@@ -577,6 +670,34 @@ export function replan(state) {
     const recent = recentTotals[t.nutrient] || 0;
     if (t.kind === 'max' && recent > t.daily) overshoot[t.nutrient] = recent - t.daily;
   }
+  // A swap richer than the planned meal also lowers the following days.
+  // Take the larger of the daily-max overshoot and the plan-relative excess — never
+  // add them, or a rich swap that also busts the daily max would be counted twice.
+  for (const [n, v] of Object.entries(replacementOver)) {
+    overshoot[n] = Math.max(overshoot[n] || 0, v);
+  }
+  // The nutrient the replacement reason names: the maximum the swap pushed up most
+  // (calories count for more), otherwise the minimum it lowered most.
+  let replacementPrimary = null;
+  if (replacements.length > 0) {
+    for (const t of targets) {
+      if (t.kind !== 'max' || !replacementOver[t.nutrient]) continue;
+      const score = replacementOver[t.nutrient] / t.daily;
+      if (!replacementPrimary || score > replacementPrimary.score) {
+        replacementPrimary = { nutrient: t.nutrient, kind: 'max', score };
+      }
+    }
+    if (!replacementPrimary) {
+      for (const t of targets) {
+        if (t.kind !== 'min' || !replacementUnder[t.nutrient]) continue;
+        const score = replacementUnder[t.nutrient] / t.daily + (t.nutrient === 'kcal' ? 2 : 0);
+        if (!replacementPrimary || score > replacementPrimary.score) {
+          replacementPrimary = { nutrient: t.nutrient, kind: 'min', score };
+        }
+      }
+    }
+  }
+
   // Logged on the last planned day and over a maximum: no window is left to adjust.
   const lastDayOverMax = windowDates.length === 0 && Object.keys(overshoot).length > 0;
   const adjustedMax = windowDates.length > 0 && Object.keys(overshoot).length > 0;
@@ -771,6 +892,10 @@ export function replan(state) {
       shortfall,
       skipNoMin: false,
       windowDayCount: windowDates.length,
+      replacements,
+      replacementOver,
+      replacementUnder,
+      replacementPrimary,
     });
 
   return {
@@ -787,6 +912,8 @@ export function replan(state) {
     windowDates,
     shortfall,
     skippedNames,
+    replacements,
+    replacementPrimary,
   };
 }
 
