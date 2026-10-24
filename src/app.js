@@ -8,7 +8,7 @@ import {
 } from './engine/planner.js';
 import { renderTargets } from './ui/targets.js';
 import { renderPlan } from './ui/plan.js';
-import { renderLog } from './ui/log.js';
+import { renderLog, logEntriesForSave } from './ui/log.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
@@ -61,26 +61,19 @@ const ctx = {
   },
   saveLogAndReplan: (payload) => {
     if (!ctx.state.plan) return;
-    // Accept either a food-item array (older callers) or { items, skipped, replaced }.
+    // Accept either a food-item array (older callers) or { items, skipped, replaced, eaten, extra }.
     const items = Array.isArray(payload) ? payload : (payload?.items || []);
     const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
-    // A replacement records which planned meal was swapped, so the reason can name it.
-    const replaced = Array.isArray(payload) ? [] : (payload?.replaced || []);
-    // Planned meals eaten in this save, so a correction can turn them into Skipped.
-    const eaten = Array.isArray(payload) ? [] : (payload?.eaten || []);
     if (!items.length && !skipped.length) return;
-    const log = [...(ctx.state.log || [])];
     const when = { date: todayIso(), time: localTime() };
-    if (items.length) {
-      log.push({
-        ...when,
-        items,
-        ...(replaced.length ? { replaced: [...replaced] } : {}),
-        ...(eaten.length ? { eaten: [...eaten] } : {}),
-      });
-    }
-    // Always include items: [] on skips so older progress code never iterates undefined.
-    if (skipped.length) log.push({ ...when, skipped: [...skipped], items: [] });
+    // Free-search foods are tagged extra, so a saved entry says it was eaten outside
+    // the planned meals; a replacement keeps its `replaced` slot instead.
+    const entries = logEntriesForSave(
+      Array.isArray(payload) ? { items } : payload,
+      when,
+    );
+    if (entries.length === 0) return;
+    const log = [...(ctx.state.log || []), ...entries];
     const result = replan({
       targets: ctx.state.targets,
       recipes: ctx.recipes,

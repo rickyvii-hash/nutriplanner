@@ -122,6 +122,48 @@ export function canReplaceMeal(draft) {
 
 export const REPLACE_BLOCKED_MESSAGE = 'Clear This meal first, or save it, before replacing another meal.';
 
+/**
+ * The save payload for the current draft. Free-search foods are extras: they are
+ * logged with `extra: true` and never replace or skip a planned slot.
+ */
+export function draftSavePayload(draft) {
+  const d = ensureDraft(draft);
+  return {
+    items: flatDraftItems(d),
+    skipped: draftSkippedIds(d),
+    eaten: d.groups.map((g) => ({ recipeId: g.recipeId, slot: g.slot })),
+    extra: d.items.length > 0,
+  };
+}
+
+/**
+ * The log entries a save appends. Food goes in one entry; skipped planned meals
+ * stay in their own entry. When the food came from free search the entry is marked
+ * `extra: true`, unless it is a replacement (then `replaced` names the slot it
+ * stands for). Extras never replace or skip a planned slot on their own.
+ */
+export function logEntriesForSave(payload, when) {
+  const items = Array.isArray(payload?.items) ? payload.items : [];
+  const skipped = Array.isArray(payload?.skipped) ? payload.skipped : [];
+  const replaced = Array.isArray(payload?.replaced) ? payload.replaced : [];
+  const eaten = Array.isArray(payload?.eaten) ? payload.eaten : [];
+  const extra = Boolean(payload?.extra) && replaced.length === 0;
+  const entries = [];
+  if (items.length > 0) {
+    entries.push({
+      ...when,
+      items: items.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+      ...(extra ? { extra: true } : {}),
+      ...(replaced.length ? { replaced: [...replaced] } : {}),
+      ...(eaten.length ? { eaten: [...eaten] } : {}),
+    });
+  }
+  if (skipped.length > 0) {
+    entries.push({ ...when, skipped: [...skipped], items: [] });
+  }
+  return entries;
+}
+
 /** Remove a whole block (all its ingredients at once) and clear its in-draft state. */
 export function removeDraftGroup(draft, groupId) {
   if (!draft || !Array.isArray(draft.groups)) return draft;
@@ -179,7 +221,7 @@ export function renderLog(ctx) {
   const mode = el(`<section class="card">
     <div class="mode-tabs">
       <button type="button" class="mode-tab is-active" data-mode="plan">From plan</button>
-      <button type="button" class="mode-tab" data-mode="search">Free search</button>
+      <button type="button" class="mode-tab" data-mode="search">Extra / outside meals</button>
     </div>
     <div class="mode-body" data-body="plan"></div>
     <div class="mode-body hidden" data-body="search"></div>
@@ -221,7 +263,10 @@ export function renderLog(ctx) {
   });
 
   const searchBody = mode.querySelector('[data-body="search"]');
-  appendHtml(searchBody, `<label class="field">
+  appendHtml(searchBody, `<p class="muted tiny" data-extra-help>
+    Snack, drink or a restaurant meal — not tied to a planned slot.
+  </p>
+  <label class="field">
     <span>Search a food</span>
     <input type="search" placeholder="e.g. pizza, ice cream" data-search>
   </label>
@@ -635,13 +680,9 @@ export function renderLog(ctx) {
   });
 
   root.querySelector('[data-save]').addEventListener('click', () => {
-    ctx.saveLogAndReplan({
-      items: flatDraftItems(draft),
-      skipped: draftSkippedIds(draft),
-      // Remember which planned meals were eaten, so the saved log can be corrected
-      // back to Skipped for that same recipe.
-      eaten: draft.groups.map((g) => ({ recipeId: g.recipeId, slot: g.slot })),
-    });
+    // Free-search foods are saved as extras; planned meals added as eaten stay
+    // recorded too, and skipped meals go in their own entry.
+    ctx.saveLogAndReplan(draftSavePayload(draft));
   });
   root.querySelector('[data-back]').addEventListener('click', () => ctx.navigate('plan'));
 

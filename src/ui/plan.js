@@ -197,10 +197,22 @@ export function renderPlan(ctx) {
   for (const { entry, index } of dayEntries) {
     const skipped = isSkippedEntry(entry);
     const replaced = Array.isArray(entry.replaced) ? entry.replaced[0] : null;
+    // An extra is food eaten outside the planned meals: it is not tied to a slot,
+    // so it is never matched to a planned recipe (which would offer a skip).
+    const extra = Boolean(entry.extra);
+    const hasEaten = Array.isArray(entry.eaten) && entry.eaten.length > 0;
     const recipe = skipped
       ? recipesById.get(entry.skipped[0]) || null
-      : findPlannedRecipeForEntry(entry, planDay, recipesById);
-    const kind = skipped ? 'Skipped' : (replaced ? 'Eaten · replaced' : 'Eaten');
+      : (extra && !hasEaten)
+        ? null
+        : findPlannedRecipeForEntry(entry, planDay, recipesById);
+    const kind = skipped
+      ? 'Skipped'
+      : replaced
+        ? 'Eaten · replaced'
+        : extra
+          ? (hasEaten ? 'Eaten · extra' : 'Extra / outside meals')
+          : 'Eaten';
     const when = [entry.date, entry.time].filter(Boolean).join(' · ');
     const li = el(`<li class="log-edit" data-entry="${index}">
       <div class="log-edit-head">
@@ -241,7 +253,9 @@ export function renderPlan(ctx) {
       // A replaced meal is removed and re-done through Replace, never turned into a skip.
     } else if (skipped && recipe) {
       actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-eat="${index}" data-recipe="${escapeHtml(recipe.id)}">Add as eaten</button>`));
-    } else if (!skipped && recipe) {
+    } else if (!skipped && !extra && recipe) {
+      // Extras hold no slot, and turning a mixed entry into Skipped would drop the
+      // extra foods: neither offers "Mark as skipped".
       actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-skip="${index}" data-recipe="${escapeHtml(recipe.id)}">Mark as skipped</button>`));
     }
     li.appendChild(actions);
