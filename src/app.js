@@ -1,7 +1,7 @@
 import {
   loadState, saveState, getStorageNotice, clearState,
   proposalToStore, pendingProposalForPlan, withoutPendingProposal,
-  applyStaleMonthOnStart, startOverState, changeProfileState,
+  acceptUpdatedPlan, applyStaleMonthOnStart, startOverState, changeProfileState,
 } from './store.js';
 import {
   buildPlan, replan, todayIso, localTime,
@@ -52,7 +52,7 @@ const ctx = {
       ctx.state.bought || [],
     );
     // A new month plan replaces any leftover update proposal and clears a stale-month banner.
-    ctx.state = withoutPendingProposal({ ...ctx.state, plan, keptForBought: [] });
+    ctx.state = withoutPendingProposal({ ...ctx.state, plan, planBase: null, keptForBought: [] });
     ctx.proposal = null;
     ctx.monthBanner = null;
     saveState(ctx.state);
@@ -91,11 +91,9 @@ const ctx = {
   },
   useUpdatedPlan: () => {
     if (!ctx.proposal) return;
-    ctx.state = withoutPendingProposal({
-      ...ctx.state,
-      plan: ctx.proposal.plan,
-      keptForBought: ctx.proposal.keptForBought || [],
-    });
+    // Remember the plan from before this accepted update, so a later correction
+    // of the triggering log can replan from it.
+    ctx.state = acceptUpdatedPlan(ctx.state, ctx.proposal);
     saveState(ctx.state);
     ctx.proposal = null;
     ctx.navigate('plan');

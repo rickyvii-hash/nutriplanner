@@ -130,10 +130,15 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   const logDate = fromDate || correctionFromDate(state);
   const today = todayIso();
   const replanFrom = logDate > today ? logDate : today;
+  // When an earlier update was accepted, the current plan already contains its
+  // make-up days. Replan from the plan before that acceptance with the corrected
+  // log, so removing or reducing the meal that drove the update also removes (or
+  // shrinks) the make-up instead of keeping it.
+  const basePlan = state.planBase || state.plan;
   const result = replan({
     targets: state.targets || [],
     recipes,
-    plan: state.plan,
+    plan: basePlan,
     log: state.log || [],
     bought: state.bought || [],
     foodsById: ctx.foodsById || new Map(),
@@ -143,6 +148,10 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   const planChanged = result.changed.length > 0;
   const next = {
     ...state,
+    // The accepted make-up is undone until the refreshed proposal is accepted
+    // again; keeping the plan therefore never keeps a stale compensation.
+    plan: basePlan,
+    planBase: null,
     pendingProposal: planChanged ? proposalToStore(result) : null,
   };
   ctx.state = next;

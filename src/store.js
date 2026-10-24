@@ -8,6 +8,9 @@ export function emptyAppState() {
     profileId: null,
     targets: [],
     plan: null,
+    // The month plan as it was before an accepted update: a correction replans
+    // from here, so a make-up for a meal that is later removed cannot survive.
+    planBase: null,
     log: [],
     bought: [],
     keptForBought: [],
@@ -72,6 +75,7 @@ export function changeProfileState(state, { keepLog = true } = {}) {
     profileId: null,
     targets: [],
     plan: null,
+    planBase: null,
     pendingProposal: null,
     keptForBought: [],
   };
@@ -135,6 +139,22 @@ export function withoutPendingProposal(state) {
   return { ...state, pendingProposal: null };
 }
 
+/**
+ * Apply an accepted update proposal. The plan before the update is remembered in
+ * `planBase` (the first time only), so a later log correction can replan from the
+ * plan that existed before any make-up was accepted instead of from the already
+ * compensated days.
+ */
+export function acceptUpdatedPlan(state, proposal) {
+  if (!state || !proposal) return state;
+  return withoutPendingProposal({
+    ...state,
+    plan: proposal.plan,
+    keptForBought: proposal.keptForBought || [],
+    planBase: state.planBase || state.plan || null,
+  });
+}
+
 /** Calendar month as YYYY-MM in local time. */
 export function currentMonthKey(now = new Date()) {
   const y = now.getFullYear();
@@ -174,6 +194,7 @@ export function applyStaleMonthOnStart(state, now = new Date()) {
     state: withoutPendingProposal({
       ...state,
       plan: null,
+      planBase: null,
       keptForBought: [],
     }),
     banner,
@@ -195,6 +216,7 @@ export function loadState() {
       profileId: data.profileId ?? null,
       targets: Array.isArray(data.targets) ? data.targets : [],
       plan: data.plan ?? null,
+      planBase: data.planBase && typeof data.planBase === 'object' ? data.planBase : null,
       log: Array.isArray(data.log) ? data.log : [],
       bought: Array.isArray(data.bought) ? data.bought : [],
       keptForBought: Array.isArray(data.keptForBought) ? data.keptForBought : [],
@@ -223,6 +245,7 @@ export function saveState(state) {
         profileId: state.profileId,
         targets: state.targets,
         plan: state.plan,
+        planBase: state.planBase || null,
         log: state.log,
         bought: state.bought,
         keptForBought: state.keptForBought || [],

@@ -9,6 +9,9 @@ import {
   updateLogEntryItems,
   removeLogEntry,
 } from '../src/log_corrections.js';
+import {
+  acceptUpdatedPlan, saveState, loadState, clearState,
+} from '../src/store.js';
 
 const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
 const recipes = JSON.parse(fs.readFileSync(new URL('../data/recipes.json', import.meta.url), 'utf8'));
@@ -190,4 +193,164 @@ test('the same recipe skipped on two past days counts twice in the make-up', (t)
   for (const date of new Set(both.changed.map((c) => c.date))) {
     assert.ok(date > today, `${date} was already over and must not change`);
   }
+});
+
+// --- Correcting the log after an accepted update -----------------------------
+// Accepting an update bakes its make-up days into the plan. Correcting the meal
+// that drove it must replan from the plan before that acceptance, otherwise the
+// make-up would stay for a meal that is no longer in the log.
+
+const TODAY = '2026-10-24';
+const BIG_MEAL = [
+  { foodId: 'pizza-cheese', grams: 700 },
+  { foodId: 'ice-cream-vanilla', grams: 200 },
+];
+const MEDIUM_MEAL = [
+  { foodId: 'pizza-cheese', grams: 500 },
+  { foodId: 'ice-cream-vanilla', grams: 100 },
+];
+const SMALL_MEAL = [
+  { foodId: 'pizza-cheese', grams: 100 },
+  { foodId: 'ice-cream-vanilla', grams: 100 },
+];
+
+function overshootLog(items) {
+  return [{ date: TODAY, time: '20:00', items: items.map((it) => ({ ...it })) }];
+}
+
+function correctionCtx(state) {
+  return {
+    state,
+    recipes,
+    recipesById,
+    foodsById,
+    screen: 'plan',
+    navigate(name) { this.screen = name; },
+  };
+}
+
+/** Log the big off-plan meal and accept the update it proposes. */
+function acceptOvershoot() {
+  const log = overshootLog(BIG_MEAL);
+  const result = replan({
+    targets, recipes, plan, log, bought: [], foodsById, fromDate: TODAY,
+  });
+  assert.ok(result.changed.length > 0, 'the overshoot must make up on the next days');
+  const accepted = acceptUpdatedPlan(baseState(log), result);
+  return { result, accepted };
+}
+
+test('accepted update: removing the triggering meal removes its make-up days', (t) => {
+  freezeToday(t);
+  const { result, accepted } = acceptOvershoot();
+
+  assert.deepEqual(accepted.plan, result.plan, 'Use updated plan applies the proposal');
+  assert.deepEqual(accepted.planBase, plan, 'the plan before the update is remembered');
+  assert.equal(accepted.pendingProposal, null);
+
+  const makeUpDates = [...new Set(result.changed.map((c) => c.date))];
+  assert.ok(makeUpDates.length > 0);
+
+  const ctx = correctionCtx(accepted);
+  const applied = applyLogCorrection(ctx, removeLogEntry(accepted, 0), { fromDate: TODAY });
+
+  assert.equal(applied.planChanged, false, 'nothing was eaten, so nothing is left to make up');
+  assert.equal(ctx.screen, 'plan');
+  assert.equal(ctx.state.pendingProposal, null);
+  assert.equal(ctx.state.planBase, null, 'the baseline is back in place, so no history is left over');
+  assert.deepEqual(ctx.state.plan, plan, 'the accepted make-up must not survive the removed meal');
+  for (const date of makeUpDates) {
+    assert.deepEqual(ctx.state.plan.days[date], plan.days[date], `${date} must go back to the base plan`);
+  }
+
+  // The numbers behind the result count no food at all.
+  assert.equal(applied.result.recentTotals.satFat, 0);
+  assert.equal(applied.result.nothingToChange, true);
+  assert.doesNotMatch(applied.result.reason, /You logged/i);
+});
+
+test('accepted update: reducing the meal below the maximum removes the make-up', (t) => {
+  freezeToday(t);
+  const { accepted } = acceptOvershoot();
+  const oldTotals = totalsOfItems(BIG_MEAL);
+
+  const ctx = correctionCtx(accepted);
+  const corrected = updateLogEntryItems(accepted, 0, SMALL_MEAL);
+  const applied = applyLogCorrection(ctx, corrected, { fromDate: TODAY });
+
+  const smallTotals = totalsOfItems(SMALL_MEAL);
+  assert.ok(smallTotals.satFat < 13, 'the reduced meal is under the daily maximum');
+  assert.ok(smallTotals.satFat < oldTotals.satFat);
+  assert.equal(applied.planChanged, false);
+  assert.deepEqual(ctx.state.plan, plan, 'the make-up from the old overshoot must not remain');
+  assert.equal(ctx.state.planBase, null);
+
+  // The corrected log, not the old one, is behind the numbers.
+  assert.ok(Math.abs(applied.result.recentTotals.satFat - smallTotals.satFat) < 1e-9);
+  assert.ok(applied.result.recentTotals.satFat < oldTotals.satFat);
+});
+
+test('accepted update: a smaller overshoot replans from the base plan and quotes the new log', (t) => {
+  freezeToday(t);
+  const { accepted } = acceptOvershoot();
+  const oldTotals = totalsOfItems(BIG_MEAL);
+
+  const ctx = correctionCtx(accepted);
+  const corrected = updateLogEntryItems(accepted, 0, MEDIUM_MEAL);
+  const applied = applyLogCorrection(ctx, corrected, { fromDate: TODAY });
+  assert.equal(applied.planChanged, true, 'the meal is still over the maximum, so a smaller make-up is proposed');
+
+  const mediumTotals = totalsOfItems(MEDIUM_MEAL);
+  assert.ok(mediumTotals.satFat > 13 && mediumTotals.satFat < oldTotals.satFat);
+
+  // The accepted make-up is undone before the refreshed proposal is shown.
+  assert.deepEqual(ctx.state.plan, plan);
+  assert.ok(ctx.state.pendingProposal?.plan, 'the refreshed proposal is stored');
+
+  // Every "before" comes from the base plan, so the update never replans from
+  // the already compensated days.
+  for (const change of applied.result.changed) {
+    assert.equal(
+      change.before,
+      plan.days[change.date][change.slot],
+      `${change.date} ${change.slot} must start from the base plan`,
+    );
+  }
+  assert.ok(
+    applied.result.changed.some((c) => accepted.plan.days[c.date][c.slot] !== plan.days[c.date][c.slot]),
+    'the accepted update really changed the same window, so this is a real regression check',
+  );
+
+  // The reason and the totals use the corrected meal, not the old one.
+  assert.ok(Math.abs(applied.result.recentTotals.satFat - mediumTotals.satFat) < 1e-9);
+  assert.ok(applied.result.reason.includes(mediumTotals.satFat.toFixed(1)));
+  assert.ok(!applied.result.reason.includes(oldTotals.satFat.toFixed(1)));
+
+  // Accepting the refreshed proposal remembers the base plan again for the next correction.
+  const reaccepted = acceptUpdatedPlan(ctx.state, applied.result);
+  assert.deepEqual(reaccepted.plan, applied.result.plan);
+  assert.deepEqual(reaccepted.planBase, plan);
+});
+
+test('accepted update: Use updated plan records the plan from before the update', () => {
+  const source = fs.readFileSync(new URL('../src/app.js', import.meta.url), 'utf8');
+  const handler = source.match(/useUpdatedPlan:[\s\S]{0,400}/);
+  assert.ok(handler, 'the Use updated plan action must be in app.js');
+  assert.match(handler[0], /acceptUpdatedPlan/, 'it must keep the plan from before the accepted update');
+});
+
+test('the baseline plan from before an accepted update survives a reload', () => {
+  const map = new Map();
+  globalThis.localStorage = {
+    getItem: (k) => (map.has(k) ? map.get(k) : null),
+    setItem: (k, v) => { map.set(k, String(v)); },
+    removeItem: (k) => { map.delete(k); },
+  };
+  const { accepted } = acceptOvershoot();
+  saveState(accepted);
+  const loaded = loadState();
+  assert.deepEqual(loaded.plan, accepted.plan);
+  assert.deepEqual(loaded.planBase, plan, 'a reload must keep the plan from before the accepted update');
+  clearState();
+  assert.equal(loadState().planBase, null);
 });
