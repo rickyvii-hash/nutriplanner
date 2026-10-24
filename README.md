@@ -48,3 +48,5 @@ Food data: [USDA FoodData Central](https://fdc.nal.usda.gov/) (SR Legacy), a pub
 ## Disclaimer
 
 Support tool, not medical advice.
+
+Licensed under AGPL-3.0.
