@@ -67,7 +67,8 @@ const ctx = {
     const log = [...(ctx.state.log || [])];
     const when = { date: todayIso(), time: localTime() };
     if (items.length) log.push({ ...when, items });
-    if (skipped.length) log.push({ ...when, skipped: [...skipped] });
+    // Always include items: [] on skips so older progress code never iterates undefined.
+    if (skipped.length) log.push({ ...when, skipped: [...skipped], items: [] });
     const result = replan({
       targets: ctx.state.targets,
       recipes: ctx.recipes,

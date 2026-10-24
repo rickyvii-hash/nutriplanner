@@ -348,9 +348,12 @@ function buildReason({
     if (!under || score > under.score) under = { t, missed, ratio, score };
   }
   if (under && skippedNames.length > 0) {
-    const e = effects.find((x) => x.nutrient === under.t.nutrient);
-    const more = e && e.delta > 0.05
-      ? ` (about ${formatAmount(under.t.nutrient, e.delta)} more per day on average)`
+    // Quote the intended daily make-up (shortfall / window, capped at +25%), not the
+    // raw before/after delta — recipe swaps can move further than the bump alone.
+    const days = Math.max(1, daysTouched);
+    const bump = Math.min(under.missed / days, under.t.daily * 0.25);
+    const more = bump > 0.05
+      ? ` (about ${formatAmount(under.t.nutrient, bump)} more per day on average)`
       : '';
     const names = skippedNames.length === 1
       ? skippedNames[0]

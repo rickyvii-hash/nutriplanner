@@ -103,21 +103,25 @@ export function renderPlan(ctx) {
 
   const dayLog = (state.log || []).filter((e) => e.date === selected);
   let display = dayTotals(meals, recipesById, foodsById);
+  let progressNote = 'Based on planned meals (nothing logged yet).';
 
-  if (dayLog.length > 0) {
-    // The plan's own recipes are replaced by what was actually logged: sum it the same way.
-    const parts = [];
-    for (const entry of dayLog) {
-      for (const it of entry.items) {
-        const food = foodsById.get(it.foodId);
-        if (food) parts.push(foodNutrients(food, it.grams));
-      }
+  // Skipped meals have no food items and must not crash or count as zero eaten.
+  const parts = [];
+  for (const entry of dayLog) {
+    for (const it of entry.items || []) {
+      const food = foodsById.get(it.foodId);
+      if (food) parts.push(foodNutrients(food, it.grams));
     }
+  }
+  if (parts.length > 0) {
     display = sumNutrients(parts);
+    progressNote = 'Based on meals you logged for this day.';
+  } else if (dayLog.some((e) => Array.isArray(e.skipped) && e.skipped.length > 0)) {
+    progressNote = 'Based on planned meals (skipped meals are not counted as eaten).';
   }
 
   const bars = el(`<section class="card"><h3>Daily progress</h3><div class="progress-list"></div>
-    <p class="muted tiny">${dayLog.length ? 'Based on meals you logged for this day.' : 'Based on planned meals (nothing logged yet).'}</p>
+    <p class="muted tiny">${progressNote}</p>
   </section>`);
   const progressList = bars.querySelector('.progress-list');
   for (const t of state.targets) {
