@@ -356,12 +356,13 @@ function assertSpreadOverWindow({ plan, result, bump }) {
     }
   }
 
-  // The reason quotes the average change over the days that really changed, and the
-  // effects show that same average.
-  const avg = deltas.reduce((a, b) => a + b, 0) / deltas.length;
+  // The reason quotes the change the Effect row shows: the two per-day averages are
+  // rounded for display first, then subtracted (never a separately rounded float delta).
   const kcal = result.effects.find((e) => e.nutrient === 'kcal');
-  assert.equal(reasonAverage(result.reason, 'kcal'), Math.round(avg));
-  assert.equal(Math.round(kcal.after - kcal.before), Math.round(avg));
+  const shownDelta = Number(kcal.after.toFixed(0)) - Number(kcal.before.toFixed(0));
+  assert.equal(reasonAverage(result.reason, 'kcal'), shownDelta, result.reason);
+  const avg = deltas.reduce((a, b) => a + b, 0) / deltas.length;
+  assert.ok(Math.abs(shownDelta - avg) <= 1, `${shownDelta} vs ${avg}`);
 
   // The day count in the reason is the number of days that really changed, with the right plural.
   const match = result.reason.match(/next (\d+) (days?)/);
@@ -382,6 +383,17 @@ test('Recovery: a skipped lunch is spread over the window and the reason quotes 
   assert.match(result.reason, /skipped/i);
   // With at least half of the window changed there is no "could not spread" note.
   assert.doesNotMatch(result.reason, /part of the shortfall is not made up/);
+});
+
+test('after a Recovery skip the reason quotes the same kcal as the Effect row', () => {
+  const { result } = skipLunchResult();
+  const kcal = result.effects.find((e) => e.nutrient === 'kcal');
+  // What Plan updated prints: each average rounded for display, then subtracted.
+  const shown = Number(kcal.after.toFixed(0)) - Number(kcal.before.toFixed(0));
+  assert.equal(reasonAverage(result.reason, 'kcal'), shown, result.reason);
+  // This case is exactly where rounding the float delta disagrees with the screen,
+  // so the assertion above really guards the bug that was reported.
+  assert.notEqual(Math.round(kcal.after - kcal.before), shown);
 });
 
 test('Recovery: skipping lunch and dinner together keeps the same bounds with the combined shortfall', () => {

@@ -349,7 +349,8 @@ function buildReason({
   }
   if (over) {
     const e = effects.find((x) => x.nutrient === over.t.nutrient);
-    const less = e && e.delta < -0.05 ? ` (about ${formatAmount(over.t.nutrient, Math.abs(e.delta))} less per day on average)` : '';
+    const change = effectChange(over.t.nutrient, e);
+    const less = change < 0 ? ` (about ${formatAmount(over.t.nutrient, Math.abs(change))} less per day on average)` : '';
     return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
       + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so ${nextDaysPhrase(daysTouched)} lower in `
       + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
@@ -369,12 +370,12 @@ function buildReason({
     if (!under || score > under.score) under = { t, missed, ratio, score };
   }
   if (under && skippedNames.length > 0) {
-    // Quote the real change shown in the effects (after - before), not the intended
-    // make-up: the numbers on the same screen must agree.
+    // Quote the real change shown in the effects (rounded after - rounded before),
+    // not the intended make-up: the numbers on the same screen must agree.
     const dayEffect = effects.find((e) => e.nutrient === under.t.nutrient);
-    const delta = dayEffect ? dayEffect.delta : 0;
-    const more = delta > 0.05
-      ? ` (about ${formatAmount(under.t.nutrient, delta)} more per day on average)`
+    const change = effectChange(under.t.nutrient, dayEffect);
+    const more = change > 0
+      ? ` (about ${formatAmount(under.t.nutrient, change)} more per day on average)`
       : '';
     const names = skippedNames.length === 1
       ? skippedNames[0]
@@ -413,6 +414,25 @@ function formatAmount(key, v) {
   if (key === 'kcal') return `${Math.round(v)} kcal`;
   if (key === 'sodium') return `${Math.round(v)} mg`;
   return `${v.toFixed(1)} g`;
+}
+
+/** Decimals the Effect row on Plan updated prints for a per-day average. */
+function effectDecimals(key) {
+  return key === 'kcal' || key === 'sodium' ? 0 : 1;
+}
+
+/** The number the Effect row prints for a per-day average (same rounding as the screen). */
+function effectValue(key, v) {
+  return Number(Number(v || 0).toFixed(effectDecimals(key)));
+}
+
+/**
+ * Change quoted in the reason: rounded(after) - rounded(before), i.e. exactly the
+ * arithmetic of the two numbers the Effect row shows, never a separately rounded float.
+ */
+function effectChange(key, effect) {
+  if (!effect) return 0;
+  return effectValue(key, effect.after) - effectValue(key, effect.before);
 }
 
 /**
