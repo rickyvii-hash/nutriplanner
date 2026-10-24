@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { buildPlan, replan, todayIso } from '../src/engine/planner.js';
-import { foodNutrients, sumNutrients } from '../src/engine/nutrients.js';
+import { foodNutrients, sumNutrients, recipeNutrients } from '../src/engine/nutrients.js';
 import { profileById } from '../src/engine/profiles.js';
 import {
   applyLogCorrection,
@@ -151,4 +151,43 @@ test('removing a past log still recalculates from today using the entries that r
   // Only the entry that is still there counts.
   const remaining = totalsOfItems(corrected.log[0].items);
   assert.ok(Math.abs(result.recentTotals.satFat - remaining.satFat) < 1e-9);
+});
+
+test('the same recipe skipped on two past days counts twice in the make-up', (t) => {
+  freezeToday(t);
+  const today = todayIso();
+
+  // The corrected log records the same planned lunch as skipped on two different past days.
+  const lunchId = plan.days[D2].lunch;
+  const lunch = recipesById.get(lunchId);
+  const perSkip = recipeNutrients(lunch, foodsById);
+  const log = [
+    { date: D2, time: '13:00', skipped: [lunchId], items: [] },
+    { date: D1, time: '13:00', skipped: [lunchId], items: [] },
+  ];
+
+  const base = { targets, recipes, plan, bought: [], foodsById, fromDate: today, logFromDate: D2 };
+  const both = replan({ ...base, log });
+  const one = replan({ ...base, log: [log[0]] });
+
+  // Both skips are real missed meals: the shortfall is twice one skip, not one.
+  assert.deepEqual(both.skippedNames, [lunch.name], 'the name is listed once even if it was skipped twice');
+  assert.ok(
+    Math.abs(both.shortfall.fibre - perSkip.totals.fibre * 2) < 1e-9,
+    'two skips of the same recipe leave twice the fibre to make up',
+  );
+  assert.ok(Math.abs(one.shortfall.fibre - perSkip.totals.fibre) < 1e-9);
+  assert.ok(both.shortfall.fibre > one.shortfall.fibre, 'the earlier skip is never dropped');
+
+  // The reason quotes the real total of both skips.
+  assert.match(both.reason, new RegExp(`about ${(perSkip.totals.fibre * 2).toFixed(1)} g of your`));
+  assert.match(both.reason, /on a past day/i);
+  assert.doesNotMatch(both.reason, /\btoday\b/i);
+
+  // Past days stay frozen and only the future is proposed.
+  assert.deepEqual(both.plan.days[D2], plan.days[D2]);
+  assert.deepEqual(both.plan.days[D1], plan.days[D1]);
+  for (const date of new Set(both.changed.map((c) => c.date))) {
+    assert.ok(date > today, `${date} was already over and must not change`);
+  }
 });

@@ -566,12 +566,22 @@ export function replan(state) {
   const logIsPast = logFromDate < fromDate;
 
   // Planned meals marked skipped on the logged days: their known nutrients are the shortfall for minima.
+  // Every skip in the corrected log counts: the same recipe skipped on two past days is two
+  // missed meals, so both feed the shortfall (one per day, so a duplicate entry for the same
+  // day cannot double count the same planned meal).
   const skippedIds = [];
+  const skippedOccurrences = [];
+  const skippedSeen = new Set();
   for (const entry of log || []) {
     if (!entry?.date || entry.date < logFromDate || entry.date > fromDate) continue;
     if (!Array.isArray(entry.skipped)) continue;
     for (const id of entry.skipped) {
-      if (id && !skippedIds.includes(id)) skippedIds.push(id);
+      if (!id) continue;
+      const key = `${entry.date}|${id}`;
+      if (skippedSeen.has(key)) continue;
+      skippedSeen.add(key);
+      skippedOccurrences.push(id);
+      if (!skippedIds.includes(id)) skippedIds.push(id);
     }
   }
   const skippedNames = skippedIds.map((id) => recipesById.get(id)?.name || id);
@@ -579,7 +589,7 @@ export function replan(state) {
   for (const t of targets) {
     if (t.kind !== 'min') continue;
     let sum = 0;
-    for (const id of skippedIds) {
+    for (const id of skippedOccurrences) {
       const recipe = recipesById.get(id);
       if (!recipe) continue;
       const r = recipeNutrients(recipe, foodsById);
