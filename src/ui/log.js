@@ -1,4 +1,5 @@
 import { todayIso, SLOTS } from '../engine/planner.js';
+import { searchFoods } from '../engine/search.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
 
@@ -475,12 +476,12 @@ export function renderLog(ctx) {
   const addSearchBtn = root.querySelector('[data-add-search]');
 
   const runSearch = () => {
-    const q = (searchInput.value || '').trim().toLowerCase();
+    const q = searchInput.value || '';
     resultsEl.innerHTML = '';
     selectedFoodId = null;
     addSearchBtn.disabled = true;
-    if (q.length < 2) return;
-    const hits = foods.filter((f) => f.name.toLowerCase().includes(q) || f.id.includes(q)).slice(0, 8);
+    if (!q.trim()) return;
+    const hits = searchFoods(foods, q, { limit: 12 });
     for (const f of hits) {
       const b = el(`<button type="button" class="search-hit">${escapeHtml(f.name)}</button>`);
       b.addEventListener('click', () => {
