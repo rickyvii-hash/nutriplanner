@@ -442,6 +442,25 @@ export function renderLog(ctx) {
     const picker = el(`<div class="replace-picker" data-replace-picker>
       <p class="field-label">Replace ${slot} with another ${slot} recipe</p>
       <div class="replace-options"></div>
+      <button type="button" class="btn-secondary" data-ate-elsewhere>I ate something else</button>
+      <div class="replace-custom hidden" data-replace-custom>
+        <p class="field-label">Search the food you ate instead</p>
+        <label class="field">
+          <span>Search a food</span>
+          <input type="search" placeholder="e.g. pizza, ice cream" data-replace-search>
+        </label>
+        <div class="search-results" data-replace-results></div>
+        <label class="field">
+          <span>Portion (grams)</span>
+          <input type="number" min="1" max="5000" step="1" placeholder="e.g. 150" value="100" data-replace-portion>
+        </label>
+        <p class="field-error" data-replace-portion-error hidden>Enter a portion between 1 and 5000 g</p>
+        <button type="button" class="btn-secondary" data-replace-add disabled>Add food</button>
+        <ul class="logged-items" data-replace-items></ul>
+        <p class="muted tiny" data-replace-empty>Nothing added yet.</p>
+        <p class="field-error" data-replace-blocked-custom hidden>${REPLACE_BLOCKED_MESSAGE}</p>
+        <button type="button" class="btn-primary" data-replace-save disabled>Replace with these foods</button>
+      </div>
       <button type="button" class="btn-text" data-close-picker>Cancel</button>
     </div>`);
     const options = picker.querySelector('.replace-options');
@@ -453,6 +472,109 @@ export function renderLog(ctx) {
       b.addEventListener('click', () => replaceMeal(slot, currentId, other));
       options.appendChild(b);
     }
+
+    // Second Replace path: the person ate free-search foods instead of the planned meal.
+    // They build the meal here, then it is logged as a replacement of this slot.
+    const customBox = picker.querySelector('[data-replace-custom]');
+    picker.querySelector('[data-ate-elsewhere]').addEventListener('click', () => {
+      customBox.classList.toggle('hidden');
+    });
+    const customItems = [];
+    let customSelectedId = null;
+    const customSearch = picker.querySelector('[data-replace-search]');
+    const customResults = picker.querySelector('[data-replace-results]');
+    const customPortion = picker.querySelector('[data-replace-portion]');
+    const customPortionError = picker.querySelector('[data-replace-portion-error]');
+    const customAdd = picker.querySelector('[data-replace-add]');
+    const customList = picker.querySelector('[data-replace-items]');
+    const customEmpty = picker.querySelector('[data-replace-empty]');
+    const customBlocked = picker.querySelector('[data-replace-blocked-custom]');
+    const customSave = picker.querySelector('[data-replace-save]');
+
+    const paintCustom = () => {
+      customList.innerHTML = '';
+      customItems.forEach((it, index) => {
+        const name = foodName(it.foodId);
+        const li = el(`<li class="logged-item">
+          <span>${escapeHtml(name)}</span>
+          <input type="number" min="1" max="5000" step="1" value="${it.grams}"
+            data-custom-edit="${index}" aria-label="${escapeHtml(name)} grams">
+          <span class="muted">g</span>
+          <button type="button" class="btn-icon" data-custom-del="${index}"
+            aria-label="Remove ${escapeHtml(name)}">×</button>
+        </li>`);
+        customList.appendChild(li);
+      });
+      customEmpty.classList.toggle('hidden', customItems.length > 0);
+      customSave.disabled = customItems.length === 0;
+      customList.querySelectorAll('[data-custom-edit]').forEach((input) => {
+        input.addEventListener('change', () => {
+          const index = Number(input.dataset.customEdit);
+          const grams = parsePortion(input.value);
+          if (grams === null) {
+            input.value = customItems[index].grams;
+            return;
+          }
+          customItems[index].grams = grams;
+          customBlocked.classList.add('hidden');
+        });
+      });
+      customList.querySelectorAll('[data-custom-del]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          customItems.splice(Number(btn.dataset.customDel), 1);
+          paintCustom();
+        });
+      });
+    };
+
+    const runCustomSearch = () => {
+      const q = customSearch.value || '';
+      customResults.innerHTML = '';
+      customSelectedId = null;
+      customAdd.disabled = true;
+      if (!q.trim()) return;
+      for (const f of searchFoods(foods, q, { limit: 12 })) {
+        const b = el(`<button type="button" class="search-hit">${escapeHtml(f.name)}</button>`);
+        b.addEventListener('click', () => {
+          customSelectedId = f.id;
+          customResults.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
+          b.classList.add('is-selected');
+          customAdd.disabled = false;
+        });
+        customResults.appendChild(b);
+      }
+    };
+    customSearch.addEventListener('input', runCustomSearch);
+    customPortion.addEventListener('input', () => customPortionError.classList.add('hidden'));
+    customAdd.addEventListener('click', () => {
+      if (!customSelectedId) return;
+      const grams = parsePortion(customPortion.value);
+      if (grams === null) {
+        customPortionError.classList.remove('hidden');
+        customPortion.focus();
+        return;
+      }
+      customPortionError.classList.add('hidden');
+      customItems.push({ foodId: customSelectedId, grams });
+      paintCustom();
+    });
+    customSave.addEventListener('click', () => {
+      if (customItems.length === 0) return;
+      // Same rule as a recipe Replace: never drop what is already in "This meal".
+      if (draftHasPending(draft)) {
+        customBlocked.classList.remove('hidden');
+        return;
+      }
+      const names = customItems.map((it) => foodName(it.foodId));
+      const name = names.length === 1 ? names[0] : `${names[0]} and ${names.length - 1} more`;
+      ctx.saveLogAndReplan({
+        items: customItems.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+        skipped: draftSkippedIds(draft),
+        replaced: [{ slot, fromRecipeId: currentId, recipeId: null, name }],
+      });
+    });
+    paintCustom();
+
     picker.querySelector('[data-close-picker]').addEventListener('click', () => picker.remove());
     row.after(picker);
   };

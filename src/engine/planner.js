@@ -365,27 +365,10 @@ function buildReason({
     ? 'Not every target can be met with the available recipes; this is the closest plan. '
     : '';
 
-  // The maximum that today's log went furthest over (relative to its daily limit).
-  let over = null;
-  for (const t of targets) {
-    if (t.kind !== 'max') continue;
-    const recent = recentTotals ? (recentTotals[t.nutrient] || 0) : 0;
-    if (recent <= t.daily) continue;
-    const ratio = (recent - t.daily) / t.daily;
-    if (!over || ratio > over.ratio) over = { t, recent, ratio };
-  }
-  if (over) {
-    const e = effects.find((x) => x.nutrient === over.t.nutrient);
-    const change = effectChange(over.t.nutrient, e);
-    const less = change < 0 ? ` (about ${formatAmount(over.t.nutrient, Math.abs(change))} less per day on average)` : '';
-    return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
-      + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so ${nextDaysPhrase(daysTouched)} lower in `
-      + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
-  }
-
-  // A planned meal was swapped for another recipe: say what the swap did, quoting the
-  // same rounded per-day numbers the Effect rows show. If it moved a target the wrong
-  // way, the reason says so plainly instead of calling it an improvement.
+  // A planned meal was swapped for another recipe or for free-search foods: say what
+  // the swap did, quoting the same rounded per-day numbers the Effect rows show. If it
+  // moved a target the wrong way, the reason says so plainly instead of calling it an
+  // improvement.
   if (replacements.length > 0 && replacementPrimary) {
     const key = replacementPrimary.nutrient;
     const effect = effects.find((x) => x.nutrient === key);
@@ -411,6 +394,24 @@ function buildReason({
       return `${closestNote}${what}, which has ${amount}. The next ${daysTouched} day${daysTouched === 1 ? '' : 's'} changed, but they average ${quoted}, which is worse for that ${replacementPrimary.kind === 'max' ? 'maximum' : 'minimum'}.${otherNote}${keptNote}`;
     }
     return `${closestNote}${what}, which has ${amount}, so ${nextDaysPhrase(daysTouched)} ${replacementPrimary.kind === 'max' ? 'lower' : 'higher'} in ${nutrientWords(key)} (${quoted}).${otherNote}${keptNote}`;
+  }
+
+  // The maximum that today's log went furthest over (relative to its daily limit).
+  let over = null;
+  for (const t of targets) {
+    if (t.kind !== 'max') continue;
+    const recent = recentTotals ? (recentTotals[t.nutrient] || 0) : 0;
+    if (recent <= t.daily) continue;
+    const ratio = (recent - t.daily) / t.daily;
+    if (!over || ratio > over.ratio) over = { t, recent, ratio };
+  }
+  if (over) {
+    const e = effects.find((x) => x.nutrient === over.t.nutrient);
+    const change = effectChange(over.t.nutrient, e);
+    const less = change < 0 ? ` (about ${formatAmount(over.t.nutrient, Math.abs(change))} less per day on average)` : '';
+    return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
+      + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so ${nextDaysPhrase(daysTouched)} lower in `
+      + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
   }
 
   // Skipped meals under a minimum: raise the next days and quote the real numbers.
@@ -569,24 +570,34 @@ export function replan(state) {
   // Meals replaced on the log date: what was eaten instead of the planned meal.
   // The difference from the plan feeds the same window rules as an off-plan meal,
   // so a richer swap is made up for on the next days and a lighter one is topped up.
+  // A replacement can be another recipe or free-search foods ("I ate something else");
+  // in both cases the after side is the food actually logged for that slot.
   const replacements = [];
   const replacementOver = {};
   const replacementUnder = {};
   for (const entry of log || []) {
     if (entry.date !== fromDate || !Array.isArray(entry.replaced)) continue;
     for (const r of entry.replaced) {
-      const recipe = recipesById.get(r?.recipeId);
       const planned = recipesById.get(plan.days?.[fromDate]?.[r?.slot]);
-      if (!recipe || !planned) continue;
+      if (!planned) continue;
+      const isCustom = !r?.recipeId || r.recipeId === 'custom';
+      const recipe = isCustom ? null : recipesById.get(r.recipeId);
+      const items = Array.isArray(entry.items) ? entry.items : [];
+      if (isCustom && items.length === 0) continue;
+      if (!isCustom && !recipe) continue;
+      const customName = typeof r.name === 'string' && r.name.trim() ? r.name.trim() : 'something else';
       replacements.push({
         slot: r.slot,
-        recipeId: recipe.id,
-        name: recipe.name,
+        recipeId: recipe ? recipe.id : null,
+        name: recipe ? recipe.name : customName,
         plannedId: planned.id,
         plannedName: planned.name,
+        custom: isCustom,
       });
       const before = recipeNutrients(planned, foodsById);
-      const after = recipeNutrients(recipe, foodsById);
+      const after = isCustom
+        ? loggedNutrients(items, foodsById)
+        : recipeNutrients(recipe, foodsById);
       for (const t of targets) {
         const n = t.nutrient;
         // An unknown value is never treated as a difference of zero.
@@ -913,6 +924,8 @@ export function replan(state) {
     shortfall,
     skippedNames,
     replacements,
+    replacementOver,
+    replacementUnder,
     replacementPrimary,
   };
 }
