@@ -10,6 +10,8 @@ import {
   flatDraftItems,
   isRecipeInDraft,
   draftGroupForRecipe,
+  skipRecipeGroup,
+  draftSkippedIds,
 } from '../src/ui/log.js';
 import { recipeNutrients, foodNutrients, sumNutrients } from '../src/engine/nutrients.js';
 
@@ -113,6 +115,40 @@ test('free-search foods stay flat rows and are logged after the grouped ingredie
   const flat = flatDraftItems(draft);
   assert.equal(flat.length, lunch.ingredients.length + 1);
   assert.deepEqual(flat.at(-1), { foodId: 'apple-raw', grams: 120 });
+});
+
+test('a planned recipe is never both eaten and skipped', () => {
+  // Adding as eaten clears an earlier skip of the same recipe.
+  const draft = newLogDraft();
+  skipRecipeGroup(draft, lunch.id);
+  assert.deepEqual(draft.skipped, [lunch.id]);
+  addRecipeGroup(draft, lunch);
+  assert.equal(draft.skipped.includes(lunch.id), false, 'Add as eaten must drop the skip');
+  assert.ok(isRecipeInDraft(draft, lunch.id));
+
+  // Skipping an eaten block removes it instead of keeping both.
+  skipRecipeGroup(draft, lunch.id);
+  assert.equal(draft.groups.length, 0, 'Skipped must drop the eaten block');
+  assert.deepEqual(draft.skipped, [lunch.id]);
+  assert.equal(flatDraftItems(draft).length, 0, 'a skipped recipe logs no foods');
+
+  addRecipeGroup(draft, breakfast);
+  skipRecipeGroup(draft, lunch.id);
+  assert.equal(draft.groups.length, 1, 'other eaten blocks are untouched');
+  assert.ok(isRecipeInDraft(draft, breakfast.id));
+});
+
+test('save payload drops a skipped id that is also eaten in a stale draft', () => {
+  const draft = newLogDraft();
+  addRecipeGroup(draft, lunch);
+  // Simulate an older saved draft that holds the same recipe in both lists.
+  draft.skipped.push(lunch.id, breakfast.id);
+
+  const savedSkipped = draftSkippedIds(draft);
+  assert.deepEqual(savedSkipped, [breakfast.id], 'the eaten recipe is not saved as skipped too');
+  const eatenIds = new Set(draft.groups.map((g) => g.recipeId));
+  assert.ok(savedSkipped.every((id) => !eatenIds.has(id)), 'items and skipped never overlap');
+  assert.equal(flatDraftItems(draft).length, lunch.ingredients.length);
 });
 
 test('an older draft without groups is upgraded instead of crashing', () => {

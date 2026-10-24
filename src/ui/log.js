@@ -40,13 +40,22 @@ export function isRecipeInDraft(draft, recipeId) {
   return Boolean(draftGroupForRecipe(draft, recipeId));
 }
 
+/** Remove a planned recipe from the skipped list. */
+export function unskipRecipe(draft, recipeId) {
+  if (!draft || !Array.isArray(draft.skipped)) return draft;
+  draft.skipped = draft.skipped.filter((id) => id !== recipeId);
+  return draft;
+}
+
 /**
  * Add a planned meal as one block. Its ingredients stay together so the block can be
  * removed in one tap; adding the same recipe twice never duplicates it.
+ * A recipe cannot be eaten and skipped at the same time, so its skip is cleared.
  */
 export function addRecipeGroup(draft, recipe) {
   if (!recipe) return null;
   const d = ensureDraft(draft);
+  unskipRecipe(d, recipe.id);
   const existing = draftGroupForRecipe(d, recipe.id);
   if (existing) return existing;
   const group = {
@@ -59,6 +68,28 @@ export function addRecipeGroup(draft, recipe) {
   };
   d.groups.push(group);
   return group;
+}
+
+/**
+ * Mark a planned recipe as skipped. Eaten and skipped are mutually exclusive, so any
+ * eaten block of the same recipe is removed.
+ */
+export function skipRecipeGroup(draft, recipeId) {
+  if (!recipeId) return draft;
+  const d = ensureDraft(draft);
+  const group = draftGroupForRecipe(d, recipeId);
+  if (group) removeDraftGroup(d, group.id);
+  if (!d.skipped.includes(recipeId)) d.skipped.push(recipeId);
+  return d;
+}
+
+/**
+ * The skipped recipe ids to save: a recipe already eaten as a block is never also
+ * skipped, so the log cannot count it as both.
+ */
+export function draftSkippedIds(draft) {
+  const eaten = new Set((draft?.groups || []).map((g) => g.recipeId).filter(Boolean));
+  return (Array.isArray(draft?.skipped) ? draft.skipped : []).filter((id) => id && !eaten.has(id));
 }
 
 /** Remove a whole block (all its ingredients at once) and clear its in-draft state. */
@@ -145,7 +176,7 @@ export function renderLog(ctx) {
       <div class="meal-actions">
         <button type="button" class="btn-secondary btn-small" data-add-recipe="${recipe?.id}" ${alreadySkipped || inDraft ? 'disabled' : ''}>Add as eaten</button>
         <button type="button" class="btn-secondary btn-small" data-replace-recipe="${recipe?.id}" ${alreadySkipped || inDraft ? 'disabled' : ''}>Replace</button>
-        <button type="button" class="btn-secondary btn-small" data-skip-recipe="${recipe?.id}" ${alreadySkipped ? 'disabled' : ''}>Skipped</button>
+        <button type="button" class="btn-secondary btn-small" data-skip-recipe="${recipe?.id}" ${alreadySkipped || inDraft ? 'disabled' : ''}>Skipped</button>
       </div>
     </div>`);
     planBody.appendChild(row);
@@ -306,7 +337,7 @@ export function renderLog(ctx) {
     });
     ul.querySelectorAll('[data-unskip]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        draft.skipped = draft.skipped.filter((id) => id !== btn.dataset.unskip);
+        unskipRecipe(draft, btn.dataset.unskip);
         ctx.refresh();
       });
     });
@@ -341,8 +372,9 @@ export function renderLog(ctx) {
   root.querySelectorAll('[data-skip-recipe]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const id = btn.dataset.skipRecipe;
-      if (!id || draft.skipped.includes(id)) return;
-      draft.skipped.push(id);
+      if (!id) return;
+      // Skipping drops any eaten block of the same recipe: the two choices are exclusive.
+      skipRecipeGroup(draft, id);
       ctx.refresh();
     });
   });
@@ -355,7 +387,7 @@ export function renderLog(ctx) {
   const replaceMeal = (slot, fromRecipeId, recipe) => {
     ctx.saveLogAndReplan({
       items: recipe.ingredients.map((ing) => ({ foodId: ing.foodId, grams: ing.grams })),
-      skipped: [...draft.skipped],
+      skipped: draftSkippedIds(draft),
       replaced: [{ slot, recipeId: recipe.id, fromRecipeId }],
     });
   };
@@ -437,7 +469,7 @@ export function renderLog(ctx) {
   root.querySelector('[data-save]').addEventListener('click', () => {
     ctx.saveLogAndReplan({
       items: flatDraftItems(draft),
-      skipped: [...draft.skipped],
+      skipped: draftSkippedIds(draft),
     });
   });
   root.querySelector('[data-back]').addEventListener('click', () => ctx.navigate('plan'));
