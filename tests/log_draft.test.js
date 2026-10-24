@@ -12,6 +12,10 @@ import {
   draftGroupForRecipe,
   skipRecipeGroup,
   draftSkippedIds,
+  unskipRecipe,
+  draftHasPending,
+  canReplaceMeal,
+  REPLACE_BLOCKED_MESSAGE,
 } from '../src/ui/log.js';
 import { recipeNutrients, foodNutrients, sumNutrients } from '../src/engine/nutrients.js';
 
@@ -158,3 +162,39 @@ test('an older draft without groups is upgraded instead of crashing', () => {
   addRecipeGroup(draft, lunch);
   assert.equal(draft.groups.length, 1);
 });
+
+test('replace is blocked while "This meal" has something and allowed when it is empty', () => {
+  const draft = newLogDraft();
+  assert.equal(draftHasPending(draft), false, 'an empty draft has nothing to lose');
+  assert.equal(canReplaceMeal(draft), true, 'Replace works as before on an empty draft');
+
+  // A planned meal added as eaten blocks it, and removing the block frees it again.
+  const group = addRecipeGroup(draft, breakfast);
+  assert.equal(draftHasPending(draft), true);
+  assert.equal(canReplaceMeal(draft), false);
+  removeDraftGroup(draft, group.id);
+  assert.equal(canReplaceMeal(draft), true);
+
+  // A free-search food blocks it until it is removed.
+  draft.items.push({ foodId: 'apple-raw', grams: 150 });
+  assert.equal(draftHasPending(draft), true);
+  assert.equal(canReplaceMeal(draft), false);
+  draft.items.splice(0, 1);
+  assert.equal(canReplaceMeal(draft), true);
+
+  // A skipped meal blocks it until the skip is undone.
+  skipRecipeGroup(draft, lunch.id);
+  assert.equal(draftHasPending(draft), true);
+  assert.equal(canReplaceMeal(draft), false);
+  unskipRecipe(draft, lunch.id);
+  assert.equal(draftHasPending(draft), false);
+  assert.equal(canReplaceMeal(draft), true);
+});
+
+test('the blocked notice tells the user how to unblock Replace', () => {
+  assert.equal(
+    REPLACE_BLOCKED_MESSAGE,
+    'Clear This meal first, or save it, before replacing another meal.',
+  );
+});
+

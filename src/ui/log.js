@@ -92,6 +92,25 @@ export function draftSkippedIds(draft) {
   return (Array.isArray(draft?.skipped) ? draft.skipped : []).filter((id) => id && !eaten.has(id));
 }
 
+/**
+ * True when "This meal" already holds something: planned meals added as eaten,
+ * free-search foods, or skipped meals.
+ */
+export function draftHasPending(draft) {
+  const d = ensureDraft(draft);
+  return d.items.length > 0 || d.groups.length > 0 || d.skipped.length > 0;
+}
+
+/**
+ * Replace saves its own meal and nothing else, so it may only run on an empty
+ * draft; otherwise the foods already in "This meal" would be dropped silently.
+ */
+export function canReplaceMeal(draft) {
+  return !draftHasPending(draft);
+}
+
+export const REPLACE_BLOCKED_MESSAGE = 'Clear This meal first, or save it, before replacing another meal.';
+
 /** Remove a whole block (all its ingredients at once) and clear its in-draft state. */
 export function removeDraftGroup(draft, groupId) {
   if (!draft || !Array.isArray(draft.groups)) return draft;
@@ -383,8 +402,19 @@ export function renderLog(ctx) {
   // and open the updated plan preview. The replaced meal is eaten, never skipped.
   const closeReplacePickers = () => {
     planBody.querySelectorAll('[data-replace-picker]').forEach((p) => p.remove());
+    planBody.querySelectorAll('[data-replace-blocked]').forEach((p) => p.remove());
+  };
+  // Replace must never throw away what is already in "This meal": say so under the row.
+  const showReplaceBlocked = (row) => {
+    closeReplacePickers();
+    row.after(el(`<p class="field-error replace-blocked" data-replace-blocked>${REPLACE_BLOCKED_MESSAGE}</p>`));
   };
   const replaceMeal = (slot, fromRecipeId, recipe) => {
+    if (draftHasPending(draft)) {
+      const row = planBody.querySelector(`[data-replace-recipe="${fromRecipeId}"]`)?.closest('.plan-meal-row');
+      if (row) showReplaceBlocked(row);
+      return;
+    }
     ctx.saveLogAndReplan({
       items: recipe.ingredients.map((ing) => ({ foodId: ing.foodId, grams: ing.grams })),
       skipped: draftSkippedIds(draft),
@@ -421,6 +451,11 @@ export function renderLog(ctx) {
       if (!row) return;
       const slot = row.querySelector('.meal-slot')?.textContent?.trim().toLowerCase();
       if (!slot) return;
+      // Nothing is replaced while "This meal" holds something: no picker, just the notice.
+      if (draftHasPending(draft)) {
+        showReplaceBlocked(row);
+        return;
+      }
       openReplacePicker(row, slot, btn.dataset.replaceRecipe);
     });
   });
