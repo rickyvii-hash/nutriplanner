@@ -37,6 +37,10 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 
 .brand { display: flex; align-items: center; gap: 12px; padding: 8px 0 16px; }
 .brand-compact { padding-bottom: 8px; }
+.brand .btn-text { margin-left: auto; }
+.plan-settings h3 { margin-bottom: 6px; }
+.plan-settings p { margin: 0 0 10px; }
+.plan-settings .btn-secondary { width: 100%; min-height: 44px; }
 .brand .logo { font-size: 2rem; }
 .brand p { margin: 2px 0 0; color: var(--muted); font-size: 0.92rem; }
 .brand .back { margin-right: 4px; }
@@ -360,4 +364,34 @@ input[type="checkbox"], input[type="radio"] { min-width: 28px; min-height: 28px;
 .summary-status.status-within { color: var(--green); }
 .summary-status.status-above, .summary-status.status-below { color: #7a5a1e; background: var(--tan-soft); }
 .summary-status.status-incomplete { color: var(--muted); font-style: italic; }
+
+/* Confirmation panel: what a Start over / Change profile will erase, with Cancel first. */
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 50; background: rgba(31, 58, 45, 0.35);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0; overflow-y: auto;
+}
+.confirm-panel {
+  width: 100%; max-width: 560px; max-height: 88vh; overflow-y: auto;
+  background: var(--card); border: 1px solid var(--line); border-radius: 20px 20px 0 0;
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0));
+  box-shadow: 0 -8px 30px rgba(31, 58, 45, 0.18);
+}
+.confirm-panel h2 { margin-bottom: 10px; }
+.confirm-body p { margin: 0 0 10px; }
+.confirm-list { margin: 0 0 12px; padding-left: 20px; }
+.confirm-list li { padding: 3px 0; }
+.confirm-check {
+  display: flex; align-items: center; gap: 10px; padding: 10px 0;
+  font-weight: 600; min-height: 44px; cursor: pointer;
+}
+.confirm-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.confirm-actions .btn-primary, .confirm-actions .btn-secondary { width: 100%; min-height: 44px; }
+
+@media (min-width: 800px) {
+  .confirm-overlay { align-items: center; padding: 24px; }
+  .confirm-panel { border-radius: 20px; max-height: 80vh; }
+  .confirm-actions { flex-direction: row; justify-content: flex-end; }
+  .confirm-actions .btn-primary, .confirm-actions .btn-secondary { width: auto; }
+}
 

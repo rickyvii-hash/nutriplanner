@@ -1,7 +1,7 @@
 import {
-  loadState, saveState, getStorageNotice,
+  loadState, saveState, getStorageNotice, clearState,
   proposalToStore, pendingProposalForPlan, withoutPendingProposal,
-  applyStaleMonthOnStart,
+  applyStaleMonthOnStart, startOverState, changeProfileState,
 } from './store.js';
 import {
   buildPlan, replan, todayIso, localTime,
@@ -13,6 +13,7 @@ import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
 import { shouldShowNav } from './ui/nav.js';
+import { openStartOverPanel, openChangeProfilePanel } from './ui/reset.js';
 
 const app = document.getElementById('app');
 
@@ -102,6 +103,31 @@ const ctx = {
     saveState(ctx.state);
     ctx.proposal = null;
     ctx.navigate('plan');
+  },
+  // Both actions ask for confirmation before anything is erased.
+  startOver: () => openStartOverPanel(ctx),
+  changeProfile: () => openChangeProfilePanel(ctx),
+  confirmStartOver: () => {
+    // Remove the saved data and forget everything held in memory.
+    clearState();
+    ctx.state = startOverState();
+    ctx.proposal = null;
+    ctx.logDraft = null;
+    ctx.selectedDate = null;
+    ctx.monthBanner = null;
+    ctx.screen = 'targets';
+    render();
+  },
+  confirmChangeProfile: ({ keepLog = true } = {}) => {
+    // The plan goes; the meal log and shopping ticks stay unless the person clears them.
+    ctx.state = changeProfileState(ctx.state, { keepLog });
+    saveState(ctx.state);
+    ctx.proposal = null;
+    ctx.logDraft = null;
+    ctx.selectedDate = null;
+    ctx.monthBanner = null;
+    ctx.screen = 'targets';
+    render();
   },
 };
 

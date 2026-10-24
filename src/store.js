@@ -2,17 +2,98 @@
 
 const KEY = 'nutriplanner-v1';
 
-const EMPTY = {
-  profileId: null,
-  targets: [],
-  plan: null,
-  log: [],
-  bought: [],
-  keptForBought: [],
-  shopEvery: 7,
-  shopStart: null,
-  pendingProposal: null,
-};
+/** A fresh, empty device state (the shape every screen expects). */
+export function emptyAppState() {
+  return {
+    profileId: null,
+    targets: [],
+    plan: null,
+    log: [],
+    bought: [],
+    keptForBought: [],
+    shopEvery: 7,
+    shopStart: null,
+    pendingProposal: null,
+  };
+}
+
+const EMPTY = emptyAppState();
+
+/**
+ * State after "Start over": everything this device saved is erased and the profile
+ * choice resets to none, so the app opens on the choose-profile start screen.
+ */
+export function startOverState() {
+  return emptyAppState();
+}
+
+/** The things a Start over erases, written for the confirmation panel. */
+export const START_OVER_ITEMS = [
+  'Your month plan',
+  'Your meal logs',
+  'Shopping ticks (items you marked bought)',
+  'A pending plan update proposal',
+  'Notes about meals kept because you bought the ingredients',
+];
+
+/** Title, list and footnote shown before a Start over is confirmed. */
+export function startOverConfirmCopy() {
+  return {
+    title: 'Start over?',
+    intro: 'This erases everything this device saved:',
+    items: [...START_OVER_ITEMS],
+    note: 'Your profile choice resets to none. This cannot be undone.',
+    confirmLabel: 'Yes, start over',
+    cancelLabel: 'Cancel',
+  };
+}
+
+/** Copy for "Change profile": the log is kept unless the person asks to clear it. */
+export function changeProfileCopy() {
+  return {
+    title: 'Change profile?',
+    intro: 'Pick a new profile next. This clears your current month plan and loads the new profile\'s targets.',
+    clearLabel: 'Also clear my meal log and shopping list',
+    keepNote: 'Leave this unchecked to keep your meal logs and shopping ticks.',
+    confirmLabel: 'Change profile',
+    cancelLabel: 'Cancel',
+  };
+}
+
+/**
+ * State after confirming a profile change: the plan is cleared and the profile choice
+ * resets to none. `keepLog` defaults to true, so the meal log and shopping ticks stay
+ * unless the person explicitly clears them.
+ */
+export function changeProfileState(state, { keepLog = true } = {}) {
+  const current = state || emptyAppState();
+  const next = {
+    ...current,
+    profileId: null,
+    targets: [],
+    plan: null,
+    pendingProposal: null,
+    keptForBought: [],
+  };
+  if (keepLog) {
+    return {
+      ...next,
+      log: Array.isArray(current.log) ? [...current.log] : [],
+      bought: Array.isArray(current.bought) ? [...current.bought] : [],
+    };
+  }
+  return { ...next, log: [], bought: [] };
+}
+
+/**
+ * Which start screen a stored state opens: the choose-profile start screen when no
+ * profile is chosen, the plan when one exists, otherwise the Targets screen.
+ */
+export function startScreenFor(state) {
+  if (!state || !state.profileId) return 'choose-profile';
+  if (state.plan) return 'plan';
+  return 'targets';
+}
 
 let storageNotice = null;
 

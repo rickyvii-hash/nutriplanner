@@ -29,10 +29,17 @@ export function renderPlan(ctx) {
   const { state, recipesById, foodsById } = ctx;
   const root = el(`<div class="screen screen-plan"></div>`);
 
-  root.appendChild(el(`<header class="brand brand-compact">
+  const header = el(`<header class="brand brand-compact">
     <span class="logo" aria-hidden="true">🌿</span>
     <div><h1>Month plan</h1><p>Adaptive meal planning that flexes with real life.</p></div>
-  </header>`));
+  </header>`);
+  if (state.plan) {
+    // A clear way back to the start screen, with a confirmation before anything is erased.
+    const reset = el(`<button type="button" class="btn-text" data-action="start-over">Start over</button>`);
+    reset.addEventListener('click', () => ctx.startOver?.());
+    header.appendChild(reset);
+  }
+  root.appendChild(header);
 
   if (!state.plan) {
     root.appendChild(el(`<section class="card empty-state">

@@ -92,6 +92,7 @@ export function renderTargets(ctx) {
       </div>
       <button type="button" class="btn-text" data-action="change-profile">Change profile</button>
     </div>
+    <p class="muted tiny">Changing profile asks for confirmation and keeps your meal log unless you choose to clear it.</p>
   </section>`));
 
   const list = el(`<section class="card target-list"><h3>Daily targets</h3><div class="targets"></div></section>`);
@@ -125,6 +126,15 @@ export function renderTargets(ctx) {
   });
 
   root.appendChild(list);
+
+  if (state.plan) {
+    // Reachable from Targets too: begin again from the profile choice.
+    root.appendChild(el(`<section class="card plan-settings">
+      <h3>Plan settings</h3>
+      <p class="muted tiny">Start over asks for confirmation, then erases the month plan, meal logs and shopping ticks.</p>
+      <button type="button" class="btn-secondary" data-action="start-over">Start over</button>
+    </section>`));
+  }
 
   const actions = el(`<div class="stack-actions">
     <button type="button" class="btn-secondary" data-action="add-target">Add custom target</button>
@@ -169,8 +179,13 @@ export function renderTargets(ctx) {
     });
   });
 
+  // Changing profile always confirms first: the log is kept unless the person clears it.
   root.querySelector('[data-action="change-profile"]')?.addEventListener('click', () => {
-    onChange({ ...state, profileId: null, targets: [], plan: null });
+    ctx.changeProfile?.();
+  });
+
+  root.querySelector('[data-action="start-over"]')?.addEventListener('click', () => {
+    ctx.startOver?.();
   });
 
   const addTargetBtn = root.querySelector('[data-action="add-target"]');
