@@ -2,6 +2,7 @@ import { todayIso, SLOTS } from '../engine/planner.js';
 import { searchFoods } from '../engine/search.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
+import { findPlannedRecipeForEntry } from '../log_corrections.js';
 
 // Saved meals can be corrected later from the Plan screen.
 export {
@@ -164,6 +165,127 @@ export function logEntriesForSave(payload, when) {
   return entries;
 }
 
+/**
+ * The planned slot a recipe belongs to: the plan day first, then the recipe's own slot.
+ * Returns null when the recipe cannot be placed in a slot.
+ */
+export function slotForRecipeId(recipeId, planDay, recipesById) {
+  if (!recipeId) return null;
+  if (planDay && typeof planDay === 'object') {
+    for (const slot of Object.keys(planDay)) {
+      if (planDay[slot] === recipeId) return slot;
+    }
+  }
+  return recipesById?.get?.(recipeId)?.slot || null;
+}
+
+/**
+ * The planned slots a saved log entry settles. Free-search extras settle no slot,
+ * so they never block or overwrite a planned meal.
+ */
+export function entrySlots(entry, planDay, recipesById) {
+  const slots = new Set();
+  if (!entry || typeof entry !== 'object') return slots;
+  for (const eaten of Array.isArray(entry.eaten) ? entry.eaten : []) {
+    const slot = eaten?.slot || slotForRecipeId(eaten?.recipeId, planDay, recipesById);
+    if (slot) slots.add(slot);
+  }
+  for (const replaced of Array.isArray(entry.replaced) ? entry.replaced : []) {
+    if (replaced?.slot) slots.add(replaced.slot);
+  }
+  for (const recipeId of Array.isArray(entry.skipped) ? entry.skipped : []) {
+    const slot = slotForRecipeId(recipeId, planDay, recipesById);
+    if (slot) slots.add(slot);
+  }
+  if (slots.size === 0 && !entry.extra) {
+    // Entries saved before the log recorded the slot are matched by their ingredients.
+    const recipe = findPlannedRecipeForEntry(entry, planDay, recipesById);
+    if (recipe?.slot) slots.add(recipe.slot);
+  }
+  return slots;
+}
+
+/**
+ * The one saved outcome for each planned slot of `date`: eaten, skipped or replaced.
+ * Reopening Log reads this, so a slot already saved is never logged a second time.
+ * A later entry for the same slot wins over an earlier contradictory one.
+ */
+export function savedSlotOutcomes(log, date, planDay, recipesById) {
+  const outcomes = new Map();
+  const entries = Array.isArray(log) ? log : [];
+  entries.forEach((entry, index) => {
+    if (!entry || entry.date !== date) return;
+    for (const recipeId of Array.isArray(entry.skipped) ? entry.skipped : []) {
+      const slot = slotForRecipeId(recipeId, planDay, recipesById);
+      if (slot) outcomes.set(slot, { kind: 'skipped', slot, recipeId, index, entry });
+    }
+    for (const eaten of Array.isArray(entry.eaten) ? entry.eaten : []) {
+      const slot = eaten?.slot || slotForRecipeId(eaten?.recipeId, planDay, recipesById);
+      if (slot) outcomes.set(slot, { kind: 'eaten', slot, recipeId: eaten?.recipeId || null, index, entry });
+    }
+    for (const replaced of Array.isArray(entry.replaced) ? entry.replaced : []) {
+      if (!replaced?.slot) continue;
+      outcomes.set(replaced.slot, {
+        kind: 'replaced',
+        slot: replaced.slot,
+        recipeId: replaced.recipeId || null,
+        fromRecipeId: replaced.fromRecipeId || null,
+        index,
+        entry,
+      });
+    }
+    const settlesNothing = !Array.isArray(entry.eaten)
+      && !Array.isArray(entry.replaced)
+      && (!Array.isArray(entry.skipped) || entry.skipped.length === 0);
+    if (settlesNothing && !entry.extra) {
+      const recipe = findPlannedRecipeForEntry(entry, planDay, recipesById);
+      if (recipe?.slot) {
+        outcomes.set(recipe.slot, { kind: 'eaten', slot: recipe.slot, recipeId: recipe.id, index, entry });
+      }
+    }
+  });
+  return outcomes;
+}
+
+/** "eaten" → "Eaten", for the saved-state badge on a plan row. */
+export function savedOutcomeLabel(kind) {
+  if (kind === 'skipped') return 'Skipped';
+  if (kind === 'replaced') return 'Replaced';
+  if (kind === 'eaten') return 'Eaten';
+  return '';
+}
+
+/**
+ * Merge a save into the log so each date/slot keeps exactly one outcome: an earlier
+ * entry that settles a slot the new save also settles is replaced, not duplicated.
+ * Entries for other days and free-search extras are kept as they are.
+ */
+export function mergeLogEntries(log, entries, { date, planDay, recipesById } = {}) {
+  const current = Array.isArray(log) ? log : [];
+  const added = (Array.isArray(entries) ? entries : []).filter(Boolean);
+  if (added.length === 0) return current;
+
+  const settledByDate = new Map();
+  for (const entry of added) {
+    const day = entry.date || date;
+    if (!day) continue;
+    const slots = entrySlots(entry, planDay, recipesById);
+    if (slots.size === 0) continue;
+    if (!settledByDate.has(day)) settledByDate.set(day, new Set());
+    for (const slot of slots) settledByDate.get(day).add(slot);
+  }
+
+  const kept = current.filter((entry) => {
+    const settled = settledByDate.get(entry?.date);
+    if (!settled) return true;
+    for (const slot of entrySlots(entry, planDay, recipesById)) {
+      if (settled.has(slot)) return false;
+    }
+    return true;
+  });
+  return [...kept, ...added];
+}
+
 /** Remove a whole block (all its ingredients at once) and clear its in-draft state. */
 export function removeDraftGroup(draft, groupId) {
   if (!draft || !Array.isArray(draft.groups)) return draft;
@@ -231,28 +353,48 @@ export function renderLog(ctx) {
   // This mode always lists today, not the day selected on the Plan screen: say which date it is.
   const planDate = state.plan.days[today] ? today : Object.keys(state.plan.days).sort()[0];
   const todayMeals = state.plan.days[planDate];
+  // A slot already saved keeps that one outcome: opening Log again shows it instead
+  // of offering to log the same meal a second time.
+  const savedOutcomes = savedSlotOutcomes(state.log, planDate, todayMeals, recipesById);
   planBody.appendChild(el(`<p class="field-label" data-plan-date>Today's planned meals (${planDate})</p>`));
   for (const slot of SLOTS) {
     const recipe = recipesById.get(todayMeals[slot]);
-    const alreadySkipped = draft.skipped.includes(recipe?.id);
+    const saved = savedOutcomes.get(slot) || null;
+    const savedKind = saved?.kind || null;
+    const alreadySkipped = savedKind
+      ? savedKind === 'skipped'
+      : draft.skipped.includes(recipe?.id);
     const inDraft = isRecipeInDraft(draft, recipe?.id);
-    const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}${inDraft ? ' is-in-draft' : ''}">
+    // A saved slot is locked: changes go through the correction path on Plan.
+    const locked = Boolean(savedKind) || alreadySkipped || inDraft;
+    const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}${inDraft ? ' is-in-draft' : ''}${savedKind ? ' is-logged' : ''}">
       <div>
         <div class="meal-slot">${slot}</div>
         <div class="meal-name-line">
           <button type="button" class="meal-open" data-open-recipe="${escapeHtml(recipe?.id || '')}" aria-haspopup="dialog">${recipe?.icon || ''} ${escapeHtml(recipe?.name || '')}</button>
           ${inDraft ? '<span class="badge-in-draft">In this meal</span>' : ''}
+          ${savedKind ? `<span class="badge-logged">Logged · ${escapeHtml(savedOutcomeLabel(savedKind))}</span>` : ''}
         </div>
-        ${alreadySkipped ? '<div class="muted tiny">Marked as skipped</div>' : ''}
+        ${savedKind ? `<div class="muted tiny" data-saved-slot="${escapeHtml(slot)}">Already logged as ${escapeHtml(savedOutcomeLabel(savedKind).toLowerCase())}. Use Change it to correct this meal.</div>` : ''}
+        ${!savedKind && alreadySkipped ? '<div class="muted tiny">Marked as skipped</div>' : ''}
       </div>
       <div class="meal-actions">
-        <button type="button" class="btn-secondary btn-small" data-add-recipe="${recipe?.id}" ${alreadySkipped || inDraft ? 'disabled' : ''}>Add as eaten</button>
-        <button type="button" class="btn-secondary btn-small" data-replace-recipe="${recipe?.id}" ${alreadySkipped || inDraft ? 'disabled' : ''}>Replace</button>
-        <button type="button" class="btn-secondary btn-small" data-skip-recipe="${recipe?.id}" ${alreadySkipped || inDraft ? 'disabled' : ''}>Skipped</button>
+        <button type="button" class="btn-secondary btn-small" data-add-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Add as eaten</button>
+        <button type="button" class="btn-secondary btn-small" data-replace-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Replace</button>
+        <button type="button" class="btn-secondary btn-small" data-skip-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Skipped</button>
+        ${savedKind ? `<button type="button" class="btn-text btn-small" data-change-saved="${escapeHtml(slot)}">Change it</button>` : ''}
       </div>
     </div>`);
     planBody.appendChild(row);
   }
+
+  // Correcting a saved slot happens on Plan, where its Logged meals card edits the entry.
+  planBody.querySelectorAll('[data-change-saved]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      ctx.selectedDate = planDate;
+      ctx.navigate('plan');
+    });
+  });
 
   // The meal name opens its detail panel without leaving the Log screen.
   planBody.querySelectorAll('[data-open-recipe]').forEach((btn) => {
