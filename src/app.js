@@ -8,7 +8,7 @@ import {
 } from './engine/planner.js';
 import { renderTargets } from './ui/targets.js';
 import { renderPlan } from './ui/plan.js';
-import { renderLog, logEntriesForSave } from './ui/log.js';
+import { renderLog, logEntriesForSave, mergeLogEntries } from './ui/log.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
@@ -73,7 +73,13 @@ const ctx = {
       when,
     );
     if (entries.length === 0) return;
-    const log = [...(ctx.state.log || []), ...entries];
+    // Each date/slot keeps one outcome: a slot already logged is replaced, so the
+    // same meal can never be counted twice.
+    const log = mergeLogEntries(ctx.state.log, entries, {
+      date: when.date,
+      planDay: ctx.state.plan.days[when.date],
+      recipesById: ctx.recipesById,
+    });
     const result = replan({
       targets: ctx.state.targets,
       recipes: ctx.recipes,

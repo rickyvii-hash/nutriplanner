@@ -207,6 +207,11 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
   display: inline-block; margin-left: 6px; font-size: 0.7rem; font-weight: 600;
   padding: 2px 8px; border-radius: 99px; background: var(--green); color: #fff;
 }
+.plan-meal-row.is-logged { background: var(--tan-soft); border-radius: 12px; padding: 10px 8px; }
+.badge-logged {
+  display: inline-block; margin-left: 6px; font-size: 0.7rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 99px; background: var(--tan); color: #3a2f18;
+}
 
 /* Replace picker: other recipes for the same slot. */
 .replace-picker { padding: 8px 0 10px; }
