@@ -27,6 +27,44 @@ export function dayValueText(result, nutrient) {
   return formatNutrient(result, nutrient, decimals);
 }
 
+/**
+ * What the day's progress bars show, and the line that explains it.
+ * Meals actually logged win; when nothing was eaten, planned meals count except
+ * the ones the user marked Skipped. A skipped meal is never counted as eaten.
+ * Returns { result, note } where result is shaped like dayTotals.
+ */
+export function dayProgressTotals(dayMeals, dayLog, recipesById, foodsById) {
+  const parts = [];
+  const skippedIds = new Set();
+  for (const entry of dayLog || []) {
+    for (const it of entry.items || []) {
+      const food = foodsById.get(it.foodId);
+      if (food) parts.push(foodNutrients(food, it.grams));
+    }
+    for (const id of entry.skipped || []) skippedIds.add(id);
+  }
+
+  if (parts.length > 0) {
+    return { result: sumNutrients(parts), note: 'Based on meals you logged for this day.' };
+  }
+  if (skippedIds.size > 0) {
+    // Keep the planned meals that were not skipped; the skipped one is gone.
+    const remaining = {};
+    for (const slot of SLOTS) {
+      const id = dayMeals?.[slot];
+      if (id && !skippedIds.has(id)) remaining[slot] = id;
+    }
+    return {
+      result: dayTotals(remaining, recipesById, foodsById),
+      note: 'Based on planned meals (skipped meals are not counted as eaten).',
+    };
+  }
+  return {
+    result: dayTotals(dayMeals, recipesById, foodsById),
+    note: 'Based on planned meals (nothing logged yet).',
+  };
+}
+
 function progressClass(kind, value, daily) {
   if (daily <= 0) return '';
   const ratio = value / daily;
@@ -140,23 +178,9 @@ export function renderPlan(ctx) {
   root.appendChild(mealCard);
 
   const dayLog = (state.log || []).filter((e) => e.date === selected);
-  let display = dayTotals(meals, recipesById, foodsById);
-  let progressNote = 'Based on planned meals (nothing logged yet).';
-
-  // Skipped meals have no food items and must not crash or count as zero eaten.
-  const parts = [];
-  for (const entry of dayLog) {
-    for (const it of entry.items || []) {
-      const food = foodsById.get(it.foodId);
-      if (food) parts.push(foodNutrients(food, it.grams));
-    }
-  }
-  if (parts.length > 0) {
-    display = sumNutrients(parts);
-    progressNote = 'Based on meals you logged for this day.';
-  } else if (dayLog.some((e) => Array.isArray(e.skipped) && e.skipped.length > 0)) {
-    progressNote = 'Based on planned meals (skipped meals are not counted as eaten).';
-  }
+  // Skipped meals have no food items: they are dropped from the planned values.
+  const { result: display, note: progressNote } =
+    dayProgressTotals(meals, dayLog, recipesById, foodsById);
 
   const bars = el(`<section class="card"><h3>Daily progress</h3><div class="progress-list"></div>
     <p class="muted tiny">${progressNote}</p>

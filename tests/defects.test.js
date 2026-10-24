@@ -5,10 +5,10 @@ import {
   buildPlan, replan, dayTotals, LAST_DAY_REASON,
 } from '../src/engine/planner.js';
 import {
-  NUTRIENT_KEYS, foodNutrients, sumNutrients, formatNutrient,
+  NUTRIENT_KEYS, foodNutrients, sumNutrients, formatNutrient, recipeNutrients,
 } from '../src/engine/nutrients.js';
 import { profileById } from '../src/engine/profiles.js';
-import { dayValueText } from '../src/ui/plan.js';
+import { dayValueText, dayProgressTotals } from '../src/ui/plan.js';
 import { parsePortion } from '../src/ui/log.js';
 import {
   CUSTOM_TARGET_DEFAULTS, defaultTargetDaily, nextCustomTarget, parseTargetDaily,
@@ -128,4 +128,43 @@ test('bottom navigation: hidden on first use, shown once a plan exists', () => {
   assert.equal(shouldShowNav({ profileId: 'cholesterol', targets: [{ nutrient: 'kcal', kind: 'max', daily: 2000 }], plan: null }), false);
   assert.equal(shouldShowNav(undefined), false);
   assert.equal(shouldShowNav({ plan: { month: '2026-10', days: {} } }), true);
+});
+
+test('plan progress: a skipped planned meal is left out of the day values', () => {
+  const targets = profileById('cholesterol').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  const date = Object.keys(plan.days).sort()[5];
+  const day = plan.days[date];
+  const full = dayTotals(day, recipesById, foodsById);
+  const lunch = recipesById.get(day.lunch);
+  assert.ok(lunch, 'the chosen day has a planned lunch');
+
+  const log = [{ date, time: '13:00', skipped: [lunch.id], items: [] }];
+  const { result, note } = dayProgressTotals(day, log, recipesById, foodsById);
+
+  const lunchTotals = recipeNutrients(lunch, foodsById);
+  // Every known nutrient is plan minus the skipped recipe, never the full plan.
+  for (const key of ['kcal', 'protein', 'carbs']) {
+    assert.ok(
+      Math.abs(result.totals[key] - (full.totals[key] - lunchTotals.totals[key])) < 1e-9,
+      `${key} must exclude the skipped lunch`,
+    );
+  }
+  assert.ok(result.totals.kcal < full.totals.kcal, 'progress is lower than the full plan');
+  assert.match(note, /skipped/i, 'the screen explains that skipped meals are not counted');
+});
+
+test('plan progress: a logged meal still wins over the planned values', () => {
+  const targets = profileById('cholesterol').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  const date = Object.keys(plan.days).sort()[5];
+  const log = [{
+    date,
+    time: '20:00',
+    items: [{ foodId: 'pizza-cheese', grams: 200 }],
+    skipped: [],
+  }];
+  const { result, note } = dayProgressTotals(plan.days[date], log, recipesById, foodsById);
+  assert.ok(result.totals.kcal > 0);
+  assert.match(note, /logged/i);
 });
