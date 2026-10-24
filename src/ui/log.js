@@ -1,5 +1,6 @@
 import { todayIso, SLOTS } from '../engine/planner.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
+import { openRecipeDetail } from './recipe_detail.js';
 
 export const MAX_PORTION_GRAMS = 5000;
 
@@ -135,7 +136,8 @@ export function renderLog(ctx) {
     const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}${inDraft ? ' is-in-draft' : ''}">
       <div>
         <div class="meal-slot">${slot}</div>
-        <div>${recipe?.icon || ''} ${escapeHtml(recipe?.name || '')}
+        <div class="meal-name-line">
+          <button type="button" class="meal-open" data-open-recipe="${escapeHtml(recipe?.id || '')}" aria-haspopup="dialog">${recipe?.icon || ''} ${escapeHtml(recipe?.name || '')}</button>
           ${inDraft ? '<span class="badge-in-draft">In this meal</span>' : ''}
         </div>
         ${alreadySkipped ? '<div class="muted tiny">Marked as skipped</div>' : ''}
@@ -148,6 +150,14 @@ export function renderLog(ctx) {
     </div>`);
     planBody.appendChild(row);
   }
+
+  // The meal name opens its detail panel without leaving the Log screen.
+  planBody.querySelectorAll('[data-open-recipe]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const recipe = recipesById.get(btn.dataset.openRecipe);
+      if (recipe) openRecipeDetail(ctx, recipe, root);
+    });
+  });
 
   const searchBody = mode.querySelector('[data-body="search"]');
   appendHtml(searchBody, `<label class="field">
@@ -190,7 +200,9 @@ export function renderLog(ctx) {
     for (const group of draft.groups) {
       const li = el(`<li class="logged-group" data-group="${escapeHtml(group.id)}">
         <div class="logged-group-header">
-          <span class="logged-group-title">Eaten · <span class="group-slot">${escapeHtml(group.slot)}</span> · ${escapeHtml(group.recipeName)}</span>
+          <button type="button" class="meal-open logged-group-title" data-open-group-recipe="${escapeHtml(group.recipeId || '')}" aria-haspopup="dialog">
+            Eaten · <span class="group-slot">${escapeHtml(group.slot)}</span> · ${escapeHtml(group.recipeName)}
+          </button>
           <button type="button" class="btn-icon" data-remove-group="${escapeHtml(group.id)}" aria-label="Remove this whole meal">×</button>
         </div>
         <ul class="logged-group-items"></ul>
@@ -236,6 +248,14 @@ export function renderLog(ctx) {
     const hasAnything = draft.items.length > 0 || draft.groups.length > 0 || draft.skipped.length > 0;
     empty.style.display = hasAnything ? 'none' : 'block';
     saveBtn.disabled = !hasAnything;
+
+    // The "Eaten · …" header opens the detail panel of that group's recipe.
+    ul.querySelectorAll('[data-open-group-recipe]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const recipe = recipesById.get(btn.dataset.openGroupRecipe);
+        if (recipe) openRecipeDetail(ctx, recipe, root);
+      });
+    });
 
     ul.querySelectorAll('[data-edit]').forEach((input) => {
       input.addEventListener('change', () => {

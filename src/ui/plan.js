@@ -1,6 +1,7 @@
 import { dayTotals, todayIso, SLOTS } from '../engine/planner.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
+import { openRecipeDetail } from './recipe_detail.js';
 
 /**
  * Text for a daily nutrient value: "n/a" when nothing is known, "≥12.2" when a meal
@@ -93,10 +94,17 @@ export function renderPlan(ctx) {
   const list = mealCard.querySelector('.meal-list');
   for (const slot of SLOTS) {
     const recipe = recipesById.get(meals[slot]);
-    list.appendChild(el(`<li class="meal-item">
-      <span class="meal-slot">${slot}</span>
-      <span class="meal-name">${recipe?.icon || ''} ${escapeHtml(recipe?.name || meals[slot])}</span>
-    </li>`));
+    const item = el(`<li class="meal-item">
+      <button type="button" class="meal-open" data-open-recipe="${escapeHtml(recipe?.id || '')}" aria-haspopup="dialog">
+        <span class="meal-slot">${slot}</span>
+        <span class="meal-name">${recipe?.icon || ''} ${escapeHtml(recipe?.name || meals[slot])}</span>
+      </button>
+    </li>`);
+    // Tapping a planned meal opens its detail panel in place; it never leaves the screen.
+    item.querySelector('[data-open-recipe]').addEventListener('click', () => {
+      if (recipe) openRecipeDetail(ctx, recipe, root);
+    });
+    list.appendChild(item);
   }
   mealCard.querySelector('[data-action="log"]').addEventListener('click', () => ctx.navigate('log'));
   root.appendChild(mealCard);

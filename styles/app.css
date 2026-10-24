@@ -302,6 +302,59 @@ input[type="checkbox"], input[type="radio"] { min-width: 28px; min-height: 28px;
   .footer-note { color: #333; }
 }
 
+/* Recipe detail: a calm sheet over the screen with ingredients, targets and search links. */
+.recipe-overlay {
+  position: fixed; inset: 0; z-index: 40; background: rgba(31, 58, 45, 0.35);
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.recipe-panel {
+  width: 100%; max-width: 720px; max-height: 88vh; overflow-y: auto;
+  background: var(--card); border: 1px solid var(--line); border-radius: 20px 20px 0 0;
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0));
+  box-shadow: 0 -8px 30px rgba(31, 58, 45, 0.18);
+}
+.recipe-panel-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  margin-bottom: 12px;
+}
+.recipe-panel-head h2 { display: flex; align-items: center; gap: 8px; font-size: 1.2rem; margin: 0; }
+.recipe-close { min-width: 44px; min-height: 44px; font-size: 1.5rem; line-height: 1; }
+.recipe-section { margin: 0 0 14px; }
+.recipe-section h3 {
+  font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.02em;
+  color: var(--muted); margin: 0 0 6px;
+}
+.recipe-ingredients, .recipe-nutrients { list-style: none; margin: 0; padding: 0; }
+.recipe-ingredients li, .recipe-nutrients li {
+  display: flex; justify-content: space-between; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 0.95rem;
+}
+.recipe-ingredients li:last-child, .recipe-nutrients li:last-child { border-bottom: none; }
+.recipe-ingredients li span:first-child { overflow-wrap: anywhere; }
+.recipe-grams { color: var(--muted); white-space: nowrap; }
+.recipe-links { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 10px; }
+.recipe-link {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 44px; text-decoration: none;
+}
+.recipe-note { margin: 0; }
+
+/* A meal name / row that opens the detail panel. */
+.meal-open {
+  font: inherit; color: inherit; background: transparent; border: none;
+  display: flex; align-items: center; gap: 10px; text-align: left;
+  flex: 1; min-height: 44px; padding: 6px 0; border-radius: 10px;
+  cursor: pointer;
+}
+.meal-open:hover { color: var(--green); }
+.logged-group-title.meal-open { font-size: 0.92rem; font-weight: 600; }
+.meal-name-line { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+
+@media (min-width: 800px) {
+  .recipe-overlay { align-items: center; padding: 24px; }
+  .recipe-panel { border-radius: 20px; max-height: 80vh; }
+}
+
 /* Doctor summary: each status has its own look, with no good/bad judgement. */
 .summary-status { font-weight: 600; white-space: normal; }
 .summary-status.status-within { color: var(--green); }
