@@ -1,6 +1,7 @@
 import {
   loadState, saveState, getStorageNotice,
   proposalToStore, pendingProposalForPlan, withoutPendingProposal,
+  applyStaleMonthOnStart,
 } from './store.js';
 import {
   buildPlan, replan, todayIso, localTime,
@@ -25,6 +26,7 @@ const ctx = {
   selectedDate: null,
   proposal: null,
   logDraft: null,
+  monthBanner: null,
   navigate: (name) => {
     ctx.screen = name;
     if (name !== 'log') ctx.logDraft = null;
@@ -48,9 +50,10 @@ const ctx = {
       ctx.foodsById,
       ctx.state.bought || [],
     );
-    // A new month plan replaces any leftover update proposal.
+    // A new month plan replaces any leftover update proposal and clears a stale-month banner.
     ctx.state = withoutPendingProposal({ ...ctx.state, plan, keptForBought: [] });
     ctx.proposal = null;
+    ctx.monthBanner = null;
     saveState(ctx.state);
     ctx.selectedDate = todayIso();
     ctx.navigate('plan');
@@ -166,9 +169,15 @@ async function start() {
       shopEvery: [2, 3, 5, 7].includes(ctx.state.shopEvery) ? ctx.state.shopEvery : 7,
       shopStart: ctx.state.shopStart || todayIso(),
     };
+    // A plan for another month must not open as today: clear it, keep targets/log/shopping.
+    const stale = applyStaleMonthOnStart(ctx.state);
+    ctx.state = stale.state;
+    ctx.monthBanner = stale.banner;
+    if (stale.banner) ctx.proposal = null;
     saveState(ctx.state);
+
     const pending = pendingProposalForPlan(ctx.state);
-    if (pending) {
+    if (pending && !stale.banner) {
       ctx.proposal = pending;
       ctx.screen = 'updated';
     } else if (ctx.state.plan) {

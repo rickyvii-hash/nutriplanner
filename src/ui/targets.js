@@ -77,6 +77,13 @@ export function renderTargets(ctx) {
   }
 
   const profile = PROFILES.find((p) => p.id === state.profileId);
+
+  if (ctx.monthBanner) {
+    root.appendChild(el(`<section class="card note-card month-banner" data-month-banner>
+      <p>${escapeHtml(ctx.monthBanner)}</p>
+    </section>`));
+  }
+
   root.appendChild(el(`<section class="card">
     <div class="row">
       <div>

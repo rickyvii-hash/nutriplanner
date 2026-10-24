@@ -7,6 +7,10 @@ import {
   saveState,
   loadState,
   clearState,
+  currentMonthKey,
+  formatMonthYear,
+  stalePlanBanner,
+  applyStaleMonthOnStart,
 } from '../src/store.js';
 
 function installMemoryStorage() {
@@ -86,6 +90,63 @@ test('withoutPendingProposal clears a stored proposal', () => {
   assert.equal(cleared.log.length, 1);
   // Original state is not mutated.
   assert.ok(state.pendingProposal);
+});
+
+test('currentMonthKey and formatMonthYear are stable pure helpers', () => {
+  assert.equal(currentMonthKey(new Date(2026, 9, 24)), '2026-10');
+  assert.equal(currentMonthKey(new Date(2026, 10, 1)), '2026-11');
+  assert.equal(formatMonthYear('2026-10'), 'October 2026');
+  assert.equal(formatMonthYear('2026-11'), 'November 2026');
+});
+
+test('stalePlanBanner is null for the current month and set for an old month', () => {
+  const now = new Date(2026, 10, 1); // 1 November 2026
+  assert.equal(stalePlanBanner('2026-11', now), null);
+  assert.equal(
+    stalePlanBanner('2026-10', now),
+    'Your saved plan is for October 2026. Build the plan for November 2026.',
+  );
+  assert.equal(stalePlanBanner(null, now), null);
+});
+
+test('applyStaleMonthOnStart clears an old plan, keeps log and shopping, drops the proposal', () => {
+  const now = new Date(2026, 10, 1);
+  const state = {
+    profileId: 'recovery',
+    targets: [{ nutrient: 'kcal', kind: 'min', daily: 2200 }],
+    plan: { month: '2026-10', days: { '2026-10-15': { breakfast: 'a' } } },
+    log: [{ date: '2026-10-15', time: '12:00', items: [{ foodId: 'apple-raw', grams: 100 }] }],
+    bought: ['spinach-raw'],
+    keptForBought: [{ date: '2026-10-16', slot: 'lunch', recipeId: 'x' }],
+    shopEvery: 3,
+    shopStart: '2026-10-14',
+    pendingProposal: proposalToStore(sampleProposal),
+  };
+  const result = applyStaleMonthOnStart(state, now);
+  assert.equal(result.screenHint, 'targets');
+  assert.match(result.banner, /October 2026/);
+  assert.match(result.banner, /November 2026/);
+  assert.equal(result.state.plan, null);
+  assert.equal(result.state.pendingProposal, null);
+  assert.equal(result.state.keptForBought.length, 0);
+  assert.equal(result.state.log.length, 1);
+  assert.deepEqual(result.state.bought, ['spinach-raw']);
+  assert.equal(result.state.shopEvery, 3);
+  assert.equal(result.state.targets[0].daily, 2200);
+  assert.equal(result.state.profileId, 'recovery');
+});
+
+test('applyStaleMonthOnStart leaves a current-month plan alone', () => {
+  const now = new Date(2026, 9, 24);
+  const state = {
+    plan: { month: '2026-10', days: {} },
+    log: [],
+    pendingProposal: null,
+  };
+  const result = applyStaleMonthOnStart(state, now);
+  assert.equal(result.banner, null);
+  assert.equal(result.screenHint, 'plan');
+  assert.equal(result.state.plan.month, '2026-10');
 });
 
 test('saveState and loadState round-trip a pending proposal; clearState removes it', () => {

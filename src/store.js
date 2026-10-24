@@ -54,6 +54,52 @@ export function withoutPendingProposal(state) {
   return { ...state, pendingProposal: null };
 }
 
+/** Calendar month as YYYY-MM in local time. */
+export function currentMonthKey(now = new Date()) {
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  return `${y}-${m}`;
+}
+
+/** "2026-10" → "October 2026" (English month name). */
+export function formatMonthYear(monthKey) {
+  if (!monthKey || !/^\d{4}-\d{2}$/.test(monthKey)) return String(monthKey || '');
+  const [y, m] = monthKey.split('-').map(Number);
+  const name = new Date(y, m - 1, 1).toLocaleString('en-US', { month: 'long' });
+  return `${name} ${y}`;
+}
+
+/**
+ * Calm banner when a saved plan is for another month, or null when the plan is current / missing.
+ */
+export function stalePlanBanner(planMonth, now = new Date()) {
+  if (!planMonth) return null;
+  const current = currentMonthKey(now);
+  if (planMonth === current) return null;
+  return `Your saved plan is for ${formatMonthYear(planMonth)}. Build the plan for ${formatMonthYear(current)}.`;
+}
+
+/**
+ * On start: if the saved plan is for another month, clear it (keep targets, log and shopping
+ * settings), drop any pending proposal, and return a Targets banner.
+ */
+export function applyStaleMonthOnStart(state, now = new Date()) {
+  const planMonth = state?.plan?.month || null;
+  const banner = stalePlanBanner(planMonth, now);
+  if (!banner) {
+    return { state, banner: null, screenHint: state?.plan ? 'plan' : 'targets' };
+  }
+  return {
+    state: withoutPendingProposal({
+      ...state,
+      plan: null,
+      keptForBought: [],
+    }),
+    banner,
+    screenHint: 'targets',
+  };
+}
+
 export function loadState() {
   storageNotice = null;
   try {
