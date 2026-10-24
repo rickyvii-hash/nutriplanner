@@ -1,4 +1,7 @@
-import { loadState, saveState, getStorageNotice } from './store.js';
+import {
+  loadState, saveState, getStorageNotice,
+  proposalToStore, pendingProposalForPlan, withoutPendingProposal,
+} from './store.js';
 import {
   buildPlan, replan, todayIso, localTime,
 } from './engine/planner.js';
@@ -45,7 +48,9 @@ const ctx = {
       ctx.foodsById,
       ctx.state.bought || [],
     );
-    ctx.state = { ...ctx.state, plan, keptForBought: [] };
+    // A new month plan replaces any leftover update proposal.
+    ctx.state = withoutPendingProposal({ ...ctx.state, plan, keptForBought: [] });
+    ctx.proposal = null;
     saveState(ctx.state);
     ctx.selectedDate = todayIso();
     ctx.navigate('plan');
@@ -69,7 +74,7 @@ const ctx = {
       foodsById: ctx.foodsById,
       fromDate: todayIso(),
     });
-    ctx.state = { ...ctx.state, log };
+    ctx.state = { ...ctx.state, log, pendingProposal: proposalToStore(result) };
     saveState(ctx.state);
     ctx.proposal = result;
     ctx.logDraft = null;
@@ -77,16 +82,18 @@ const ctx = {
   },
   useUpdatedPlan: () => {
     if (!ctx.proposal) return;
-    ctx.state = {
+    ctx.state = withoutPendingProposal({
       ...ctx.state,
       plan: ctx.proposal.plan,
       keptForBought: ctx.proposal.keptForBought || [],
-    };
+    });
     saveState(ctx.state);
     ctx.proposal = null;
     ctx.navigate('plan');
   },
   keepOriginalPlan: () => {
+    ctx.state = withoutPendingProposal(ctx.state);
+    saveState(ctx.state);
     ctx.proposal = null;
     ctx.navigate('plan');
   },
@@ -160,8 +167,17 @@ async function start() {
       shopStart: ctx.state.shopStart || todayIso(),
     };
     saveState(ctx.state);
-    if (ctx.state.plan) ctx.screen = 'plan';
-    else ctx.screen = 'targets';
+    const pending = pendingProposalForPlan(ctx.state);
+    if (pending) {
+      ctx.proposal = pending;
+      ctx.screen = 'updated';
+    } else if (ctx.state.plan) {
+      ctx.state = withoutPendingProposal(ctx.state);
+      saveState(ctx.state);
+      ctx.screen = 'plan';
+    } else {
+      ctx.screen = 'targets';
+    }
     render();
   } catch (err) {
     app.innerHTML = `<div class="screen">
