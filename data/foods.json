@@ -1,5 +1,702 @@
 [
  {
+  "id": "agutuk-fish-with-shortening-alaskan-ice-cream-alaska-native",
+  "fdcId": 169823,
+  "name": "Agutuk, fish with shortening (Alaskan ice cream) (Alaska Native)",
+  "category": "Sweets",
+  "usdaName": "Agutuk, fish with shortening (Alaskan ice cream) (Alaska Native)",
+  "per100g": {
+   "protein": 9,
+   "fat": 43.5,
+   "carbs": 10.5,
+   "kcal": 470,
+   "fibre": null,
+   "sodium": 24,
+   "satFat": 8.6,
+   "sugars": null
+  }
+ },
+ {
+  "id": "agutuk-fish-berry-with-seal-oil-alaskan-ice-cream-alaska-nat",
+  "fdcId": 168976,
+  "name": "Agutuk, fish/berry with seal oil (Alaskan ice cream) (Alaska Native)",
+  "category": "Sweets",
+  "usdaName": "Agutuk, fish/berry with seal oil (Alaskan ice cream) (Alaska Native)",
+  "per100g": {
+   "protein": 3.4,
+   "fat": 31.8,
+   "carbs": 13.4,
+   "kcal": 353,
+   "fibre": 0.5,
+   "sodium": 21,
+   "satFat": 7.7,
+   "sugars": null
+  }
+ },
+ {
+  "id": "agutuk-meat-caribou-alaskan-ice-cream-alaska-native",
+  "fdcId": 168977,
+  "name": "Agutuk, meat-caribou (Alaskan ice cream) (Alaska Native)",
+  "category": "Sweets",
+  "usdaName": "Agutuk, meat-caribou (Alaskan ice cream) (Alaska Native)",
+  "per100g": {
+   "protein": 21.7,
+   "fat": 18.6,
+   "carbs": 0.9,
+   "kcal": 258,
+   "fibre": null,
+   "sodium": 95,
+   "satFat": 5.1,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-beer-light",
+  "fdcId": 168749,
+  "name": "Alcoholic beverage, beer, light",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, beer, light",
+  "per100g": {
+   "protein": 0.24,
+   "fat": 0,
+   "carbs": 1.64,
+   "kcal": 29,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 0.09
+  }
+ },
+ {
+  "id": "alcoholic-beverage-beer-light-bud-light",
+  "fdcId": 169572,
+  "name": "Alcoholic beverage, beer, light, BUD LIGHT",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, beer, light, BUD LIGHT",
+  "per100g": {
+   "protein": 0.25,
+   "fat": 0,
+   "carbs": 1.3,
+   "kcal": 29,
+   "fibre": 0,
+   "sodium": 3,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-beer-light-budweiser-select",
+  "fdcId": 168748,
+  "name": "Alcoholic beverage, beer, light, BUDWEISER SELECT",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, beer, light, BUDWEISER SELECT",
+  "per100g": {
+   "protein": 0.2,
+   "fat": 0,
+   "carbs": 0.87,
+   "kcal": 28,
+   "fibre": 0,
+   "sodium": 3,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-beer-light-higher-alcohol",
+  "fdcId": 174145,
+  "name": "Alcoholic beverage, beer, light, higher alcohol",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, beer, light, higher alcohol",
+  "per100g": {
+   "protein": 0.25,
+   "fat": 0,
+   "carbs": 0.77,
+   "kcal": 46,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 0.09
+  }
+ },
+ {
+  "id": "alcoholic-beverage-beer-light-low-carb",
+  "fdcId": 169575,
+  "name": "Alcoholic beverage, beer, light, low carb",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, beer, light, low carb",
+  "per100g": {
+   "protein": 0.17,
+   "fat": 0,
+   "carbs": 0.73,
+   "kcal": 27,
+   "fibre": 0,
+   "sodium": 3,
+   "satFat": 0,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "alcoholic-beverage-beer-regular-all",
+  "fdcId": 168746,
+  "name": "Alcoholic beverage, beer, regular, all",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, beer, regular, all",
+  "per100g": {
+   "protein": 0.46,
+   "fat": 0,
+   "carbs": 3.55,
+   "kcal": 43,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "alcoholic-beverage-beer-regular-budweiser",
+  "fdcId": 168747,
+  "name": "Alcoholic beverage, beer, regular, BUDWEISER",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, beer, regular, BUDWEISER",
+  "per100g": {
+   "protein": 0.36,
+   "fat": 0,
+   "carbs": 2.97,
+   "kcal": 41,
+   "fibre": 0,
+   "sodium": 3,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-all",
+  "fdcId": 173185,
+  "name": "Alcoholic beverage, wine, table, all",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, all",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.72,
+   "kcal": 83,
+   "fibre": 0,
+   "sodium": 5,
+   "satFat": 0,
+   "sugars": 0.79
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red",
+  "fdcId": 173190,
+  "name": "Alcoholic beverage, wine, table, red",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, red",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.61,
+   "kcal": 85,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 0.62
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-barbera",
+  "fdcId": 173191,
+  "name": "Alcoholic Beverage, wine, table, red, Barbera",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Barbera",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.79,
+   "kcal": 85,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-burgundy",
+  "fdcId": 173208,
+  "name": "Alcoholic Beverage, wine, table, red, Burgundy",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Burgundy",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 3.69,
+   "kcal": 86,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-cabernet-franc",
+  "fdcId": 174834,
+  "name": "Alcoholic Beverage, wine, table, red, Cabernet Franc",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Cabernet Franc",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.45,
+   "kcal": 83,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-cabernet-sauvignon",
+  "fdcId": 174833,
+  "name": "Alcoholic Beverage, wine, table, red, Cabernet Sauvignon",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Cabernet Sauvignon",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.6,
+   "kcal": 83,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-carignane",
+  "fdcId": 174840,
+  "name": "Alcoholic Beverage, wine, table, red, Carignane",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Carignane",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.4,
+   "kcal": 74,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-claret",
+  "fdcId": 173194,
+  "name": "Alcoholic Beverage, wine, table, red, Claret",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Claret",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 3.01,
+   "kcal": 83,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-gamay",
+  "fdcId": 171872,
+  "name": "Alcoholic Beverage, wine, table, red, Gamay",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Gamay",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.38,
+   "kcal": 78,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-lemberger",
+  "fdcId": 174838,
+  "name": "Alcoholic Beverage, wine, table, red, Lemberger",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Lemberger",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.46,
+   "kcal": 80,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-merlot",
+  "fdcId": 171925,
+  "name": "Alcoholic Beverage, wine, table, red, Merlot",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Merlot",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.51,
+   "kcal": 83,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": null,
+   "sugars": 0.62
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-mouvedre",
+  "fdcId": 174109,
+  "name": "Alcoholic Beverage, wine, table, red, Mouvedre",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Mouvedre",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.64,
+   "kcal": 88,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-petite-sirah",
+  "fdcId": 173193,
+  "name": "Alcoholic Beverage, wine, table, red, Petite Sirah",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Petite Sirah",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.68,
+   "kcal": 85,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-pinot-noir",
+  "fdcId": 174835,
+  "name": "Alcoholic Beverage, wine, table, red, Pinot Noir",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Pinot Noir",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.31,
+   "kcal": 82,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-sangiovese",
+  "fdcId": 174839,
+  "name": "Alcoholic Beverage, wine, table, red, Sangiovese",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Sangiovese",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.62,
+   "kcal": 86,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-syrah",
+  "fdcId": 174836,
+  "name": "Alcoholic Beverage, wine, table, red, Syrah",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Syrah",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.58,
+   "kcal": 83,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-red-zinfandel",
+  "fdcId": 173192,
+  "name": "Alcoholic Beverage, wine, table, red, Zinfandel",
+  "category": "Beverages",
+  "usdaName": "Alcoholic Beverage, wine, table, red, Zinfandel",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.86,
+   "kcal": 88,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white",
+  "fdcId": 174837,
+  "name": "Alcoholic beverage, wine, table, white",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.6,
+   "kcal": 82,
+   "fibre": 0,
+   "sodium": 5,
+   "satFat": 0,
+   "sugars": 0.96
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-chardonnay",
+  "fdcId": 174110,
+  "name": "Alcoholic beverage, wine, table, white, Chardonnay",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Chardonnay",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.16,
+   "kcal": 84,
+   "fibre": 0,
+   "sodium": 5,
+   "satFat": null,
+   "sugars": 0.96
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-chenin-blanc",
+  "fdcId": 173195,
+  "name": "Alcoholic beverage, wine, table, white, Chenin Blanc",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Chenin Blanc",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 3.31,
+   "kcal": 80,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-fume-blanc",
+  "fdcId": 173196,
+  "name": "Alcoholic beverage, wine, table, white, Fume Blanc",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Fume Blanc",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.27,
+   "kcal": 82,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-gewurztraminer",
+  "fdcId": 174843,
+  "name": "Alcoholic beverage, wine, table, white, Gewurztraminer",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Gewurztraminer",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.6,
+   "kcal": 81,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-late-harvest",
+  "fdcId": 173202,
+  "name": "Alcoholic beverage, wine, table, white, late harvest",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, late harvest",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 13.39,
+   "kcal": 112,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-late-harvest-gewurztrami",
+  "fdcId": 174844,
+  "name": "Alcoholic beverage, wine, table, white, late harvest, Gewurztraminer",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, late harvest, Gewurztraminer",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 11.39,
+   "kcal": 108,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-muller-thurgau",
+  "fdcId": 173198,
+  "name": "Alcoholic beverage, wine, table, white, Muller Thurgau",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Muller Thurgau",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 3.48,
+   "kcal": 76,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-muscat",
+  "fdcId": 174849,
+  "name": "Alcoholic beverage, wine, table, white, Muscat",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Muscat",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 5.23,
+   "kcal": 82,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-pinot-blanc",
+  "fdcId": 174848,
+  "name": "Alcoholic beverage, wine, table, white, Pinot Blanc",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Pinot Blanc",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 1.94,
+   "kcal": 81,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-pinot-gris-grigio",
+  "fdcId": 174841,
+  "name": "Alcoholic beverage, wine, table, white, Pinot Gris (Grigio)",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Pinot Gris (Grigio)",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.06,
+   "kcal": 83,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-riesling",
+  "fdcId": 173200,
+  "name": "Alcoholic beverage, wine, table, white, Riesling",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Riesling",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 3.74,
+   "kcal": 80,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-sauvignon-blanc",
+  "fdcId": 173201,
+  "name": "Alcoholic beverage, wine, table, white, Sauvignon Blanc",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Sauvignon Blanc",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 2.05,
+   "kcal": 81,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
+  "id": "alcoholic-beverage-wine-table-white-semillon",
+  "fdcId": 174845,
+  "name": "Alcoholic beverage, wine, table, white, Semillon",
+  "category": "Beverages",
+  "usdaName": "Alcoholic beverage, wine, table, white, Semillon",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0,
+   "carbs": 3.12,
+   "kcal": 82,
+   "fibre": null,
+   "sodium": null,
+   "satFat": null,
+   "sugars": null
+  }
+ },
+ {
   "id": "almond-milk-unsweetened",
   "fdcId": 174832,
   "name": "Almond milk, unsweetened",
@@ -51,6 +748,108 @@
   }
  },
  {
+  "id": "apple-juice-canned-or-bottled-unsweetened-with-added-ascorbi",
+  "fdcId": 167771,
+  "name": "Apple juice, canned or bottled, unsweetened, with added ascorbic acid",
+  "category": "Beverages",
+  "usdaName": "Apple juice, canned or bottled, unsweetened, with added ascorbic acid",
+  "per100g": {
+   "protein": 0.1,
+   "fat": 0.13,
+   "carbs": 11.3,
+   "kcal": 46,
+   "fibre": 0.2,
+   "sodium": 4,
+   "satFat": 0.022,
+   "sugars": 9.62
+  }
+ },
+ {
+  "id": "apple-juice-canned-or-bottled-unsweetened-with-added-ascorbi-167800",
+  "fdcId": 167800,
+  "name": "Apple juice, canned or bottled, unsweetened, with added ascorbic acid,",
+  "category": "Beverages",
+  "usdaName": "Apple juice, canned or bottled, unsweetened, with added ascorbic acid, calcium, and potassium",
+  "per100g": {
+   "protein": 0.12,
+   "fat": 0.17,
+   "carbs": 11.49,
+   "kcal": 48,
+   "fibre": 0.3,
+   "sodium": 5,
+   "satFat": 0.029,
+   "sugars": 9.47
+  }
+ },
+ {
+  "id": "apple-juice-frozen-concentrate-unsweetened-diluted-with-3-vo",
+  "fdcId": 167775,
+  "name": "Apple juice, frozen concentrate, unsweetened, diluted with 3 volume wa",
+  "category": "Beverages",
+  "usdaName": "Apple juice, frozen concentrate, unsweetened, diluted with 3 volume water, with added ascorbic acid",
+  "per100g": {
+   "protein": 0.14,
+   "fat": 0.1,
+   "carbs": 11.54,
+   "kcal": 47,
+   "fibre": 0.1,
+   "sodium": 7,
+   "satFat": 0.018,
+   "sugars": null
+  }
+ },
+ {
+  "id": "apple-juice-frozen-concentrate-unsweetened-diluted-with-3-vo-173935",
+  "fdcId": 173935,
+  "name": "Apple juice, frozen concentrate, unsweetened, diluted with 3 volume wa",
+  "category": "Beverages",
+  "usdaName": "Apple juice, frozen concentrate, unsweetened, diluted with 3 volume water without added ascorbic acid",
+  "per100g": {
+   "protein": 0.14,
+   "fat": 0.1,
+   "carbs": 11.54,
+   "kcal": 47,
+   "fibre": 0.1,
+   "sodium": 7,
+   "satFat": 0.018,
+   "sugars": 10.93
+  }
+ },
+ {
+  "id": "apple-juice-frozen-concentrate-unsweetened-undiluted-with-ad",
+  "fdcId": 168188,
+  "name": "Apple juice, frozen concentrate, unsweetened, undiluted, with added as",
+  "category": "Beverages",
+  "usdaName": "Apple juice, frozen concentrate, unsweetened, undiluted, with added ascorbic acid",
+  "per100g": {
+   "protein": 0.51,
+   "fat": 0.37,
+   "carbs": 41,
+   "kcal": 166,
+   "fibre": null,
+   "sodium": 25,
+   "satFat": 0.06,
+   "sugars": 38.83
+  }
+ },
+ {
+  "id": "apple-juice-frozen-concentrate-unsweetened-undiluted-without",
+  "fdcId": 173934,
+  "name": "Apple juice, frozen concentrate, unsweetened, undiluted, without added",
+  "category": "Beverages",
+  "usdaName": "Apple juice, frozen concentrate, unsweetened, undiluted, without added ascorbic acid",
+  "per100g": {
+   "protein": 0.51,
+   "fat": 0.37,
+   "carbs": 41,
+   "kcal": 166,
+   "fibre": 0.4,
+   "sodium": 25,
+   "satFat": 0.06,
+   "sugars": 38.83
+  }
+ },
+ {
   "id": "apple-raw",
   "fdcId": 168202,
   "name": "Apple, raw",
@@ -68,6 +867,23 @@
   }
  },
  {
+  "id": "applebee-s-french-fries",
+  "fdcId": 169009,
+  "name": "APPLEBEE'S, french fries",
+  "category": "Prepared",
+  "usdaName": "APPLEBEE'S, french fries",
+  "per100g": {
+   "protein": 3.31,
+   "fat": 13.17,
+   "carbs": 39.5,
+   "kcal": 290,
+   "fibre": 3.9,
+   "sodium": 618,
+   "satFat": 2.333,
+   "sugars": 0
+  }
+ },
+ {
   "id": "apricots-raw",
   "fdcId": 171697,
   "name": "Apricots, raw",
@@ -82,6 +898,23 @@
    "sodium": 1,
    "satFat": 0.027,
    "sugars": 9.24
+  }
+ },
+ {
+  "id": "arby-s-roast-beef-sandwich-classic",
+  "fdcId": 170791,
+  "name": "ARBY'S, roast beef sandwich, classic",
+  "category": "Prepared",
+  "usdaName": "ARBY'S, roast beef sandwich, classic",
+  "per100g": {
+   "protein": 15.17,
+   "fat": 10.3,
+   "carbs": 22.21,
+   "kcal": 242,
+   "fibre": 1.3,
+   "sodium": 653,
+   "satFat": 3.399,
+   "sugars": 3.84
   }
  },
  {
@@ -238,6 +1071,23 @@
   }
  },
  {
+  "id": "beef-sandwich-steaks-flaked-chopped-formed-and-thinly-sliced",
+  "fdcId": 170600,
+  "name": "Beef, sandwich steaks, flaked, chopped, formed and thinly sliced, raw",
+  "category": "Prepared",
+  "usdaName": "Beef, sandwich steaks, flaked, chopped, formed and thinly sliced, raw",
+  "per100g": {
+   "protein": 16.5,
+   "fat": 27,
+   "carbs": 0,
+   "kcal": 309,
+   "fibre": 0,
+   "sodium": 68,
+   "satFat": 11.538,
+   "sugars": 0
+  }
+ },
+ {
   "id": "beetroot-raw",
   "fdcId": 169145,
   "name": "Beetroot, raw",
@@ -252,6 +1102,295 @@
    "sodium": 78,
    "satFat": 0.027,
    "sugars": 6.76
+  }
+ },
+ {
+  "id": "beverages-apple-juice-drink-light-fortified-with-vitamin-c",
+  "fdcId": 174112,
+  "name": "Beverages, Apple juice drink, light, fortified with vitamin C",
+  "category": "Beverages",
+  "usdaName": "Beverages, Apple juice drink, light, fortified with vitamin C",
+  "per100g": {
+   "protein": 0,
+   "fat": 0.1,
+   "carbs": 5.1,
+   "kcal": 22,
+   "fibre": 0,
+   "sodium": 13,
+   "satFat": 0,
+   "sugars": 4.8
+  }
+ },
+ {
+  "id": "beverages-carbonated-cola-fast-food-cola",
+  "fdcId": 175093,
+  "name": "Beverages, carbonated, cola, fast-food cola",
+  "category": "Beverages",
+  "usdaName": "Beverages, carbonated, cola, fast-food cola",
+  "per100g": {
+   "protein": 0.07,
+   "fat": 0.02,
+   "carbs": 9.56,
+   "kcal": 37,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 8.97
+  }
+ },
+ {
+  "id": "beverages-carbonated-cola-regular",
+  "fdcId": 174852,
+  "name": "Beverages, carbonated, cola, regular",
+  "category": "Beverages",
+  "usdaName": "Beverages, carbonated, cola, regular",
+  "per100g": {
+   "protein": 0,
+   "fat": 0.25,
+   "carbs": 10.36,
+   "kcal": 42,
+   "fibre": 0,
+   "sodium": 3,
+   "satFat": 0,
+   "sugars": 9.94
+  }
+ },
+ {
+  "id": "beverages-carbonated-cola-without-caffeine",
+  "fdcId": 174851,
+  "name": "Beverages, carbonated, cola, without caffeine",
+  "category": "Beverages",
+  "usdaName": "Beverages, carbonated, cola, without caffeine",
+  "per100g": {
+   "protein": 0,
+   "fat": 0,
+   "carbs": 10.58,
+   "kcal": 41,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 10.58
+  }
+ },
+ {
+  "id": "beverages-coffee-brewed-breakfast-blend",
+  "fdcId": 171881,
+  "name": "Beverages, coffee, brewed, breakfast blend",
+  "category": "Beverages",
+  "usdaName": "Beverages, coffee, brewed, breakfast blend",
+  "per100g": {
+   "protein": 0.3,
+   "fat": 0,
+   "carbs": 0.17,
+   "kcal": 2,
+   "fibre": 0,
+   "sodium": 1,
+   "satFat": 0,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "beverages-coffee-brewed-espresso-restaurant-prepared",
+  "fdcId": 171891,
+  "name": "Beverages, coffee, brewed, espresso, restaurant-prepared",
+  "category": "Beverages",
+  "usdaName": "Beverages, coffee, brewed, espresso, restaurant-prepared",
+  "per100g": {
+   "protein": 0.12,
+   "fat": 0.18,
+   "carbs": 1.67,
+   "kcal": 9,
+   "fibre": 0,
+   "sodium": 14,
+   "satFat": 0.092,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "beverages-coffee-brewed-espresso-restaurant-prepared-decaffe",
+  "fdcId": 174125,
+  "name": "Beverages, coffee, brewed, espresso, restaurant-prepared, decaffeinate",
+  "category": "Beverages",
+  "usdaName": "Beverages, coffee, brewed, espresso, restaurant-prepared, decaffeinated",
+  "per100g": {
+   "protein": 0.1,
+   "fat": 0.18,
+   "carbs": 1.69,
+   "kcal": 9,
+   "fibre": 0,
+   "sodium": 14,
+   "satFat": 0.092,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "beverages-coffee-brewed-prepared-with-tap-water-decaffeinate",
+  "fdcId": 171889,
+  "name": "Beverages, coffee, brewed, prepared with tap water, decaffeinated",
+  "category": "Beverages",
+  "usdaName": "Beverages, coffee, brewed, prepared with tap water, decaffeinated",
+  "per100g": {
+   "protein": 0.1,
+   "fat": 0,
+   "carbs": 0,
+   "kcal": 0,
+   "fibre": 0,
+   "sodium": 2,
+   "satFat": 0.002,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "beverages-cranberry-apple-juice-drink-bottled",
+  "fdcId": 174140,
+  "name": "Beverages, cranberry-apple juice drink, bottled",
+  "category": "Beverages",
+  "usdaName": "Beverages, cranberry-apple juice drink, bottled",
+  "per100g": {
+   "protein": 0,
+   "fat": 0.11,
+   "carbs": 15.85,
+   "kcal": 63,
+   "fibre": 0,
+   "sodium": 2,
+   "satFat": 0.013,
+   "sugars": 14.5
+  }
+ },
+ {
+  "id": "beverages-cranberry-apple-juice-drink-low-calorie-with-vitam",
+  "fdcId": 168123,
+  "name": "Beverages, cranberry-apple juice drink, low calorie, with vitamin C ad",
+  "category": "Beverages",
+  "usdaName": "Beverages, cranberry-apple juice drink, low calorie, with vitamin C added",
+  "per100g": {
+   "protein": 0.1,
+   "fat": 0,
+   "carbs": 4.7,
+   "kcal": 19,
+   "fibre": 0.1,
+   "sodium": 5,
+   "satFat": 0,
+   "sugars": 4.6
+  }
+ },
+ {
+  "id": "beverages-motts-apple-juice-light-fortified-with-vitamin-c",
+  "fdcId": 174857,
+  "name": "Beverages, MOTTS, Apple juice light, fortified with vitamin C",
+  "category": "Beverages",
+  "usdaName": "Beverages, MOTTS, Apple juice light, fortified with vitamin C",
+  "per100g": {
+   "protein": 0,
+   "fat": 0.1,
+   "carbs": 5.1,
+   "kcal": 22,
+   "fibre": 0,
+   "sodium": 13,
+   "satFat": 0,
+   "sugars": 4.8
+  }
+ },
+ {
+  "id": "beverages-ocean-spray-cranberry-apple-juice-drink-bottled",
+  "fdcId": 171895,
+  "name": "Beverages, OCEAN SPRAY, Cranberry-Apple Juice Drink, bottled",
+  "category": "Beverages",
+  "usdaName": "Beverages, OCEAN SPRAY, Cranberry-Apple Juice Drink, bottled",
+  "per100g": {
+   "protein": 0.29,
+   "fat": 0,
+   "carbs": 13.68,
+   "kcal": 56,
+   "fibre": 0.6,
+   "sodium": 19,
+   "satFat": 0.001,
+   "sugars": 13.12
+  }
+ },
+ {
+  "id": "beverages-orange-juice-drink",
+  "fdcId": 169044,
+  "name": "Beverages, Orange juice drink",
+  "category": "Beverages",
+  "usdaName": "Beverages, Orange juice drink",
+  "per100g": {
+   "protein": 0.2,
+   "fat": 0,
+   "carbs": 13.41,
+   "kcal": 54,
+   "fibre": 0.2,
+   "sodium": 2,
+   "satFat": 0,
+   "sugars": 9.36
+  }
+ },
+ {
+  "id": "beverages-orange-juice-light-no-pulp",
+  "fdcId": 173178,
+  "name": "Beverages, Orange juice, light, No pulp",
+  "category": "Beverages",
+  "usdaName": "Beverages, Orange juice, light, No pulp",
+  "per100g": {
+   "protein": 0.21,
+   "fat": 0,
+   "carbs": 5.42,
+   "kcal": 21,
+   "fibre": 0,
+   "sodium": 4,
+   "satFat": 0,
+   "sugars": 4.17
+  }
+ },
+ {
+  "id": "beverages-pineapple-and-orange-juice-drink-canned",
+  "fdcId": 173225,
+  "name": "Beverages, pineapple and orange juice drink, canned",
+  "category": "Beverages",
+  "usdaName": "Beverages, pineapple and orange juice drink, canned",
+  "per100g": {
+   "protein": 1.3,
+   "fat": 0,
+   "carbs": 11.8,
+   "kcal": 50,
+   "fibre": 0.1,
+   "sodium": 3,
+   "satFat": 0,
+   "sugars": 11.59
+  }
+ },
+ {
+  "id": "beverages-zevia-cola",
+  "fdcId": 174825,
+  "name": "Beverages, ZEVIA, cola",
+  "category": "Beverages",
+  "usdaName": "Beverages, ZEVIA, cola",
+  "per100g": {
+   "protein": 0,
+   "fat": 0,
+   "carbs": 1.13,
+   "kcal": 0,
+   "fibre": 0,
+   "sodium": 6,
+   "satFat": 0,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "beverages-zevia-cola-caffeine-free",
+  "fdcId": 174826,
+  "name": "Beverages, ZEVIA, cola, caffeine free",
+  "category": "Beverages",
+  "usdaName": "Beverages, ZEVIA, cola, caffeine free",
+  "per100g": {
+   "protein": 0,
+   "fat": 0,
+   "carbs": 1.13,
+   "kcal": 0,
+   "fibre": 0,
+   "sodium": 6,
+   "satFat": 0,
+   "sugars": 0
   }
  },
  {
@@ -425,6 +1564,108 @@
   }
  },
  {
+  "id": "burger-king-cheeseburger",
+  "fdcId": 170329,
+  "name": "BURGER KING, Cheeseburger",
+  "category": "Prepared",
+  "usdaName": "BURGER KING, Cheeseburger",
+  "per100g": {
+   "protein": 14.57,
+   "fat": 14.81,
+   "carbs": 23.71,
+   "kcal": 286,
+   "fibre": 1,
+   "sodium": 602,
+   "satFat": 6.842,
+   "sugars": 4.49
+  }
+ },
+ {
+  "id": "burger-king-double-cheeseburger",
+  "fdcId": 170374,
+  "name": "BURGER KING, Double Cheeseburger",
+  "category": "Prepared",
+  "usdaName": "BURGER KING, Double Cheeseburger",
+  "per100g": {
+   "protein": 16.83,
+   "fat": 16.13,
+   "carbs": 17.43,
+   "kcal": 282,
+   "fibre": null,
+   "sodium": 562,
+   "satFat": 6.922,
+   "sugars": 4.17
+  }
+ },
+ {
+  "id": "burger-king-french-fries",
+  "fdcId": 170327,
+  "name": "BURGER KING, french fries",
+  "category": "Prepared",
+  "usdaName": "BURGER KING, french fries",
+  "per100g": {
+   "protein": 3.23,
+   "fat": 12.48,
+   "carbs": 38.7,
+   "kcal": 280,
+   "fibre": 2.9,
+   "sodium": 279,
+   "satFat": 2.137,
+   "sugars": 0.51
+  }
+ },
+ {
+  "id": "burger-king-hamburger",
+  "fdcId": 170328,
+  "name": "BURGER KING, Hamburger",
+  "category": "Prepared",
+  "usdaName": "BURGER KING, Hamburger",
+  "per100g": {
+   "protein": 14.85,
+   "fat": 10.55,
+   "carbs": 26.76,
+   "kcal": 261,
+   "fibre": 1,
+   "sodium": 461,
+   "satFat": 3.821,
+   "sugars": 5.6
+  }
+ },
+ {
+  "id": "burger-king-original-chicken-sandwich",
+  "fdcId": 170331,
+  "name": "BURGER KING, Original Chicken Sandwich",
+  "category": "Prepared",
+  "usdaName": "BURGER KING, Original Chicken Sandwich",
+  "per100g": {
+   "protein": 12.14,
+   "fat": 14.69,
+   "carbs": 26.22,
+   "kcal": 286,
+   "fibre": 2.4,
+   "sodium": 638,
+   "satFat": 2.723,
+   "sugars": 3.02
+  }
+ },
+ {
+  "id": "burger-king-premium-fish-sandwich",
+  "fdcId": 170330,
+  "name": "BURGER KING, Premium Fish Sandwich",
+  "category": "Prepared",
+  "usdaName": "BURGER KING, Premium Fish Sandwich",
+  "per100g": {
+   "protein": 10.29,
+   "fat": 12.45,
+   "carbs": 26.69,
+   "kcal": 260,
+   "fibre": 0.9,
+   "sodium": 602,
+   "satFat": 1.949,
+   "sugars": 3.53
+  }
+ },
+ {
   "id": "butter-unsalted",
   "fdcId": 173430,
   "name": "Butter, unsalted",
@@ -473,6 +1714,23 @@
    "sodium": 18,
    "satFat": 0.034,
    "sugars": 3.2
+  }
+ },
+ {
+  "id": "candies-reese-s-fast-break-milk-chocolate-peanut-butter-soft",
+  "fdcId": 170669,
+  "name": "Candies, REESE's Fast Break, milk chocolate, peanut butter, soft nouga",
+  "category": "Beverages",
+  "usdaName": "Candies, REESE's Fast Break, milk chocolate, peanut butter, soft nougats, candy bar",
+  "per100g": {
+   "protein": 8.93,
+   "fat": 23.21,
+   "carbs": 63.9,
+   "kcal": 495,
+   "fibre": 3.6,
+   "sodium": 321,
+   "satFat": 8.036,
+   "sugars": 53.57
   }
  },
  {
@@ -816,6 +2074,23 @@
   }
  },
  {
+  "id": "cookies-chocolate-chip-commercially-prepared-soft-type",
+  "fdcId": 172717,
+  "name": "Cookies, chocolate chip, commercially prepared, soft-type",
+  "category": "Beverages",
+  "usdaName": "Cookies, chocolate chip, commercially prepared, soft-type",
+  "per100g": {
+   "protein": 3.63,
+   "fat": 19.77,
+   "carbs": 65.75,
+   "kcal": 444,
+   "fibre": 1.8,
+   "sodium": 276,
+   "satFat": 9.751,
+   "sugars": 37.1
+  }
+ },
+ {
   "id": "corn-tortilla",
   "fdcId": 175036,
   "name": "Corn tortilla",
@@ -1037,6 +2312,329 @@
   }
  },
  {
+  "id": "denny-s-french-fries",
+  "fdcId": 167672,
+  "name": "DENNY'S, french fries",
+  "category": "Prepared",
+  "usdaName": "DENNY'S, french fries",
+  "per100g": {
+   "protein": 3.41,
+   "fat": 14.13,
+   "carbs": 35.2,
+   "kcal": 282,
+   "fibre": 3.5,
+   "sodium": 44,
+   "satFat": 2.534,
+   "sugars": 0.85
+  }
+ },
+ {
+  "id": "digiorno-pizza-cheese-topping-cheese-stuffed-crust-frozen-ba",
+  "fdcId": 170361,
+  "name": "DIGIORNO Pizza, cheese topping, cheese stuffed crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, cheese topping, cheese stuffed crust, frozen, baked",
+  "per100g": {
+   "protein": 13.48,
+   "fat": 11.68,
+   "carbs": 29.86,
+   "kcal": 279,
+   "fibre": 1.9,
+   "sodium": 806,
+   "satFat": 5.63,
+   "sugars": null
+  }
+ },
+ {
+  "id": "digiorno-pizza-cheese-topping-rising-crust-frozen-baked",
+  "fdcId": 170362,
+  "name": "DIGIORNO Pizza, cheese topping, rising crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, cheese topping, rising crust, frozen, baked",
+  "per100g": {
+   "protein": 12.8,
+   "fat": 8.6,
+   "carbs": 31.78,
+   "kcal": 256,
+   "fibre": 2.4,
+   "sodium": 696,
+   "satFat": 3.514,
+   "sugars": 5
+  }
+ },
+ {
+  "id": "digiorno-pizza-cheese-topping-thin-crispy-crust-frozen-baked",
+  "fdcId": 170758,
+  "name": "DIGIORNO Pizza, cheese topping, thin crispy crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, cheese topping, thin crispy crust, frozen, baked",
+  "per100g": {
+   "protein": 12.96,
+   "fat": 9.91,
+   "carbs": 26.47,
+   "kcal": 247,
+   "fibre": 3,
+   "sodium": 506,
+   "satFat": 4.601,
+   "sugars": null
+  }
+ },
+ {
+  "id": "digiorno-pizza-pepperoni-topping-cheese-stuffed-crust-frozen",
+  "fdcId": 170759,
+  "name": "DIGIORNO Pizza, pepperoni topping, cheese stuffed crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, pepperoni topping, cheese stuffed crust, frozen, baked",
+  "per100g": {
+   "protein": 13.92,
+   "fat": 11.71,
+   "carbs": 29.46,
+   "kcal": 279,
+   "fibre": 2.1,
+   "sodium": 753,
+   "satFat": 5.007,
+   "sugars": null
+  }
+ },
+ {
+  "id": "digiorno-pizza-pepperoni-topping-rising-crust-frozen-baked",
+  "fdcId": 170760,
+  "name": "DIGIORNO Pizza, pepperoni topping, rising crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, pepperoni topping, rising crust, frozen, baked",
+  "per100g": {
+   "protein": 12.46,
+   "fat": 10.11,
+   "carbs": 31.15,
+   "kcal": 265,
+   "fibre": 2.3,
+   "sodium": 743,
+   "satFat": 3.761,
+   "sugars": 5.1
+  }
+ },
+ {
+  "id": "digiorno-pizza-pepperoni-topping-thin-crispy-crust-frozen-ba",
+  "fdcId": 170761,
+  "name": "DIGIORNO Pizza, pepperoni topping, thin crispy crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, pepperoni topping, thin crispy crust, frozen, baked",
+  "per100g": {
+   "protein": 13.22,
+   "fat": 12.86,
+   "carbs": 28.67,
+   "kcal": 283,
+   "fibre": 2.8,
+   "sodium": 663,
+   "satFat": 4.973,
+   "sugars": null
+  }
+ },
+ {
+  "id": "digiorno-pizza-supreme-topping-rising-crust-frozen-baked",
+  "fdcId": 170363,
+  "name": "DIGIORNO Pizza, supreme topping, rising crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, supreme topping, rising crust, frozen, baked",
+  "per100g": {
+   "protein": 11.74,
+   "fat": 10.68,
+   "carbs": 27.93,
+   "kcal": 255,
+   "fibre": 2.3,
+   "sodium": 712,
+   "satFat": 3.965,
+   "sugars": 4.71
+  }
+ },
+ {
+  "id": "digiorno-pizza-supreme-topping-thin-crispy-crust-frozen-bake",
+  "fdcId": 170364,
+  "name": "DIGIORNO Pizza, supreme topping, thin crispy crust, frozen, baked",
+  "category": "Prepared",
+  "usdaName": "DIGIORNO Pizza, supreme topping, thin crispy crust, frozen, baked",
+  "per100g": {
+   "protein": 11.41,
+   "fat": 10.8,
+   "carbs": 28.05,
+   "kcal": 255,
+   "fibre": 2.8,
+   "sodium": 555,
+   "satFat": 4.377,
+   "sugars": null
+  }
+ },
+ {
+  "id": "domino-s-14-cheese-pizza-classic-hand-tossed-crust",
+  "fdcId": 173282,
+  "name": "DOMINO'S 14 Cheese Pizza, Classic Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Cheese Pizza, Classic Hand-Tossed Crust",
+  "per100g": {
+   "protein": 10.8,
+   "fat": 8.97,
+   "carbs": 33.24,
+   "kcal": 257,
+   "fibre": 2.2,
+   "sodium": 523,
+   "satFat": 4.11,
+   "sugars": 4.02
+  }
+ },
+ {
+  "id": "domino-s-14-cheese-pizza-crunchy-thin-crust",
+  "fdcId": 172043,
+  "name": "DOMINO'S 14 Cheese Pizza, Crunchy Thin Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Cheese Pizza, Crunchy Thin Crust",
+  "per100g": {
+   "protein": 12.33,
+   "fat": 15.1,
+   "carbs": 28.18,
+   "kcal": 298,
+   "fibre": 2.5,
+   "sodium": 628,
+   "satFat": 6.345,
+   "sugars": 4.09
+  }
+ },
+ {
+  "id": "domino-s-14-cheese-pizza-ultimate-deep-dish-crust",
+  "fdcId": 173283,
+  "name": "DOMINO'S 14 Cheese Pizza, Ultimate Deep Dish Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Cheese Pizza, Ultimate Deep Dish Crust",
+  "per100g": {
+   "protein": 10.76,
+   "fat": 9.83,
+   "carbs": 33.48,
+   "kcal": 265,
+   "fibre": 2.4,
+   "sodium": 615,
+   "satFat": 4.062,
+   "sugars": 4.22
+  }
+ },
+ {
+  "id": "domino-s-14-extravaganzza-feast-pizza-classic-hand-tossed-cr",
+  "fdcId": 172046,
+  "name": "DOMINO'S 14 EXTRAVAGANZZA FEAST Pizza, Classic Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 EXTRAVAGANZZA FEAST Pizza, Classic Hand-Tossed Crust",
+  "per100g": {
+   "protein": 10.33,
+   "fat": 11.1,
+   "carbs": 25.72,
+   "kcal": 244,
+   "fibre": 2,
+   "sodium": 456,
+   "satFat": 4.386,
+   "sugars": 3.3
+  }
+ },
+ {
+  "id": "domino-s-14-pepperoni-pizza-classic-hand-tossed-crust",
+  "fdcId": 172044,
+  "name": "DOMINO'S 14 Pepperoni Pizza, Classic Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Pepperoni Pizza, Classic Hand-Tossed Crust",
+  "per100g": {
+   "protein": 11.25,
+   "fat": 11.18,
+   "carbs": 31.86,
+   "kcal": 273,
+   "fibre": 2.1,
+   "sodium": 611,
+   "satFat": 4.779,
+   "sugars": 3.69
+  }
+ },
+ {
+  "id": "domino-s-14-pepperoni-pizza-crunchy-thin-crust",
+  "fdcId": 170370,
+  "name": "DOMINO'S 14 Pepperoni Pizza, Crunchy Thin Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Pepperoni Pizza, Crunchy Thin Crust",
+  "per100g": {
+   "protein": 13.88,
+   "fat": 19.05,
+   "carbs": 25.35,
+   "kcal": 328,
+   "fibre": 2.6,
+   "sodium": 783,
+   "satFat": 7.557,
+   "sugars": 3.65
+  }
+ },
+ {
+  "id": "domino-s-14-pepperoni-pizza-ultimate-deep-dish-crust",
+  "fdcId": 172045,
+  "name": "DOMINO'S 14 Pepperoni Pizza, Ultimate Deep Dish Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Pepperoni Pizza, Ultimate Deep Dish Crust",
+  "per100g": {
+   "protein": 11.52,
+   "fat": 12.1,
+   "carbs": 31.89,
+   "kcal": 283,
+   "fibre": 2.4,
+   "sodium": 693,
+   "satFat": 4.856,
+   "sugars": 3.91
+  }
+ },
+ {
+  "id": "domino-s-14-sausage-pizza-classic-hand-tossed-crust",
+  "fdcId": 170766,
+  "name": "DOMINO'S 14 Sausage Pizza, Classic Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Sausage Pizza, Classic Hand-Tossed Crust",
+  "per100g": {
+   "protein": 11.08,
+   "fat": 11.2,
+   "carbs": 31.84,
+   "kcal": 273,
+   "fibre": 2.4,
+   "sodium": 594,
+   "satFat": 4.607,
+   "sugars": 3.92
+  }
+ },
+ {
+  "id": "domino-s-14-sausage-pizza-crunchy-thin-crust",
+  "fdcId": 170371,
+  "name": "DOMINO'S 14 Sausage Pizza, Crunchy Thin Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Sausage Pizza, Crunchy Thin Crust",
+  "per100g": {
+   "protein": 12.77,
+   "fat": 18.52,
+   "carbs": 25.3,
+   "kcal": 319,
+   "fibre": 2.6,
+   "sodium": 725,
+   "satFat": 7.079,
+   "sugars": 3.42
+  }
+ },
+ {
+  "id": "domino-s-14-sausage-pizza-ultimate-deep-dish-crust",
+  "fdcId": 170767,
+  "name": "DOMINO'S 14 Sausage Pizza, Ultimate Deep Dish Crust",
+  "category": "Prepared",
+  "usdaName": "DOMINO'S 14 Sausage Pizza, Ultimate Deep Dish Crust",
+  "per100g": {
+   "protein": 11.03,
+   "fat": 12.03,
+   "carbs": 31.17,
+   "kcal": 277,
+   "fibre": 2.6,
+   "sodium": 677,
+   "satFat": 4.755,
+   "sugars": 3.82
+  }
+ },
+ {
   "id": "dried-apricots",
   "fdcId": 173941,
   "name": "Dried apricots",
@@ -1173,6 +2771,516 @@
   }
  },
  {
+  "id": "fast-food-pizza-chain-14-pizza-cheese-topping-regular-crust",
+  "fdcId": 173292,
+  "name": "Fast Food, Pizza Chain, 14 pizza, cheese topping, regular crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, cheese topping, regular crust",
+  "per100g": {
+   "protein": 11.39,
+   "fat": 9.69,
+   "carbs": 33.33,
+   "kcal": 266,
+   "fibre": 2.3,
+   "sodium": 598,
+   "satFat": 4.465,
+   "sugars": 3.58
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-cheese-topping-stuffed-crust",
+  "fdcId": 170773,
+  "name": "Fast Food, Pizza Chain, 14 pizza, cheese topping, stuffed crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, cheese topping, stuffed crust",
+  "per100g": {
+   "protein": 12.23,
+   "fat": 11.63,
+   "carbs": 30,
+   "kcal": 274,
+   "fibre": 1.7,
+   "sodium": 615,
+   "satFat": 5.825,
+   "sugars": 2.9
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-cheese-topping-thick-crust",
+  "fdcId": 173293,
+  "name": "Fast Food, Pizza Chain, 14 pizza, cheese topping, thick crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, cheese topping, thick crust",
+  "per100g": {
+   "protein": 10.81,
+   "fat": 10.54,
+   "carbs": 33.17,
+   "kcal": 271,
+   "fibre": 2.2,
+   "sodium": 597,
+   "satFat": 4.226,
+   "sugars": 3.34
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-cheese-topping-thin-crust",
+  "fdcId": 173294,
+  "name": "Fast Food, Pizza Chain, 14 pizza, cheese topping, thin crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, cheese topping, thin crust",
+  "per100g": {
+   "protein": 12.85,
+   "fat": 13.95,
+   "carbs": 31.2,
+   "kcal": 302,
+   "fibre": 2.5,
+   "sodium": 742,
+   "satFat": 6.224,
+   "sugars": 3.61
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-meat-and-vegetable-topping-re",
+  "fdcId": 172055,
+  "name": "Fast Food, Pizza Chain, 14 pizza, meat and vegetable topping, regular ",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, meat and vegetable topping, regular crust",
+  "per100g": {
+   "protein": 11.02,
+   "fat": 10.9,
+   "carbs": 25.38,
+   "kcal": 244,
+   "fibre": 2.2,
+   "sodium": 589,
+   "satFat": 4.407,
+   "sugars": 3.73
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-pepperoni-topping-regular-cru",
+  "fdcId": 173295,
+  "name": "Fast Food, Pizza Chain, 14 pizza, pepperoni topping, regular crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, pepperoni topping, regular crust",
+  "per100g": {
+   "protein": 11.74,
+   "fat": 11.91,
+   "carbs": 31.98,
+   "kcal": 282,
+   "fibre": 2.3,
+   "sodium": 685,
+   "satFat": 5.092,
+   "sugars": 3.26
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-pepperoni-topping-thick-crust",
+  "fdcId": 173296,
+  "name": "Fast Food, Pizza Chain, 14 pizza, pepperoni topping, thick crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, pepperoni topping, thick crust",
+  "per100g": {
+   "protein": 11.49,
+   "fat": 12.58,
+   "carbs": 31.84,
+   "kcal": 287,
+   "fibre": 2.2,
+   "sodium": 684,
+   "satFat": 4.839,
+   "sugars": 2.93
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-pepperoni-topping-thin-crust",
+  "fdcId": 170762,
+  "name": "Fast Food, Pizza Chain, 14 pizza, pepperoni topping, thin crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, pepperoni topping, thin crust",
+  "per100g": {
+   "protein": 14.01,
+   "fat": 17.61,
+   "carbs": 29,
+   "kcal": 331,
+   "fibre": 2.3,
+   "sodium": 875,
+   "satFat": 7.115,
+   "sugars": 3.22
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-sausage-topping-regular-crust",
+  "fdcId": 170367,
+  "name": "Fast Food, Pizza Chain, 14 pizza, sausage topping, regular crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, sausage topping, regular crust",
+  "per100g": {
+   "protein": 11.5,
+   "fat": 12.35,
+   "carbs": 30.62,
+   "kcal": 280,
+   "fibre": 2.3,
+   "sodium": 633,
+   "satFat": 5.033,
+   "sugars": 3.32
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-sausage-topping-thick-crust",
+  "fdcId": 170365,
+  "name": "Fast Food, Pizza Chain, 14 pizza, sausage topping, thick crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, sausage topping, thick crust",
+  "per100g": {
+   "protein": 11.06,
+   "fat": 12.94,
+   "carbs": 30.36,
+   "kcal": 282,
+   "fibre": 2.3,
+   "sodium": 637,
+   "satFat": 4.805,
+   "sugars": 2.82
+  }
+ },
+ {
+  "id": "fast-food-pizza-chain-14-pizza-sausage-topping-thin-crust",
+  "fdcId": 170366,
+  "name": "Fast Food, Pizza Chain, 14 pizza, sausage topping, thin crust",
+  "category": "Prepared",
+  "usdaName": "Fast Food, Pizza Chain, 14 pizza, sausage topping, thin crust",
+  "per100g": {
+   "protein": 13.36,
+   "fat": 17.71,
+   "carbs": 27,
+   "kcal": 321,
+   "fibre": 2.5,
+   "sodium": 782,
+   "satFat": 6.888,
+   "sugars": 3.02
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-double-regular-patty-and-bun-with-co",
+  "fdcId": 170293,
+  "name": "Fast foods, cheeseburger, double, regular patty and bun, with condimen",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger, double, regular patty and bun, with condiments",
+  "per100g": {
+   "protein": 16.24,
+   "fat": 16.18,
+   "carbs": 17.97,
+   "kcal": 282,
+   "fibre": 1,
+   "sodium": 617,
+   "satFat": 6.96,
+   "sugars": 4.16
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-double-large-patty-with-condiments",
+  "fdcId": 173320,
+  "name": "Fast foods, cheeseburger; double, large patty; with condiments",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; double, large patty; with condiments",
+  "per100g": {
+   "protein": 16.96,
+   "fat": 16.22,
+   "carbs": 14.43,
+   "kcal": 272,
+   "fibre": 1,
+   "sodium": 480,
+   "satFat": 6.473,
+   "sugars": 3.49
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-double-large-patty-with-condiments-v",
+  "fdcId": 172083,
+  "name": "Fast Foods, cheeseburger; double, large patty; with condiments, vegeta",
+  "category": "Prepared",
+  "usdaName": "Fast Foods, cheeseburger; double, large patty; with condiments, vegetables and mayonnaise",
+  "per100g": {
+   "protein": 15.5,
+   "fat": 15.63,
+   "carbs": 12.62,
+   "kcal": 253,
+   "fibre": 1.3,
+   "sodium": 405,
+   "satFat": 6.519,
+   "sugars": 3.61
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-double-regular-patty-double-decker-b",
+  "fdcId": 172084,
+  "name": "Fast foods, cheeseburger; double, regular patty; double decker bun wit",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; double, regular patty; double decker bun with condiments and special sauce",
+  "per100g": {
+   "protein": 11.94,
+   "fat": 14.1,
+   "carbs": 21.53,
+   "kcal": 261,
+   "fibre": 1.4,
+   "sodium": 485,
+   "satFat": 5.045,
+   "sugars": 3.26
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-double-regular-patty-with-condiments",
+  "fdcId": 173319,
+  "name": "Fast foods, cheeseburger; double, regular patty; with condiments",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; double, regular patty; with condiments",
+  "per100g": {
+   "protein": 16.24,
+   "fat": 16.18,
+   "carbs": 17.97,
+   "kcal": 282,
+   "fibre": 0.9,
+   "sodium": 617,
+   "satFat": 6.96,
+   "sugars": 4.16
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-single-large-patty-plain",
+  "fdcId": 170294,
+  "name": "Fast foods, cheeseburger; single, large patty; plain",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; single, large patty; plain",
+  "per100g": {
+   "protein": 17.29,
+   "fat": 15.97,
+   "carbs": 24.07,
+   "kcal": 310,
+   "fibre": 1.7,
+   "sodium": 481,
+   "satFat": 6.873,
+   "sugars": 4.67
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-single-large-patty-with-condiments",
+  "fdcId": 172082,
+  "name": "Fast foods, cheeseburger; single, large patty; with condiments",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; single, large patty; with condiments",
+  "per100g": {
+   "protein": 15.21,
+   "fat": 14.4,
+   "carbs": 19.72,
+   "kcal": 269,
+   "fibre": 1.2,
+   "sodium": 591,
+   "satFat": 7.033,
+   "sugars": 3.6
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-single-large-patty-with-condiments-v",
+  "fdcId": 172081,
+  "name": "Fast foods, cheeseburger; single, large patty; with condiments, vegeta",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; single, large patty; with condiments, vegetables and mayonnaise",
+  "per100g": {
+   "protein": 13.69,
+   "fat": 15.8,
+   "carbs": 17.73,
+   "kcal": 268,
+   "fibre": 1.1,
+   "sodium": 473,
+   "satFat": 5.746,
+   "sugars": 4.5
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-single-regular-patty-with-condiments",
+  "fdcId": 170691,
+  "name": "Fast foods, cheeseburger; single, regular patty, with condiments",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; single, regular patty, with condiments",
+  "per100g": {
+   "protein": 13.49,
+   "fat": 12.9,
+   "carbs": 25.46,
+   "kcal": 270,
+   "fibre": 1.9,
+   "sodium": 628,
+   "satFat": 5.797,
+   "sugars": 5.24
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-single-regular-patty-with-condiments-170692",
+  "fdcId": 170692,
+  "name": "Fast foods, cheeseburger; single, regular patty, with condiments and v",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; single, regular patty, with condiments and vegetables",
+  "per100g": {
+   "protein": 13.06,
+   "fat": 11.5,
+   "carbs": 24.97,
+   "kcal": 254,
+   "fibre": 1.4,
+   "sodium": 546,
+   "satFat": 5.181,
+   "sugars": 5.11
+  }
+ },
+ {
+  "id": "fast-foods-cheeseburger-single-regular-patty-plain",
+  "fdcId": 170690,
+  "name": "Fast foods, cheeseburger; single, regular patty; plain",
+  "category": "Prepared",
+  "usdaName": "Fast foods, cheeseburger; single, regular patty; plain",
+  "per100g": {
+   "protein": 16.51,
+   "fat": 14.72,
+   "carbs": 28.03,
+   "kcal": 308,
+   "fibre": 2,
+   "sodium": 515,
+   "satFat": 6.473,
+   "sugars": 4.88
+  }
+ },
+ {
+  "id": "fast-foods-hamburger-large-single-patty-with-condiments",
+  "fdcId": 170710,
+  "name": "Fast foods, hamburger, large, single patty, with condiments",
+  "category": "Prepared",
+  "usdaName": "Fast foods, hamburger, large, single patty, with condiments",
+  "per100g": {
+   "protein": 15.68,
+   "fat": 11.6,
+   "carbs": 22.14,
+   "kcal": 256,
+   "fibre": 1.1,
+   "sodium": 374,
+   "satFat": 4.785,
+   "sugars": 3.67
+  }
+ },
+ {
+  "id": "fast-foods-hamburger-double-large-patty-with-condiments-vege",
+  "fdcId": 172080,
+  "name": "Fast foods, hamburger; double, large patty; with condiments, vegetable",
+  "category": "Prepared",
+  "usdaName": "Fast foods, hamburger; double, large patty; with condiments, vegetables and mayonnaise",
+  "per100g": {
+   "protein": 13.94,
+   "fat": 15.66,
+   "carbs": 13.74,
+   "kcal": 252,
+   "fibre": 1.4,
+   "sodium": 289,
+   "satFat": 5.773,
+   "sugars": 3.52
+  }
+ },
+ {
+  "id": "fast-foods-hamburger-single-large-patty-with-condiments-vege",
+  "fdcId": 173317,
+  "name": "Fast foods, hamburger; single, large patty; with condiments, vegetable",
+  "category": "Prepared",
+  "usdaName": "Fast foods, hamburger; single, large patty; with condiments, vegetables and mayonnaise",
+  "per100g": {
+   "protein": 11.34,
+   "fat": 12.37,
+   "carbs": 17.33,
+   "kcal": 226,
+   "fibre": 1.5,
+   "sodium": 342,
+   "satFat": 3.972,
+   "sugars": 4
+  }
+ },
+ {
+  "id": "fast-foods-hamburger-single-regular-patty-double-decker-bun-",
+  "fdcId": 173318,
+  "name": "Fast foods, hamburger; single, regular patty; double decker bun with c",
+  "category": "Prepared",
+  "usdaName": "Fast foods, hamburger; single, regular patty; double decker bun with condiments and special sauce",
+  "per100g": {
+   "protein": 12.17,
+   "fat": 13.3,
+   "carbs": 22.69,
+   "kcal": 259,
+   "fibre": 1.4,
+   "sodium": 386,
+   "satFat": 4.24,
+   "sugars": null
+  }
+ },
+ {
+  "id": "fast-foods-hamburger-single-regular-patty-plain",
+  "fdcId": 170693,
+  "name": "Fast foods, hamburger; single, regular patty; plain",
+  "category": "Prepared",
+  "usdaName": "Fast foods, hamburger; single, regular patty; plain",
+  "per100g": {
+   "protein": 16.52,
+   "fat": 12.01,
+   "carbs": 31.5,
+   "kcal": 297,
+   "fibre": 1.7,
+   "sodium": 331,
+   "satFat": 4.493,
+   "sugars": 4.88
+  }
+ },
+ {
+  "id": "fast-foods-hamburger-single-regular-patty-with-condiments",
+  "fdcId": 170694,
+  "name": "Fast foods, hamburger; single, regular patty; with condiments",
+  "category": "Prepared",
+  "usdaName": "Fast foods, hamburger; single, regular patty; with condiments",
+  "per100g": {
+   "protein": 13.3,
+   "fat": 10.18,
+   "carbs": 29.57,
+   "kcal": 263,
+   "fibre": 1.8,
+   "sodium": 487,
+   "satFat": 3.567,
+   "sugars": 5.95
+  }
+ },
+ {
+  "id": "fast-foods-vanilla-light-soft-serve-ice-cream-with-cone",
+  "fdcId": 173274,
+  "name": "Fast foods, vanilla, light, soft-serve ice cream, with cone",
+  "category": "Sweets",
+  "usdaName": "Fast foods, vanilla, light, soft-serve ice cream, with cone",
+  "per100g": {
+   "protein": 4.24,
+   "fat": 4.86,
+   "carbs": 26.36,
+   "kcal": 163,
+   "fibre": 0.1,
+   "sodium": 81,
+   "satFat": 2.542,
+   "sugars": 19.49
+  }
+ },
+ {
+  "id": "fat-free-ice-cream-no-sugar-added-flavors-other-than-chocola",
+  "fdcId": 173467,
+  "name": "Fat free ice cream, no sugar added, flavors other than chocolate",
+  "category": "Sweets",
+  "usdaName": "Fat free ice cream, no sugar added, flavors other than chocolate",
+  "per100g": {
+   "protein": 4.41,
+   "fat": 0,
+   "carbs": 28.86,
+   "kcal": 133,
+   "fibre": 7.4,
+   "sodium": 110,
+   "satFat": 0,
+   "sugars": 8.82
+  }
+ },
+ {
   "id": "fennel-raw",
   "fdcId": 169385,
   "name": "Fennel, raw",
@@ -1255,6 +3363,74 @@
    "sodium": 742,
    "satFat": 1.225,
    "sugars": 2.66
+  }
+ },
+ {
+  "id": "frozen-novelties-ice-cream-type-chocolate-or-caramel-covered",
+  "fdcId": 168130,
+  "name": "Frozen novelties, ice cream type, chocolate or caramel covered, with n",
+  "category": "Sweets",
+  "usdaName": "Frozen novelties, ice cream type, chocolate or caramel covered, with nuts",
+  "per100g": {
+   "protein": 4.4,
+   "fat": 20.2,
+   "carbs": 30.9,
+   "kcal": 323,
+   "fibre": 0.6,
+   "sodium": 92,
+   "satFat": 12.658,
+   "sugars": 30
+  }
+ },
+ {
+  "id": "frozen-novelties-ice-cream-type-sundae-prepackaged",
+  "fdcId": 169900,
+  "name": "Frozen novelties, ice cream type, sundae, prepackaged",
+  "category": "Sweets",
+  "usdaName": "Frozen novelties, ice cream type, sundae, prepackaged",
+  "per100g": {
+   "protein": 4.3,
+   "fat": 6,
+   "carbs": 29.64,
+   "kcal": 190,
+   "fibre": 0.3,
+   "sodium": 95,
+   "satFat": 3.09,
+   "sugars": 20.74
+  }
+ },
+ {
+  "id": "frozen-novelties-ice-cream-type-vanilla-ice-cream-light-no-s",
+  "fdcId": 167683,
+  "name": "Frozen novelties, ice cream type, vanilla ice cream, light, no sugar a",
+  "category": "Sweets",
+  "usdaName": "Frozen novelties, ice cream type, vanilla ice cream, light, no sugar added, chocolate coated",
+  "per100g": {
+   "protein": 6.4,
+   "fat": 10.1,
+   "carbs": 26.11,
+   "kcal": 221,
+   "fibre": 0.8,
+   "sodium": 104,
+   "satFat": 5.528,
+   "sugars": 8.52
+  }
+ },
+ {
+  "id": "frozen-yogurts-chocolate-soft-serve",
+  "fdcId": 168848,
+  "name": "Frozen yogurts, chocolate, soft-serve",
+  "category": "Beverages",
+  "usdaName": "Frozen yogurts, chocolate, soft-serve",
+  "per100g": {
+   "protein": 4,
+   "fat": 6,
+   "carbs": 24.9,
+   "kcal": 160,
+   "fibre": 2.2,
+   "sodium": 98,
+   "satFat": 3.63,
+   "sugars": null
   }
  },
  {
@@ -1615,6 +3791,244 @@
   }
  },
  {
+  "id": "ice-cream-bar-covered-with-chocolate-and-nuts",
+  "fdcId": 171305,
+  "name": "Ice cream bar, covered with chocolate and nuts",
+  "category": "Sweets",
+  "usdaName": "Ice cream bar, covered with chocolate and nuts",
+  "per100g": {
+   "protein": 5.62,
+   "fat": 25.84,
+   "carbs": 11.89,
+   "kcal": 303,
+   "fibre": 1.1,
+   "sodium": 56,
+   "satFat": 15.904,
+   "sugars": 10.8
+  }
+ },
+ {
+  "id": "ice-cream-bar-stick-or-nugget-with-crunch-coating",
+  "fdcId": 171294,
+  "name": "Ice cream bar, stick or nugget, with crunch coating",
+  "category": "Sweets",
+  "usdaName": "Ice cream bar, stick or nugget, with crunch coating",
+  "per100g": {
+   "protein": 2.11,
+   "fat": 25.26,
+   "carbs": 37.12,
+   "kcal": 358,
+   "fibre": 1.1,
+   "sodium": 84,
+   "satFat": 17.895,
+   "sugars": 21.05
+  }
+ },
+ {
+  "id": "ice-cream-cone-chocolate-covered-with-nuts-flavors-other-tha",
+  "fdcId": 172228,
+  "name": "Ice cream cone, chocolate covered, with nuts, flavors other than choco",
+  "category": "Sweets",
+  "usdaName": "Ice cream cone, chocolate covered, with nuts, flavors other than chocolate",
+  "per100g": {
+   "protein": 5.21,
+   "fat": 21.88,
+   "carbs": 34.38,
+   "kcal": 354,
+   "fibre": 1,
+   "sodium": 94,
+   "satFat": 11.458,
+   "sugars": 25
+  }
+ },
+ {
+  "id": "ice-cream-cones-cake-or-wafer-type",
+  "fdcId": 175000,
+  "name": "Ice cream cones, cake or wafer-type",
+  "category": "Sweets",
+  "usdaName": "Ice cream cones, cake or wafer-type",
+  "per100g": {
+   "protein": 8.1,
+   "fat": 6.9,
+   "carbs": 79,
+   "kcal": 417,
+   "fibre": 3,
+   "sodium": 256,
+   "satFat": 1.222,
+   "sugars": 6
+  }
+ },
+ {
+  "id": "ice-cream-cones-sugar-rolled-type",
+  "fdcId": 175001,
+  "name": "Ice cream cones, sugar, rolled-type",
+  "category": "Sweets",
+  "usdaName": "Ice cream cones, sugar, rolled-type",
+  "per100g": {
+   "protein": 7.9,
+   "fat": 3.8,
+   "carbs": 84.1,
+   "kcal": 402,
+   "fibre": 1.7,
+   "sodium": 298,
+   "satFat": 0.573,
+   "sugars": 25.66
+  }
+ },
+ {
+  "id": "ice-cream-cookie-sandwich",
+  "fdcId": 172227,
+  "name": "Ice cream cookie sandwich",
+  "category": "Sweets",
+  "usdaName": "Ice cream cookie sandwich",
+  "per100g": {
+   "protein": 3.7,
+   "fat": 7.4,
+   "carbs": 39.6,
+   "kcal": 240,
+   "fibre": 1.2,
+   "sodium": 162,
+   "satFat": 1.663,
+   "sugars": 21.3
+  }
+ },
+ {
+  "id": "ice-cream-sandwich",
+  "fdcId": 172226,
+  "name": "Ice cream sandwich",
+  "category": "Sweets",
+  "usdaName": "Ice cream sandwich",
+  "per100g": {
+   "protein": 4.29,
+   "fat": 8.57,
+   "carbs": 37.14,
+   "kcal": 237,
+   "fibre": 0,
+   "sodium": 129,
+   "satFat": 2.317,
+   "sugars": 18.57
+  }
+ },
+ {
+  "id": "ice-cream-sandwich-made-with-light-ice-cream-vanilla",
+  "fdcId": 172229,
+  "name": "Ice cream sandwich, made with light ice cream, vanilla",
+  "category": "Sweets",
+  "usdaName": "Ice cream sandwich, made with light ice cream, vanilla",
+  "per100g": {
+   "protein": 4.29,
+   "fat": 3.04,
+   "carbs": 39.64,
+   "kcal": 186,
+   "fibre": 0,
+   "sodium": 146,
+   "satFat": 0.821,
+   "sugars": 17.86
+  }
+ },
+ {
+  "id": "ice-cream-sandwich-vanilla-light-no-sugar-added",
+  "fdcId": 172230,
+  "name": "Ice cream sandwich, vanilla, light, no sugar added",
+  "category": "Sweets",
+  "usdaName": "Ice cream sandwich, vanilla, light, no sugar added",
+  "per100g": {
+   "protein": 5.71,
+   "fat": 2.86,
+   "carbs": 42.86,
+   "kcal": 200,
+   "fibre": 7.1,
+   "sodium": 164,
+   "satFat": 0.821,
+   "sugars": 6.58
+  }
+ },
+ {
+  "id": "ice-cream-sundae-cone",
+  "fdcId": 171306,
+  "name": "Ice cream sundae cone",
+  "category": "Sweets",
+  "usdaName": "Ice cream sundae cone",
+  "per100g": {
+   "protein": 3,
+   "fat": 14,
+   "carbs": 28.89,
+   "kcal": 254,
+   "fibre": 1,
+   "sodium": 115,
+   "satFat": 2.717,
+   "sugars": 21.26
+  }
+ },
+ {
+  "id": "ice-cream-bar-or-stick-chocolate-covered",
+  "fdcId": 173466,
+  "name": "Ice cream, bar or stick, chocolate covered",
+  "category": "Sweets",
+  "usdaName": "Ice cream, bar or stick, chocolate covered",
+  "per100g": {
+   "protein": 4.1,
+   "fat": 24.1,
+   "carbs": 24.5,
+   "kcal": 331,
+   "fibre": 0.8,
+   "sodium": 68,
+   "satFat": 13.202,
+   "sugars": 18.3
+  }
+ },
+ {
+  "id": "ice-cream-light-soft-serve-chocolate",
+  "fdcId": 171293,
+  "name": "Ice cream, light, soft serve, chocolate",
+  "category": "Sweets",
+  "usdaName": "Ice cream, light, soft serve, chocolate",
+  "per100g": {
+   "protein": 3.36,
+   "fat": 3.69,
+   "carbs": 23.15,
+   "kcal": 141,
+   "fibre": 0,
+   "sodium": 64,
+   "satFat": 2.349,
+   "sugars": 19.46
+  }
+ },
+ {
+  "id": "ice-cream-lowfat-no-sugar-added-cone-added-peanuts-and-choco",
+  "fdcId": 170911,
+  "name": "Ice cream, lowfat, no sugar added, cone, added peanuts and chocolate s",
+  "category": "Sweets",
+  "usdaName": "Ice cream, lowfat, no sugar added, cone, added peanuts and chocolate sauce",
+  "per100g": {
+   "protein": 5.33,
+   "fat": 9.33,
+   "carbs": 40.01,
+   "kcal": 265,
+   "fibre": 9.3,
+   "sodium": 113,
+   "satFat": 6.598,
+   "sugars": 10.67
+  }
+ },
+ {
+  "id": "ice-cream-soft-serve-chocolate",
+  "fdcId": 173465,
+  "name": "Ice cream, soft serve, chocolate",
+  "category": "Sweets",
+  "usdaName": "Ice cream, soft serve, chocolate",
+  "per100g": {
+   "protein": 4.1,
+   "fat": 13,
+   "carbs": 22.2,
+   "kcal": 222,
+   "fibre": 0.7,
+   "sodium": 61,
+   "satFat": 7.46,
+   "sugars": 21.16
+  }
+ },
+ {
   "id": "ice-cream-vanilla",
   "fdcId": 167575,
   "name": "Ice cream, vanilla",
@@ -1629,6 +4043,448 @@
    "sodium": 80,
    "satFat": 6.79,
    "sugars": 21.22
+  }
+ },
+ {
+  "id": "ice-creams-breyers-98-fat-free-chocolate",
+  "fdcId": 170269,
+  "name": "Ice creams, BREYERS, 98% Fat Free Chocolate",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, 98% Fat Free Chocolate",
+  "per100g": {
+   "protein": 3.89,
+   "fat": 2.17,
+   "carbs": 30.18,
+   "kcal": 136,
+   "fibre": 5.8,
+   "sodium": 75,
+   "satFat": 1.38,
+   "sugars": 20.29
+  }
+ },
+ {
+  "id": "ice-creams-breyers-98-fat-free-vanilla",
+  "fdcId": 170661,
+  "name": "Ice creams, BREYERS, 98% Fat Free Vanilla",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, 98% Fat Free Vanilla",
+  "per100g": {
+   "protein": 3.3,
+   "fat": 2.2,
+   "carbs": 30.51,
+   "kcal": 137,
+   "fibre": 5.4,
+   "sodium": 73,
+   "satFat": 1.41,
+   "sugars": 20.93
+  }
+ },
+ {
+  "id": "ice-creams-breyers-all-natural-light-french-chocolate",
+  "fdcId": 170268,
+  "name": "Ice creams, BREYERS, All Natural Light French Chocolate",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, All Natural Light French Chocolate",
+  "per100g": {
+   "protein": 5.3,
+   "fat": 7.28,
+   "carbs": 29.68,
+   "kcal": 201,
+   "fibre": 1,
+   "sodium": 75,
+   "satFat": 4.28,
+   "sugars": 24.04
+  }
+ },
+ {
+  "id": "ice-creams-breyers-all-natural-light-french-vanilla",
+  "fdcId": 170660,
+  "name": "Ice creams, BREYERS, All Natural Light French Vanilla",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, All Natural Light French Vanilla",
+  "per100g": {
+   "protein": 4.82,
+   "fat": 5.56,
+   "carbs": 26.03,
+   "kcal": 173,
+   "fibre": 0.2,
+   "sodium": 73,
+   "satFat": 3.22,
+   "sugars": 21.11
+  }
+ },
+ {
+  "id": "ice-creams-breyers-all-natural-light-mint-chocolate-chip",
+  "fdcId": 170663,
+  "name": "Ice creams, BREYERS, All Natural Light Mint Chocolate Chip",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, All Natural Light Mint Chocolate Chip",
+  "per100g": {
+   "protein": 4.69,
+   "fat": 7.09,
+   "carbs": 28.39,
+   "kcal": 196,
+   "fibre": 0.6,
+   "sodium": 67,
+   "satFat": 4.48,
+   "sugars": 25.38
+  }
+ },
+ {
+  "id": "ice-creams-breyers-all-natural-light-vanilla",
+  "fdcId": 170261,
+  "name": "Ice creams, BREYERS, All Natural Light Vanilla",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, All Natural Light Vanilla",
+  "per100g": {
+   "protein": 4.84,
+   "fat": 4.59,
+   "carbs": 25.3,
+   "kcal": 162,
+   "fibre": 0.2,
+   "sodium": 71,
+   "satFat": 2.86,
+   "sugars": 22.78
+  }
+ },
+ {
+  "id": "ice-creams-breyers-all-natural-light-vanilla-chocolate-straw",
+  "fdcId": 170662,
+  "name": "Ice creams, BREYERS, All Natural Light Vanilla Chocolate Strawberry",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, All Natural Light Vanilla Chocolate Strawberry",
+  "per100g": {
+   "protein": 4.69,
+   "fat": 4.35,
+   "carbs": 26.06,
+   "kcal": 161,
+   "fibre": 0.4,
+   "sodium": 69,
+   "satFat": 2.7,
+   "sugars": 22.47
+  }
+ },
+ {
+  "id": "ice-creams-breyers-no-sugar-added-butter-pecan",
+  "fdcId": 170262,
+  "name": "Ice creams, BREYERS, No Sugar Added, Butter Pecan",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, No Sugar Added, Butter Pecan",
+  "per100g": {
+   "protein": 3.99,
+   "fat": 10.3,
+   "carbs": 21.3,
+   "kcal": 180,
+   "fibre": 0.9,
+   "sodium": 164,
+   "satFat": 4.18,
+   "sugars": 5.9
+  }
+ },
+ {
+  "id": "ice-creams-breyers-no-sugar-added-chocolate-caramel",
+  "fdcId": 170668,
+  "name": "Ice creams, BREYERS, No Sugar Added, Chocolate Caramel",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, No Sugar Added, Chocolate Caramel",
+  "per100g": {
+   "protein": 3.54,
+   "fat": 5.8,
+   "carbs": 25.17,
+   "kcal": 151,
+   "fibre": 1,
+   "sodium": 77,
+   "satFat": 3.65,
+   "sugars": 5.81
+  }
+ },
+ {
+  "id": "ice-creams-breyers-no-sugar-added-french-vanilla",
+  "fdcId": 170263,
+  "name": "Ice creams, BREYERS, No Sugar Added, French Vanilla",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, No Sugar Added, French Vanilla",
+  "per100g": {
+   "protein": 4.5,
+   "fat": 7.05,
+   "carbs": 20.75,
+   "kcal": 154,
+   "fibre": 0.5,
+   "sodium": 87,
+   "satFat": 4.17,
+   "sugars": 7.7
+  }
+ },
+ {
+  "id": "ice-creams-breyers-no-sugar-added-vanilla",
+  "fdcId": 170264,
+  "name": "Ice creams, BREYERS, No Sugar Added, Vanilla",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, No Sugar Added, Vanilla",
+  "per100g": {
+   "protein": 3.68,
+   "fat": 6.2,
+   "carbs": 21.92,
+   "kcal": 143,
+   "fibre": 0.5,
+   "sodium": 66,
+   "satFat": 3.9,
+   "sugars": 6.09
+  }
+ },
+ {
+  "id": "ice-creams-breyers-no-sugar-added-vanilla-chocolate-strawber",
+  "fdcId": 170664,
+  "name": "Ice creams, BREYERS, No Sugar Added, Vanilla Chocolate Strawberry",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, No Sugar Added, Vanilla Chocolate Strawberry",
+  "per100g": {
+   "protein": 3.71,
+   "fat": 6.26,
+   "carbs": 21.7,
+   "kcal": 143,
+   "fibre": 0.7,
+   "sodium": 68,
+   "satFat": 3.94,
+   "sugars": 6.15
+  }
+ },
+ {
+  "id": "ice-creams-breyers-no-sugar-added-vanilla-fudge-twirl",
+  "fdcId": 170265,
+  "name": "Ice creams, BREYERS, No Sugar Added, Vanilla Fudge Twirl",
+  "category": "Sweets",
+  "usdaName": "Ice creams, BREYERS, No Sugar Added, Vanilla Fudge Twirl",
+  "per100g": {
+   "protein": 3.53,
+   "fat": 5.68,
+   "carbs": 25.63,
+   "kcal": 153,
+   "fibre": 0.8,
+   "sodium": 72,
+   "satFat": 3.57,
+   "sugars": 5.49
+  }
+ },
+ {
+  "id": "ice-creams-chocolate",
+  "fdcId": 168809,
+  "name": "Ice creams, chocolate",
+  "category": "Sweets",
+  "usdaName": "Ice creams, chocolate",
+  "per100g": {
+   "protein": 3.8,
+   "fat": 11,
+   "carbs": 28.2,
+   "kcal": 216,
+   "fibre": 1.2,
+   "sodium": 76,
+   "satFat": 6.8,
+   "sugars": 25.36
+  }
+ },
+ {
+  "id": "ice-creams-chocolate-light",
+  "fdcId": 167585,
+  "name": "Ice creams, chocolate, light",
+  "category": "Sweets",
+  "usdaName": "Ice creams, chocolate, light",
+  "per100g": {
+   "protein": 5,
+   "fat": 7.19,
+   "carbs": 25.7,
+   "kcal": 187,
+   "fibre": 0.8,
+   "sodium": 71,
+   "satFat": 4.38,
+   "sugars": 24.71
+  }
+ },
+ {
+  "id": "ice-creams-chocolate-light-no-sugar-added",
+  "fdcId": 169633,
+  "name": "Ice creams, chocolate, light, no sugar added",
+  "category": "Sweets",
+  "usdaName": "Ice creams, chocolate, light, no sugar added",
+  "per100g": {
+   "protein": 3.54,
+   "fat": 5.74,
+   "carbs": 26.79,
+   "kcal": 173,
+   "fibre": 0.9,
+   "sodium": 75,
+   "satFat": 3.61,
+   "sugars": 5.65
+  }
+ },
+ {
+  "id": "ice-creams-chocolate-rich",
+  "fdcId": 168136,
+  "name": "Ice creams, chocolate, rich",
+  "category": "Sweets",
+  "usdaName": "Ice creams, chocolate, rich",
+  "per100g": {
+   "protein": 4.72,
+   "fat": 16.98,
+   "carbs": 19.78,
+   "kcal": 251,
+   "fibre": 0.9,
+   "sodium": 57,
+   "satFat": 10.377,
+   "sugars": 17.35
+  }
+ },
+ {
+  "id": "ice-creams-french-vanilla-soft-serve",
+  "fdcId": 167981,
+  "name": "Ice creams, french vanilla, soft-serve",
+  "category": "Sweets",
+  "usdaName": "Ice creams, french vanilla, soft-serve",
+  "per100g": {
+   "protein": 4.1,
+   "fat": 13,
+   "carbs": 22.2,
+   "kcal": 222,
+   "fibre": 0.7,
+   "sodium": 61,
+   "satFat": 7.48,
+   "sugars": 21.16
+  }
+ },
+ {
+  "id": "ice-creams-regular-low-carbohydrate-chocolate",
+  "fdcId": 170270,
+  "name": "Ice creams, regular, low carbohydrate, chocolate",
+  "category": "Sweets",
+  "usdaName": "Ice creams, regular, low carbohydrate, chocolate",
+  "per100g": {
+   "protein": 3.8,
+   "fat": 12.7,
+   "carbs": 26.8,
+   "kcal": 237,
+   "fibre": 4.8,
+   "sodium": 76,
+   "satFat": 6.8,
+   "sugars": 6.35
+  }
+ },
+ {
+  "id": "ice-creams-regular-low-carbohydrate-vanilla",
+  "fdcId": 170671,
+  "name": "Ice creams, regular, low carbohydrate, vanilla",
+  "category": "Sweets",
+  "usdaName": "Ice creams, regular, low carbohydrate, vanilla",
+  "per100g": {
+   "protein": 3.17,
+   "fat": 12.7,
+   "carbs": 22.23,
+   "kcal": 216,
+   "fibre": 4.8,
+   "sodium": 48,
+   "satFat": 6.79,
+   "sugars": 6.35
+  }
+ },
+ {
+  "id": "ice-creams-strawberry",
+  "fdcId": 168810,
+  "name": "Ice creams, strawberry",
+  "category": "Sweets",
+  "usdaName": "Ice creams, strawberry",
+  "per100g": {
+   "protein": 3.2,
+   "fat": 8.4,
+   "carbs": 27.6,
+   "kcal": 192,
+   "fibre": 0.9,
+   "sodium": 60,
+   "satFat": 5.19,
+   "sugars": null
+  }
+ },
+ {
+  "id": "ice-creams-vanilla-fat-free",
+  "fdcId": 170659,
+  "name": "Ice creams, vanilla, fat free",
+  "category": "Sweets",
+  "usdaName": "Ice creams, vanilla, fat free",
+  "per100g": {
+   "protein": 4.48,
+   "fat": 0,
+   "carbs": 30.06,
+   "kcal": 138,
+   "fibre": 1,
+   "sodium": 97,
+   "satFat": 0,
+   "sugars": 6.3
+  }
+ },
+ {
+  "id": "ice-creams-vanilla-light",
+  "fdcId": 167572,
+  "name": "Ice creams, vanilla, light",
+  "category": "Sweets",
+  "usdaName": "Ice creams, vanilla, light",
+  "per100g": {
+   "protein": 4.78,
+   "fat": 4.83,
+   "carbs": 29.46,
+   "kcal": 180,
+   "fibre": 0.3,
+   "sodium": 74,
+   "satFat": 2.927,
+   "sugars": 22.12
+  }
+ },
+ {
+  "id": "ice-creams-vanilla-light-no-sugar-added",
+  "fdcId": 169631,
+  "name": "Ice creams, vanilla, light, no sugar added",
+  "category": "Sweets",
+  "usdaName": "Ice creams, vanilla, light, no sugar added",
+  "per100g": {
+   "protein": 3.97,
+   "fat": 7.45,
+   "carbs": 21.42,
+   "kcal": 169,
+   "fibre": 0,
+   "sodium": 96,
+   "satFat": 4.048,
+   "sugars": 6.46
+  }
+ },
+ {
+  "id": "ice-creams-vanilla-light-soft-serve",
+  "fdcId": 167576,
+  "name": "Ice creams, vanilla, light, soft-serve",
+  "category": "Sweets",
+  "usdaName": "Ice creams, vanilla, light, soft-serve",
+  "per100g": {
+   "protein": 4.9,
+   "fat": 2.6,
+   "carbs": 21.8,
+   "kcal": 126,
+   "fibre": 0,
+   "sodium": 70,
+   "satFat": 1.63,
+   "sugars": 18.69
+  }
+ },
+ {
+  "id": "ice-creams-vanilla-rich",
+  "fdcId": 167573,
+  "name": "Ice creams, vanilla, rich",
+  "category": "Sweets",
+  "usdaName": "Ice creams, vanilla, rich",
+  "per100g": {
+   "protein": 3.5,
+   "fat": 16.2,
+   "carbs": 22.29,
+   "kcal": 249,
+   "fibre": 0,
+   "sodium": 61,
+   "satFat": 10.329,
+   "sugars": 20.65
   }
  },
  {
@@ -1785,6 +4641,57 @@
   }
  },
  {
+  "id": "light-ice-cream-creamsicle",
+  "fdcId": 171307,
+  "name": "Light ice cream, Creamsicle",
+  "category": "Sweets",
+  "usdaName": "Light ice cream, Creamsicle",
+  "per100g": {
+   "protein": 1.54,
+   "fat": 3.08,
+   "carbs": 32.75,
+   "kcal": 165,
+   "fibre": 0,
+   "sodium": 46,
+   "satFat": 1.813,
+   "sugars": 18.46
+  }
+ },
+ {
+  "id": "light-ice-cream-soft-serve-blended-with-cookie-pieces",
+  "fdcId": 172085,
+  "name": "Light Ice Cream, soft serve, blended with cookie pieces",
+  "category": "Sweets",
+  "usdaName": "Light Ice Cream, soft serve, blended with cookie pieces",
+  "per100g": {
+   "protein": 3.97,
+   "fat": 5.66,
+   "carbs": 25.55,
+   "kcal": 169,
+   "fibre": 0.1,
+   "sodium": 75,
+   "satFat": 2.754,
+   "sugars": 21.19
+  }
+ },
+ {
+  "id": "light-ice-cream-soft-serve-blended-with-milk-chocolate-candi",
+  "fdcId": 173324,
+  "name": "Light Ice Cream, soft serve, blended with milk chocolate candies",
+  "category": "Sweets",
+  "usdaName": "Light Ice Cream, soft serve, blended with milk chocolate candies",
+  "per100g": {
+   "protein": 4.02,
+   "fat": 6.46,
+   "carbs": 26.82,
+   "kcal": 182,
+   "fibre": 0.2,
+   "sodium": 54,
+   "satFat": 3.633,
+   "sugars": 24.37
+  }
+ },
+ {
   "id": "lime-juice",
   "fdcId": 168156,
   "name": "Lime juice",
@@ -1799,6 +4706,108 @@
    "sodium": 2,
    "satFat": 0.008,
    "sugars": 1.69
+  }
+ },
+ {
+  "id": "little-caesars-14-cheese-pizza-large-deep-dish-crust",
+  "fdcId": 172050,
+  "name": "LITTLE CAESARS 14 Cheese Pizza, Large Deep Dish Crust",
+  "category": "Prepared",
+  "usdaName": "LITTLE CAESARS 14 Cheese Pizza, Large Deep Dish Crust",
+  "per100g": {
+   "protein": 12.63,
+   "fat": 10.22,
+   "carbs": 30.1,
+   "kcal": 263,
+   "fibre": 1.3,
+   "sodium": 432,
+   "satFat": 4.237,
+   "sugars": 3.66
+  }
+ },
+ {
+  "id": "little-caesars-14-cheese-pizza-thin-crust",
+  "fdcId": 173289,
+  "name": "LITTLE CAESARS 14 Cheese Pizza, Thin Crust",
+  "category": "Prepared",
+  "usdaName": "LITTLE CAESARS 14 Cheese Pizza, Thin Crust",
+  "per100g": {
+   "protein": 16.23,
+   "fat": 16.99,
+   "carbs": 22.85,
+   "kcal": 309,
+   "fibre": 1.6,
+   "sodium": 455,
+   "satFat": 7.327,
+   "sugars": 2.76
+  }
+ },
+ {
+  "id": "little-caesars-14-original-round-cheese-pizza-regular-crust",
+  "fdcId": 172047,
+  "name": "LITTLE CAESARS 14 Original Round Cheese Pizza, Regular Crust",
+  "category": "Prepared",
+  "usdaName": "LITTLE CAESARS 14 Original Round Cheese Pizza, Regular Crust",
+  "per100g": {
+   "protein": 13.39,
+   "fat": 9.54,
+   "carbs": 31.5,
+   "kcal": 265,
+   "fibre": 1.7,
+   "sodium": 454,
+   "satFat": 4.206,
+   "sugars": 4.02
+  }
+ },
+ {
+  "id": "little-caesars-14-original-round-meat-and-vegetable-pizza-re",
+  "fdcId": 172049,
+  "name": "LITTLE CAESARS 14 Original Round Meat and Vegetable Pizza, Regular Cru",
+  "category": "Prepared",
+  "usdaName": "LITTLE CAESARS 14 Original Round Meat and Vegetable Pizza, Regular Crust",
+  "per100g": {
+   "protein": 12.12,
+   "fat": 11.35,
+   "carbs": 23.1,
+   "kcal": 243,
+   "fibre": 2.1,
+   "sodium": 578,
+   "satFat": 4.561,
+   "sugars": 3.74
+  }
+ },
+ {
+  "id": "little-caesars-14-original-round-pepperoni-pizza-regular-cru",
+  "fdcId": 172048,
+  "name": "LITTLE CAESARS 14 Original Round Pepperoni Pizza, Regular Crust",
+  "category": "Prepared",
+  "usdaName": "LITTLE CAESARS 14 Original Round Pepperoni Pizza, Regular Crust",
+  "per100g": {
+   "protein": 13.59,
+   "fat": 10.5,
+   "carbs": 31.01,
+   "kcal": 273,
+   "fibre": 1.7,
+   "sodium": 518,
+   "satFat": 4.541,
+   "sugars": 3.76
+  }
+ },
+ {
+  "id": "little-caesars-14-pepperoni-pizza-large-deep-dish-crust",
+  "fdcId": 173288,
+  "name": "LITTLE CAESARS 14 Pepperoni Pizza, Large Deep Dish Crust",
+  "category": "Prepared",
+  "usdaName": "LITTLE CAESARS 14 Pepperoni Pizza, Large Deep Dish Crust",
+  "per100g": {
+   "protein": 12.93,
+   "fat": 10.81,
+   "carbs": 29.03,
+   "kcal": 265,
+   "fibre": 1.5,
+   "sodium": 492,
+   "satFat": 4.314,
+   "sugars": 3.39
   }
  },
  {
@@ -1867,6 +4876,91 @@
    "sodium": 635,
    "satFat": 11.703,
    "sugars": 0.57
+  }
+ },
+ {
+  "id": "mcdonald-s-cheeseburger",
+  "fdcId": 170320,
+  "name": "McDONALD'S, Cheeseburger",
+  "category": "Prepared",
+  "usdaName": "McDONALD'S, Cheeseburger",
+  "per100g": {
+   "protein": 12.97,
+   "fat": 11.79,
+   "carbs": 27.81,
+   "kcal": 263,
+   "fibre": 1.1,
+   "sodium": 626,
+   "satFat": 4.435,
+   "sugars": 6.22
+  }
+ },
+ {
+  "id": "mcdonald-s-double-cheeseburger",
+  "fdcId": 172065,
+  "name": "McDONALD'S, Double Cheeseburger",
+  "category": "Prepared",
+  "usdaName": "McDONALD'S, Double Cheeseburger",
+  "per100g": {
+   "protein": 15.5,
+   "fat": 16.09,
+   "carbs": 18.79,
+   "kcal": 282,
+   "fibre": 0.8,
+   "sodium": 668,
+   "satFat": 6.998,
+   "sugars": 4.23
+  }
+ },
+ {
+  "id": "mcdonald-s-french-fries",
+  "fdcId": 170721,
+  "name": "McDONALD'S, french fries",
+  "category": "Prepared",
+  "usdaName": "McDONALD'S, french fries",
+  "per100g": {
+   "protein": 3.41,
+   "fat": 15.47,
+   "carbs": 42.58,
+   "kcal": 323,
+   "fibre": 3.9,
+   "sodium": 189,
+   "satFat": 2.271,
+   "sugars": 0.21
+  }
+ },
+ {
+  "id": "mcdonald-s-hamburger",
+  "fdcId": 170717,
+  "name": "McDONALD'S, Hamburger",
+  "category": "Prepared",
+  "usdaName": "McDONALD'S, Hamburger",
+  "per100g": {
+   "protein": 12.92,
+   "fat": 10.09,
+   "carbs": 30.28,
+   "kcal": 264,
+   "fibre": 1.3,
+   "sodium": 494,
+   "satFat": 3.504,
+   "sugars": 6.03
+  }
+ },
+ {
+  "id": "mcdonald-s-vanilla-reduced-fat-ice-cream-cone",
+  "fdcId": 172061,
+  "name": "McDONALD'S, Vanilla Reduced Fat Ice Cream Cone",
+  "category": "Sweets",
+  "usdaName": "McDONALD'S, Vanilla Reduced Fat Ice Cream Cone",
+  "per100g": {
+   "protein": 4.24,
+   "fat": 4.86,
+   "carbs": 26.36,
+   "kcal": 162,
+   "fibre": 0.1,
+   "sodium": 67,
+   "satFat": 2.41,
+   "sugars": 19.49
   }
  },
  {
@@ -2057,6 +5151,23 @@
   }
  },
  {
+  "id": "oil-industrial-coconut-confection-fat-typical-basis-for-ice-",
+  "fdcId": 172365,
+  "name": "Oil, industrial, coconut, confection fat, typical basis for ice cream ",
+  "category": "Sweets",
+  "usdaName": "Oil, industrial, coconut, confection fat, typical basis for ice cream coatings",
+  "per100g": {
+   "protein": 0,
+   "fat": 100,
+   "carbs": 0,
+   "kcal": 884,
+   "fibre": 0,
+   "sodium": 5,
+   "satFat": 86.503,
+   "sugars": 0
+  }
+ },
+ {
   "id": "okra-raw",
   "fdcId": 169260,
   "name": "Okra, raw",
@@ -2156,6 +5267,74 @@
    "sodium": 0,
    "satFat": 0.015,
    "sugars": 9.35
+  }
+ },
+ {
+  "id": "papa-john-s-14-cheese-pizza-original-crust",
+  "fdcId": 173284,
+  "name": "PAPA JOHN'S 14 Cheese Pizza, Original Crust",
+  "category": "Prepared",
+  "usdaName": "PAPA JOHN'S 14 Cheese Pizza, Original Crust",
+  "per100g": {
+   "protein": 11.53,
+   "fat": 9.25,
+   "carbs": 32.74,
+   "kcal": 260,
+   "fibre": 1.9,
+   "sodium": 578,
+   "satFat": 3.871,
+   "sugars": 5.32
+  }
+ },
+ {
+  "id": "papa-john-s-14-cheese-pizza-thin-crust",
+  "fdcId": 173287,
+  "name": "PAPA JOHN'S 14 Cheese Pizza, Thin Crust",
+  "category": "Prepared",
+  "usdaName": "PAPA JOHN'S 14 Cheese Pizza, Thin Crust",
+  "per100g": {
+   "protein": 12.29,
+   "fat": 15.66,
+   "carbs": 26.26,
+   "kcal": 295,
+   "fibre": 2.3,
+   "sodium": 528,
+   "satFat": 6.202,
+   "sugars": 3.85
+  }
+ },
+ {
+  "id": "papa-john-s-14-pepperoni-pizza-original-crust",
+  "fdcId": 173285,
+  "name": "PAPA JOHN'S 14 Pepperoni Pizza, Original Crust",
+  "category": "Prepared",
+  "usdaName": "PAPA JOHN'S 14 Pepperoni Pizza, Original Crust",
+  "per100g": {
+   "protein": 11.97,
+   "fat": 11.86,
+   "carbs": 30.04,
+   "kcal": 275,
+   "fibre": 1.2,
+   "sodium": 671,
+   "satFat": 4.908,
+   "sugars": 4.84
+  }
+ },
+ {
+  "id": "papa-john-s-14-the-works-pizza-original-crust",
+  "fdcId": 173286,
+  "name": "PAPA JOHN'S 14 The Works Pizza, Original Crust",
+  "category": "Prepared",
+  "usdaName": "PAPA JOHN'S 14 The Works Pizza, Original Crust",
+  "per100g": {
+   "protein": 10.27,
+   "fat": 10.21,
+   "carbs": 26.69,
+   "kcal": 240,
+   "fibre": 2.5,
+   "sodium": 570,
+   "satFat": 3.765,
+   "sugars": 4.84
   }
  },
  {
@@ -2312,6 +5491,40 @@
   }
  },
  {
+  "id": "pepperidge-farm-goldfish-baked-snack-crackers-explosive-pizz",
+  "fdcId": 168006,
+  "name": "Pepperidge Farm, Goldfish, Baked Snack Crackers, Explosive Pizza",
+  "category": "Prepared",
+  "usdaName": "Pepperidge Farm, Goldfish, Baked Snack Crackers, Explosive Pizza",
+  "per100g": {
+   "protein": 9.56,
+   "fat": 16.82,
+   "carbs": 67.2,
+   "kcal": 458,
+   "fibre": null,
+   "sodium": 868,
+   "satFat": null,
+   "sugars": 2.4
+  }
+ },
+ {
+  "id": "pepperidge-farm-goldfish-baked-snack-crackers-pizza",
+  "fdcId": 167596,
+  "name": "Pepperidge Farm, Goldfish, Baked Snack Crackers, Pizza",
+  "category": "Prepared",
+  "usdaName": "Pepperidge Farm, Goldfish, Baked Snack Crackers, Pizza",
+  "per100g": {
+   "protein": 9.67,
+   "fat": 18.93,
+   "carbs": 65.11,
+   "kcal": 469,
+   "fibre": 3.5,
+   "sodium": 815,
+   "satFat": 2.137,
+   "sugars": 0.86
+  }
+ },
+ {
   "id": "pineapple-raw",
   "fdcId": 169124,
   "name": "Pineapple, raw",
@@ -2380,6 +5593,329 @@
   }
  },
  {
+  "id": "pizza-hut-12-cheese-pizza-hand-tossed-crust",
+  "fdcId": 172040,
+  "name": "PIZZA HUT 12 Cheese Pizza, Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 12 Cheese Pizza, Hand-Tossed Crust",
+  "per100g": {
+   "protein": 11.93,
+   "fat": 10.89,
+   "carbs": 31.22,
+   "kcal": 271,
+   "fibre": 1.8,
+   "sodium": 685,
+   "satFat": 5.04,
+   "sugars": 3.37
+  }
+ },
+ {
+  "id": "pizza-hut-12-cheese-pizza-pan-crust",
+  "fdcId": 172041,
+  "name": "PIZZA HUT 12 Cheese Pizza, Pan Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 12 Cheese Pizza, Pan Crust",
+  "per100g": {
+   "protein": 11.73,
+   "fat": 12.56,
+   "carbs": 29.93,
+   "kcal": 280,
+   "fibre": 1.7,
+   "sodium": 624,
+   "satFat": 5.184,
+   "sugars": 3.21
+  }
+ },
+ {
+  "id": "pizza-hut-12-cheese-pizza-thin-n-crispy-crust",
+  "fdcId": 172042,
+  "name": "PIZZA HUT 12 Cheese Pizza, THIN 'N CRISPY Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 12 Cheese Pizza, THIN 'N CRISPY Crust",
+  "per100g": {
+   "protein": 15.29,
+   "fat": 14.1,
+   "carbs": 28.64,
+   "kcal": 303,
+   "fibre": 1.6,
+   "sodium": 784,
+   "satFat": 6.896,
+   "sugars": 2.67
+  }
+ },
+ {
+  "id": "pizza-hut-12-pepperoni-pizza-hand-tossed-crust",
+  "fdcId": 173279,
+  "name": "PIZZA HUT 12 Pepperoni Pizza, Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 12 Pepperoni Pizza, Hand-Tossed Crust",
+  "per100g": {
+   "protein": 12.86,
+   "fat": 11.38,
+   "carbs": 31.55,
+   "kcal": 280,
+   "fibre": 1.7,
+   "sodium": 801,
+   "satFat": 5.161,
+   "sugars": 3.67
+  }
+ },
+ {
+  "id": "pizza-hut-12-pepperoni-pizza-pan-crust",
+  "fdcId": 173280,
+  "name": "PIZZA HUT 12 Pepperoni Pizza, Pan Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 12 Pepperoni Pizza, Pan Crust",
+  "per100g": {
+   "protein": 11.97,
+   "fat": 14.21,
+   "carbs": 30.49,
+   "kcal": 298,
+   "fibre": 1.8,
+   "sodium": 692,
+   "satFat": 5.271,
+   "sugars": 3.2
+  }
+ },
+ {
+  "id": "pizza-hut-12-super-supreme-pizza-hand-tossed-crust",
+  "fdcId": 173281,
+  "name": "PIZZA HUT 12 Super Supreme Pizza, Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 12 Super Supreme Pizza, Hand-Tossed Crust",
+  "per100g": {
+   "protein": 10.9,
+   "fat": 10.72,
+   "carbs": 25.62,
+   "kcal": 243,
+   "fibre": 2,
+   "sodium": 689,
+   "satFat": 4.554,
+   "sugars": 3.71
+  }
+ },
+ {
+  "id": "pizza-hut-14-cheese-pizza-hand-tossed-crust",
+  "fdcId": 173290,
+  "name": "PIZZA HUT 14 Cheese Pizza, Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Cheese Pizza, Hand-Tossed Crust",
+  "per100g": {
+   "protein": 11.98,
+   "fat": 10.42,
+   "carbs": 33.42,
+   "kcal": 275,
+   "fibre": 2.4,
+   "sodium": 674,
+   "satFat": 4.819,
+   "sugars": 3.13
+  }
+ },
+ {
+  "id": "pizza-hut-14-cheese-pizza-pan-crust",
+  "fdcId": 173291,
+  "name": "PIZZA HUT 14 Cheese Pizza, Pan Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Cheese Pizza, Pan Crust",
+  "per100g": {
+   "protein": 10.85,
+   "fat": 11.25,
+   "carbs": 32.85,
+   "kcal": 276,
+   "fibre": 2.1,
+   "sodium": 580,
+   "satFat": 4.39,
+   "sugars": 2.47
+  }
+ },
+ {
+  "id": "pizza-hut-14-cheese-pizza-stuffed-crust",
+  "fdcId": 170774,
+  "name": "PIZZA HUT 14 Cheese Pizza, Stuffed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Cheese Pizza, Stuffed Crust",
+  "per100g": {
+   "protein": 12.23,
+   "fat": 11.63,
+   "carbs": 30,
+   "kcal": 274,
+   "fibre": 1.7,
+   "sodium": 615,
+   "satFat": 5.825,
+   "sugars": 2.9
+  }
+ },
+ {
+  "id": "pizza-hut-14-cheese-pizza-thin-n-crispy-crust",
+  "fdcId": 172051,
+  "name": "PIZZA HUT 14 Cheese Pizza, THIN 'N CRISPY Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Cheese Pizza, THIN 'N CRISPY Crust",
+  "per100g": {
+   "protein": 13.37,
+   "fat": 12.8,
+   "carbs": 34.22,
+   "kcal": 306,
+   "fibre": 2.4,
+   "sodium": 857,
+   "satFat": 6.103,
+   "sugars": 3.13
+  }
+ },
+ {
+  "id": "pizza-hut-14-pepperoni-pizza-hand-tossed-crust",
+  "fdcId": 172052,
+  "name": "PIZZA HUT 14 Pepperoni Pizza, Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Pepperoni Pizza, Hand-Tossed Crust",
+  "per100g": {
+   "protein": 12.23,
+   "fat": 12.63,
+   "carbs": 32.11,
+   "kcal": 291,
+   "fibre": 2.6,
+   "sodium": 759,
+   "satFat": 5.404,
+   "sugars": 2.82
+  }
+ },
+ {
+  "id": "pizza-hut-14-pepperoni-pizza-pan-crust",
+  "fdcId": 172053,
+  "name": "PIZZA HUT 14 Pepperoni Pizza, Pan Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Pepperoni Pizza, Pan Crust",
+  "per100g": {
+   "protein": 11.47,
+   "fat": 13.07,
+   "carbs": 31.79,
+   "kcal": 291,
+   "fibre": 2,
+   "sodium": 676,
+   "satFat": 4.823,
+   "sugars": 1.95
+  }
+ },
+ {
+  "id": "pizza-hut-14-pepperoni-pizza-thin-n-crispy-crust",
+  "fdcId": 170369,
+  "name": "PIZZA HUT 14 Pepperoni Pizza, THIN 'N CRISPY Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Pepperoni Pizza, THIN 'N CRISPY Crust",
+  "per100g": {
+   "protein": 14.13,
+   "fat": 16.17,
+   "carbs": 32.66,
+   "kcal": 333,
+   "fibre": 2.1,
+   "sodium": 967,
+   "satFat": 6.674,
+   "sugars": 2.79
+  }
+ },
+ {
+  "id": "pizza-hut-14-sausage-pizza-hand-tossed-crust",
+  "fdcId": 170769,
+  "name": "PIZZA HUT 14 Sausage Pizza, Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Sausage Pizza, Hand-Tossed Crust",
+  "per100g": {
+   "protein": 11.92,
+   "fat": 13.5,
+   "carbs": 29.39,
+   "kcal": 287,
+   "fibre": 2.3,
+   "sodium": 671,
+   "satFat": 5.459,
+   "sugars": 2.72
+  }
+ },
+ {
+  "id": "pizza-hut-14-sausage-pizza-pan-crust",
+  "fdcId": 170372,
+  "name": "PIZZA HUT 14 Sausage Pizza, Pan Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Sausage Pizza, Pan Crust",
+  "per100g": {
+   "protein": 11.08,
+   "fat": 13.85,
+   "carbs": 29.56,
+   "kcal": 287,
+   "fibre": 2,
+   "sodium": 596,
+   "satFat": 4.855,
+   "sugars": 1.82
+  }
+ },
+ {
+  "id": "pizza-hut-14-sausage-pizza-thin-n-crispy-crust",
+  "fdcId": 170768,
+  "name": "PIZZA HUT 14 Sausage Pizza, THIN 'N CRISPY Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Sausage Pizza, THIN 'N CRISPY Crust",
+  "per100g": {
+   "protein": 13.95,
+   "fat": 16.9,
+   "carbs": 28.7,
+   "kcal": 323,
+   "fibre": 2.4,
+   "sodium": 839,
+   "satFat": 6.698,
+   "sugars": 2.62
+  }
+ },
+ {
+  "id": "pizza-hut-14-super-supreme-pizza-hand-tossed-crust",
+  "fdcId": 172054,
+  "name": "PIZZA HUT 14 Super Supreme Pizza, Hand-Tossed Crust",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT 14 Super Supreme Pizza, Hand-Tossed Crust",
+  "per100g": {
+   "protein": 11.34,
+   "fat": 10.95,
+   "carbs": 26.01,
+   "kcal": 248,
+   "fibre": 2.3,
+   "sodium": 658,
+   "satFat": 4.217,
+   "sugars": 3.04
+  }
+ },
+ {
+  "id": "pizza-hut-breadstick-parmesan-garlic",
+  "fdcId": 170789,
+  "name": "PIZZA HUT, breadstick, parmesan garlic",
+  "category": "Prepared",
+  "usdaName": "PIZZA HUT, breadstick, parmesan garlic",
+  "per100g": {
+   "protein": 12.2,
+   "fat": 12.88,
+   "carbs": 44.48,
+   "kcal": 343,
+   "fibre": 2.4,
+   "sodium": 539,
+   "satFat": 2.966,
+   "sugars": 1.11
+  }
+ },
+ {
+  "id": "pizza-rolls-frozen-unprepared",
+  "fdcId": 168957,
+  "name": "Pizza rolls, frozen, unprepared",
+  "category": "Prepared",
+  "usdaName": "Pizza rolls, frozen, unprepared",
+  "per100g": {
+   "protein": 8.73,
+   "fat": 9.98,
+   "carbs": 50.72,
+   "kcal": 328,
+   "fibre": 1.2,
+   "sodium": 599,
+   "satFat": 2.494,
+   "sugars": 3.74
+  }
+ },
+ {
   "id": "pizza-cheese",
   "fdcId": 170317,
   "name": "Pizza, cheese",
@@ -2394,6 +5930,108 @@
    "sodium": 447,
    "satFat": 4.272,
    "sugars": 3.57
+  }
+ },
+ {
+  "id": "pizza-cheese-topping-rising-crust-frozen-cooked",
+  "fdcId": 170714,
+  "name": "Pizza, cheese topping, rising crust, frozen, cooked",
+  "category": "Prepared",
+  "usdaName": "Pizza, cheese topping, rising crust, frozen, cooked",
+  "per100g": {
+   "protein": 12.37,
+   "fat": 8.78,
+   "carbs": 32.91,
+   "kcal": 260,
+   "fibre": 2.5,
+   "sodium": 556,
+   "satFat": 3.825,
+   "sugars": 5.09
+  }
+ },
+ {
+  "id": "pizza-cheese-topping-thin-crust-frozen-cooked",
+  "fdcId": 170373,
+  "name": "Pizza, cheese topping, thin crust, frozen, cooked",
+  "category": "Prepared",
+  "usdaName": "Pizza, cheese topping, thin crust, frozen, cooked",
+  "per100g": {
+   "protein": 11.91,
+   "fat": 11.07,
+   "carbs": 28.8,
+   "kcal": 263,
+   "fibre": 3,
+   "sodium": 471,
+   "satFat": 5.698,
+   "sugars": 3.71
+  }
+ },
+ {
+  "id": "pizza-meat-and-vegetable-topping-regular-crust-frozen-cooked",
+  "fdcId": 170715,
+  "name": "Pizza, meat and vegetable topping, regular crust, frozen, cooked",
+  "category": "Prepared",
+  "usdaName": "Pizza, meat and vegetable topping, regular crust, frozen, cooked",
+  "per100g": {
+   "protein": 11.28,
+   "fat": 14.43,
+   "carbs": 25.14,
+   "kcal": 276,
+   "fibre": 2.2,
+   "sodium": 555,
+   "satFat": 5.083,
+   "sugars": 4.85
+  }
+ },
+ {
+  "id": "pizza-meat-and-vegetable-topping-rising-crust-frozen-cooked",
+  "fdcId": 170716,
+  "name": "Pizza, meat and vegetable topping, rising crust, frozen, cooked",
+  "category": "Prepared",
+  "usdaName": "Pizza, meat and vegetable topping, rising crust, frozen, cooked",
+  "per100g": {
+   "protein": 12.63,
+   "fat": 11.75,
+   "carbs": 28.78,
+   "kcal": 271,
+   "fibre": 2.3,
+   "sodium": 640,
+   "satFat": 4.586,
+   "sugars": 7.26
+  }
+ },
+ {
+  "id": "pizza-meat-topping-thick-crust-frozen-cooked",
+  "fdcId": 172095,
+  "name": "Pizza, meat topping, thick crust, frozen, cooked",
+  "category": "Prepared",
+  "usdaName": "Pizza, meat topping, thick crust, frozen, cooked",
+  "per100g": {
+   "protein": 11.76,
+   "fat": 11.52,
+   "carbs": 30.76,
+   "kcal": 274,
+   "fibre": 2.3,
+   "sodium": 690,
+   "satFat": 4.283,
+   "sugars": 3.88
+  }
+ },
+ {
+  "id": "pizza-pepperoni-topping-regular-crust-frozen-cooked",
+  "fdcId": 172096,
+  "name": "Pizza, pepperoni topping, regular crust, frozen, cooked",
+  "category": "Prepared",
+  "usdaName": "Pizza, pepperoni topping, regular crust, frozen, cooked",
+  "per100g": {
+   "protein": 14.38,
+   "fat": 13.13,
+   "carbs": 24.69,
+   "kcal": 274,
+   "fibre": 2,
+   "sodium": 590,
+   "satFat": 4.827,
+   "sugars": 3.39
   }
  },
  {
@@ -2530,6 +6168,23 @@
    "sodium": 527,
    "satFat": 3.4,
    "sugars": 0.33
+  }
+ },
+ {
+  "id": "potato-chips-without-salt-reduced-fat",
+  "fdcId": 170253,
+  "name": "Potato chips, without salt, reduced fat",
+  "category": "Snacks",
+  "usdaName": "Potato chips, without salt, reduced fat",
+  "per100g": {
+   "protein": 7.1,
+   "fat": 20.8,
+   "carbs": 67.8,
+   "kcal": 487,
+   "fibre": 6.1,
+   "sodium": 8,
+   "satFat": 4.16,
+   "sugars": 0.22
   }
  },
  {
@@ -2771,6 +6426,23 @@
   }
  },
  {
+  "id": "restaurant-family-style-french-fries",
+  "fdcId": 169836,
+  "name": "Restaurant, family style, french fries",
+  "category": "Prepared",
+  "usdaName": "Restaurant, family style, french fries",
+  "per100g": {
+   "protein": 3.49,
+   "fat": 14.04,
+   "carbs": 37.2,
+   "kcal": 289,
+   "fibre": 3.9,
+   "sodium": 357,
+   "satFat": 2.489,
+   "sugars": 0.28
+  }
+ },
+ {
   "id": "rice-cakes",
   "fdcId": 170250,
   "name": "Rice cakes",
@@ -2890,6 +6562,23 @@
   }
  },
  {
+  "id": "sauce-pizza-canned-ready-to-serve",
+  "fdcId": 172880,
+  "name": "Sauce, pizza, canned, ready-to-serve",
+  "category": "Prepared",
+  "usdaName": "Sauce, pizza, canned, ready-to-serve",
+  "per100g": {
+   "protein": 2.18,
+   "fat": 1.15,
+   "carbs": 8.66,
+   "kcal": 54,
+   "fibre": 2,
+   "sodium": 348,
+   "satFat": 0.46,
+   "sugars": 3.78
+  }
+ },
+ {
   "id": "sauerkraut-canned",
   "fdcId": 169279,
   "name": "Sauerkraut, canned",
@@ -2907,6 +6596,193 @@
   }
  },
  {
+  "id": "school-lunch-pizza-big-daddy-s-ls-16-51-whole-grain-rolled-e",
+  "fdcId": 170305,
+  "name": "School Lunch, pizza, BIG DADDY'S LS 16 51% Whole Grain Rolled Edge Che",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, BIG DADDY'S LS 16 51% Whole Grain Rolled Edge Cheese Pizza, frozen",
+  "per100g": {
+   "protein": 13.89,
+   "fat": 8.81,
+   "carbs": 27.1,
+   "kcal": 243,
+   "fibre": 2.7,
+   "sodium": 400,
+   "satFat": 4.14,
+   "sugars": 4.77
+  }
+ },
+ {
+  "id": "school-lunch-pizza-big-daddy-s-ls-16-51-whole-grain-rolled-e-170701",
+  "fdcId": 170701,
+  "name": "School Lunch, pizza, BIG DADDY'S LS 16 51% Whole Grain Rolled Edge Tur",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, BIG DADDY'S LS 16 51% Whole Grain Rolled Edge Turkey Pepperoni Pizza, frozen",
+  "per100g": {
+   "protein": 13.63,
+   "fat": 9.33,
+   "carbs": 27.35,
+   "kcal": 248,
+   "fibre": 4.1,
+   "sodium": 450,
+   "satFat": 3.99,
+   "sugars": 3.83
+  }
+ },
+ {
+  "id": "school-lunch-pizza-cheese-topping-thick-crust-whole-grain-fr",
+  "fdcId": 170779,
+  "name": "School Lunch, pizza, cheese topping, thick crust, whole grain, frozen,",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, cheese topping, thick crust, whole grain, frozen, cooked",
+  "per100g": {
+   "protein": 14.62,
+   "fat": 9.27,
+   "carbs": 28.08,
+   "kcal": 254,
+   "fibre": 2.9,
+   "sodium": 421,
+   "satFat": 4.358,
+   "sugars": 5.02
+  }
+ },
+ {
+  "id": "school-lunch-pizza-cheese-topping-thin-crust-whole-grain-fro",
+  "fdcId": 170792,
+  "name": "School Lunch, pizza, cheese topping, thin crust, whole grain, frozen, ",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, cheese topping, thin crust, whole grain, frozen, cooked",
+  "per100g": {
+   "protein": 12.72,
+   "fat": 7.91,
+   "carbs": 31.31,
+   "kcal": 247,
+   "fibre": 4,
+   "sodium": 421,
+   "satFat": 4,
+   "sugars": 7.12
+  }
+ },
+ {
+  "id": "school-lunch-pizza-pepperoni-topping-thick-crust-whole-grain",
+  "fdcId": 170781,
+  "name": "School Lunch, pizza, pepperoni topping, thick crust, whole grain, froz",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, pepperoni topping, thick crust, whole grain, frozen, cooked",
+  "per100g": {
+   "protein": 14.35,
+   "fat": 9.82,
+   "carbs": 28.3,
+   "kcal": 259,
+   "fibre": 4.3,
+   "sodium": 474,
+   "satFat": 4.219,
+   "sugars": 4.03
+  }
+ },
+ {
+  "id": "school-lunch-pizza-pepperoni-topping-thin-crust-whole-grain-",
+  "fdcId": 170780,
+  "name": "School Lunch, pizza, pepperoni topping, thin crust, whole grain, froze",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, pepperoni topping, thin crust, whole grain, frozen, cooked",
+  "per100g": {
+   "protein": 12.78,
+   "fat": 8.62,
+   "carbs": 31.24,
+   "kcal": 254,
+   "fibre": 4.3,
+   "sodium": 495,
+   "satFat": 2.81,
+   "sugars": 7.62
+  }
+ },
+ {
+  "id": "school-lunch-pizza-sausage-topping-thick-crust-whole-grain-f",
+  "fdcId": 170793,
+  "name": "School Lunch, pizza, sausage topping, thick crust, whole grain, frozen",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, sausage topping, thick crust, whole grain, frozen, cooked",
+  "per100g": {
+   "protein": 13.26,
+   "fat": 9.07,
+   "carbs": 30.58,
+   "kcal": 257,
+   "fibre": 4,
+   "sodium": 433,
+   "satFat": 4.219,
+   "sugars": 3.72
+  }
+ },
+ {
+  "id": "school-lunch-pizza-sausage-topping-thin-crust-whole-grain-fr",
+  "fdcId": 170782,
+  "name": "School Lunch, pizza, sausage topping, thin crust, whole grain, frozen,",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, sausage topping, thin crust, whole grain, frozen, cooked",
+  "per100g": {
+   "protein": 12.63,
+   "fat": 7.83,
+   "carbs": 32.24,
+   "kcal": 250,
+   "fibre": 3.9,
+   "sodium": 457,
+   "satFat": 3.488,
+   "sugars": 7.53
+  }
+ },
+ {
+  "id": "school-lunch-pizza-tony-s-breakfast-pizza-sausage-frozen",
+  "fdcId": 170704,
+  "name": "School Lunch, pizza, TONY'S Breakfast Pizza Sausage, frozen",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, TONY'S Breakfast Pizza Sausage, frozen",
+  "per100g": {
+   "protein": 10.39,
+   "fat": 10.04,
+   "carbs": 26.99,
+   "kcal": 240,
+   "fibre": 2,
+   "sodium": 600,
+   "satFat": 3.47,
+   "sugars": 5.87
+  }
+ },
+ {
+  "id": "school-lunch-pizza-tony-s-smartpizza-whole-grain-4x6-cheese-",
+  "fdcId": 170702,
+  "name": "School Lunch, pizza, TONY'S SMARTPIZZA Whole Grain 4x6 Cheese Pizza 50",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, TONY'S SMARTPIZZA Whole Grain 4x6 Cheese Pizza 50/50 Cheese, frozen",
+  "per100g": {
+   "protein": 12.08,
+   "fat": 7.51,
+   "carbs": 29.27,
+   "kcal": 233,
+   "fibre": 3.8,
+   "sodium": 400,
+   "satFat": 2.79,
+   "sugars": 6.76
+  }
+ },
+ {
+  "id": "school-lunch-pizza-tony-s-smartpizza-whole-grain-4x6-peppero",
+  "fdcId": 170703,
+  "name": "School Lunch, pizza, TONY'S SMARTPIZZA Whole Grain 4x6 Pepperoni Pizza",
+  "category": "Prepared",
+  "usdaName": "School Lunch, pizza, TONY'S SMARTPIZZA Whole Grain 4x6 Pepperoni Pizza 50/50 Cheese, frozen",
+  "per100g": {
+   "protein": 12.14,
+   "fat": 8.19,
+   "carbs": 28.84,
+   "kcal": 238,
+   "fibre": 4.1,
+   "sodium": 470,
+   "satFat": 2.81,
+   "sugars": 7.24
+  }
+ },
+ {
   "id": "shrimp-cooked",
   "fdcId": 171971,
   "name": "Shrimp, cooked",
@@ -2921,6 +6797,482 @@
    "sodium": 947,
    "satFat": 0.521,
    "sugars": 0
+  }
+ },
+ {
+  "id": "snack-potato-chips-made-from-dried-potatoes-plain",
+  "fdcId": 168853,
+  "name": "Snack, potato chips, made from dried potatoes, plain",
+  "category": "Snacks",
+  "usdaName": "Snack, potato chips, made from dried potatoes, plain",
+  "per100g": {
+   "protein": 4.62,
+   "fat": 35.28,
+   "carbs": 55.38,
+   "kcal": 545,
+   "fibre": 2.9,
+   "sodium": 529,
+   "satFat": 8.643,
+   "sugars": 0.76
+  }
+ },
+ {
+  "id": "snacks-potato-chips-barbecue-flavor",
+  "fdcId": 167962,
+  "name": "Snacks, potato chips, barbecue-flavor",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, barbecue-flavor",
+  "per100g": {
+   "protein": 6.51,
+   "fat": 31.06,
+   "carbs": 55.92,
+   "kcal": 487,
+   "fibre": 3.8,
+   "sodium": 545,
+   "satFat": 4.002,
+   "sugars": 5.47
+  }
+ },
+ {
+  "id": "snacks-potato-chips-cheese-flavor",
+  "fdcId": 169682,
+  "name": "Snacks, potato chips, cheese-flavor",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, cheese-flavor",
+  "per100g": {
+   "protein": 8.5,
+   "fat": 27.2,
+   "carbs": 57.7,
+   "kcal": 496,
+   "fibre": 5.2,
+   "sodium": 458,
+   "satFat": 8.6,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-potato-chips-fat-free-salted",
+  "fdcId": 169686,
+  "name": "Snacks, potato chips, fat free, salted",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, fat free, salted",
+  "per100g": {
+   "protein": 9.64,
+   "fat": 0.6,
+   "carbs": 83.76,
+   "kcal": 379,
+   "fibre": 7.5,
+   "sodium": 643,
+   "satFat": 0.15,
+   "sugars": 3.69
+  }
+ },
+ {
+  "id": "snacks-potato-chips-fat-free-made-with-olestra",
+  "fdcId": 169684,
+  "name": "Snacks, potato chips, fat-free, made with olestra",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, fat-free, made with olestra",
+  "per100g": {
+   "protein": 7.74,
+   "fat": 0.7,
+   "carbs": 65,
+   "kcal": 274,
+   "fibre": 6.8,
+   "sodium": 554,
+   "satFat": 0.24,
+   "sugars": 0
+  }
+ },
+ {
+  "id": "snacks-potato-chips-lightly-salted",
+  "fdcId": 174805,
+  "name": "Snacks, potato chips, lightly salted",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, lightly salted",
+  "per100g": {
+   "protein": 6.72,
+   "fat": 35.39,
+   "carbs": 53.54,
+   "kcal": 560,
+   "fibre": 4.2,
+   "sodium": 187,
+   "satFat": 5.49,
+   "sugars": 0.34
+  }
+ },
+ {
+  "id": "snacks-potato-chips-made-from-dried-potatoes-preformed-multi",
+  "fdcId": 174804,
+  "name": "Snacks, potato chips, made from dried potatoes (preformed), multigrain",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, made from dried potatoes (preformed), multigrain",
+  "per100g": {
+   "protein": 5.3,
+   "fat": 24.74,
+   "carbs": 65.34,
+   "kcal": 505,
+   "fibre": 2.7,
+   "sodium": 544,
+   "satFat": 6.307,
+   "sugars": 4.08
+  }
+ },
+ {
+  "id": "snacks-potato-chips-made-from-dried-potatoes-cheese-flavor",
+  "fdcId": 169678,
+  "name": "Snacks, potato chips, made from dried potatoes, cheese-flavor",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, made from dried potatoes, cheese-flavor",
+  "per100g": {
+   "protein": 7,
+   "fat": 37,
+   "carbs": 50.6,
+   "kcal": 551,
+   "fibre": 3.4,
+   "sodium": 600,
+   "satFat": 9.57,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-potato-chips-made-from-dried-potatoes-fat-free-made-w",
+  "fdcId": 168864,
+  "name": "Snacks, potato chips, made from dried potatoes, fat-free, made with ol",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, made from dried potatoes, fat-free, made with olestra",
+  "per100g": {
+   "protein": 5.06,
+   "fat": 0.93,
+   "carbs": 56,
+   "kcal": 253,
+   "fibre": 7.3,
+   "sodium": 429,
+   "satFat": 0.355,
+   "sugars": 0.59
+  }
+ },
+ {
+  "id": "snacks-potato-chips-made-from-dried-potatoes-reduced-fat",
+  "fdcId": 167553,
+  "name": "Snacks, potato chips, made from dried potatoes, reduced fat",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, made from dried potatoes, reduced fat",
+  "per100g": {
+   "protein": 4.56,
+   "fat": 26.14,
+   "carbs": 64.76,
+   "kcal": 502,
+   "fibre": 3.2,
+   "sodium": 450,
+   "satFat": 6.759,
+   "sugars": 0.63
+  }
+ },
+ {
+  "id": "snacks-potato-chips-made-from-dried-potatoes-sour-cream-and-",
+  "fdcId": 167554,
+  "name": "Snacks, potato chips, made from dried potatoes, sour-cream and onion-f",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, made from dried potatoes, sour-cream and onion-flavor",
+  "per100g": {
+   "protein": 6.6,
+   "fat": 37,
+   "carbs": 51.3,
+   "kcal": 547,
+   "fibre": 1.2,
+   "sodium": 541,
+   "satFat": 9.47,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-potato-chips-plain-made-with-partially-hydrogenated-s",
+  "fdcId": 170248,
+  "name": "Snacks, potato chips, plain, made with partially hydrogenated soybean ",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, plain, made with partially hydrogenated soybean oil, salted",
+  "per100g": {
+   "protein": 7,
+   "fat": 34.6,
+   "carbs": 52.9,
+   "kcal": 536,
+   "fibre": 4.8,
+   "sodium": 594,
+   "satFat": 5.43,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-potato-chips-plain-made-with-partially-hydrogenated-s-170648",
+  "fdcId": 170648,
+  "name": "Snacks, potato chips, plain, made with partially hydrogenated soybean ",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, plain, made with partially hydrogenated soybean oil, unsalted",
+  "per100g": {
+   "protein": 7,
+   "fat": 34.6,
+   "carbs": 52.9,
+   "kcal": 536,
+   "fibre": 4.8,
+   "sodium": 8,
+   "satFat": 5.43,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-potato-chips-plain-unsalted",
+  "fdcId": 170649,
+  "name": "Snacks, potato chips, plain, unsalted",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, plain, unsalted",
+  "per100g": {
+   "protein": 7,
+   "fat": 34.6,
+   "carbs": 52.9,
+   "kcal": 536,
+   "fibre": 4.8,
+   "sodium": 8,
+   "satFat": 10.96,
+   "sugars": 0.22
+  }
+ },
+ {
+  "id": "snacks-potato-chips-reduced-fat",
+  "fdcId": 169683,
+  "name": "Snacks, potato chips, reduced fat",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, reduced fat",
+  "per100g": {
+   "protein": 7.1,
+   "fat": 20.8,
+   "carbs": 66.9,
+   "kcal": 471,
+   "fibre": 5.9,
+   "sodium": 571,
+   "satFat": 4.16,
+   "sugars": 0.22
+  }
+ },
+ {
+  "id": "snacks-potato-chips-sour-cream-and-onion-flavor",
+  "fdcId": 167963,
+  "name": "Snacks, potato chips, sour-cream-and-onion-flavor",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, sour-cream-and-onion-flavor",
+  "per100g": {
+   "protein": 8.1,
+   "fat": 33.9,
+   "carbs": 51.5,
+   "kcal": 531,
+   "fibre": 5.2,
+   "sodium": 549,
+   "satFat": 8.89,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-potato-chips-white-restructured-baked",
+  "fdcId": 169046,
+  "name": "Snacks, potato chips, white, restructured, baked",
+  "category": "Snacks",
+  "usdaName": "Snacks, potato chips, white, restructured, baked",
+  "per100g": {
+   "protein": 5,
+   "fat": 18.2,
+   "carbs": 71.4,
+   "kcal": 469,
+   "fibre": 4.8,
+   "sodium": 536,
+   "satFat": 2.631,
+   "sugars": 5.01
+  }
+ },
+ {
+  "id": "snacks-sweet-potato-chips-unsalted",
+  "fdcId": 174783,
+  "name": "Snacks, sweet potato chips, unsalted",
+  "category": "Snacks",
+  "usdaName": "Snacks, sweet potato chips, unsalted",
+  "per100g": {
+   "protein": 2.94,
+   "fat": 32.35,
+   "carbs": 56.82,
+   "kcal": 532,
+   "fibre": 8.8,
+   "sodium": 35,
+   "satFat": 2.941,
+   "sugars": 8.82
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-light-baked-with-less-oil",
+  "fdcId": 168137,
+  "name": "Snacks, tortilla chips, light (baked with less oil)",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, light (baked with less oil)",
+  "per100g": {
+   "protein": 8.7,
+   "fat": 15.2,
+   "carbs": 73.4,
+   "kcal": 465,
+   "fibre": 5.7,
+   "sodium": 400,
+   "satFat": 2.837,
+   "sugars": 0.53
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-low-fat-made-with-olestra-nacho-cheese",
+  "fdcId": 168863,
+  "name": "Snacks, tortilla chips, low fat, made with olestra, nacho cheese",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, low fat, made with olestra, nacho cheese",
+  "per100g": {
+   "protein": 8.44,
+   "fat": 3.53,
+   "carbs": 65.22,
+   "kcal": 318,
+   "fibre": 6.4,
+   "sodium": 705,
+   "satFat": 1.054,
+   "sugars": 2.82
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-low-fat-unsalted",
+  "fdcId": 170254,
+  "name": "Snacks, tortilla chips, low fat, unsalted",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, low fat, unsalted",
+  "per100g": {
+   "protein": 11,
+   "fat": 5.7,
+   "carbs": 80.1,
+   "kcal": 416,
+   "fibre": 5.3,
+   "sodium": 15,
+   "satFat": 0.85,
+   "sugars": 0.85
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-nacho-cheese",
+  "fdcId": 167559,
+  "name": "Snacks, tortilla chips, nacho cheese",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, nacho cheese",
+  "per100g": {
+   "protein": 7.36,
+   "fat": 27.42,
+   "carbs": 60.81,
+   "kcal": 519,
+   "fibre": 5.1,
+   "sodium": 691,
+   "satFat": 3.876,
+   "sugars": 2.59
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-nacho-flavor-made-with-enriched-masa-f",
+  "fdcId": 170256,
+  "name": "Snacks, tortilla chips, nacho-flavor, made with enriched masa flour",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, nacho-flavor, made with enriched masa flour",
+  "per100g": {
+   "protein": 7.8,
+   "fat": 25.6,
+   "carbs": 62.3,
+   "kcal": 511,
+   "fibre": 5.3,
+   "sodium": 708,
+   "satFat": 4.9,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-nacho-flavor-reduced-fat",
+  "fdcId": 168858,
+  "name": "Snacks, tortilla chips, nacho-flavor, reduced fat",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, nacho-flavor, reduced fat",
+  "per100g": {
+   "protein": 8.7,
+   "fat": 15.2,
+   "carbs": 71.6,
+   "kcal": 445,
+   "fibre": 4.8,
+   "sodium": 1003,
+   "satFat": 2.91,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-plain-white-corn-salted",
+  "fdcId": 167558,
+  "name": "Snacks, tortilla chips, plain, white corn, salted",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, plain, white corn, salted",
+  "per100g": {
+   "protein": 7.1,
+   "fat": 20.68,
+   "carbs": 67.78,
+   "kcal": 472,
+   "fibre": 5.4,
+   "sodium": 328,
+   "satFat": 2.811,
+   "sugars": 0.78
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-ranch-flavor",
+  "fdcId": 167560,
+  "name": "Snacks, tortilla chips, ranch-flavor",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, ranch-flavor",
+  "per100g": {
+   "protein": 7.19,
+   "fat": 24.63,
+   "carbs": 62.74,
+   "kcal": 501,
+   "fibre": 4,
+   "sodium": 519,
+   "satFat": 3.539,
+   "sugars": 3.03
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-taco-flavor",
+  "fdcId": 167970,
+  "name": "Snacks, tortilla chips, taco-flavor",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, taco-flavor",
+  "per100g": {
+   "protein": 7.9,
+   "fat": 24.2,
+   "carbs": 63.1,
+   "kcal": 480,
+   "fibre": 5.3,
+   "sodium": 787,
+   "satFat": 4.64,
+   "sugars": null
+  }
+ },
+ {
+  "id": "snacks-tortilla-chips-unsalted-white-corn",
+  "fdcId": 168116,
+  "name": "Snacks, tortilla chips, unsalted, white corn",
+  "category": "Snacks",
+  "usdaName": "Snacks, tortilla chips, unsalted, white corn",
+  "per100g": {
+   "protein": 7.79,
+   "fat": 23.36,
+   "carbs": 65.32,
+   "kcal": 503,
+   "fibre": 5.3,
+   "sodium": 15,
+   "satFat": 2.458,
+   "sugars": 1
   }
  },
  {
@@ -3162,6 +7514,23 @@
   }
  },
  {
+  "id": "t-g-i-friday-s-french-fries",
+  "fdcId": 169833,
+  "name": "T.G.I. FRIDAY'S, french fries",
+  "category": "Prepared",
+  "usdaName": "T.G.I. FRIDAY'S, french fries",
+  "per100g": {
+   "protein": 3.74,
+   "fat": 14.82,
+   "carbs": 36.9,
+   "kcal": 296,
+   "fibre": 4.1,
+   "sodium": 409,
+   "satFat": 2.6,
+   "sugars": 0
+  }
+ },
+ {
   "id": "tahini",
   "fdcId": 168604,
   "name": "Tahini",
@@ -3315,6 +7684,40 @@
   }
  },
  {
+  "id": "tortilla-chips-low-fat-baked-without-fat",
+  "fdcId": 168859,
+  "name": "Tortilla chips, low fat, baked without fat",
+  "category": "Snacks",
+  "usdaName": "Tortilla chips, low fat, baked without fat",
+  "per100g": {
+   "protein": 11,
+   "fat": 5.7,
+   "carbs": 80.2,
+   "kcal": 448,
+   "fibre": 5.3,
+   "sodium": 517,
+   "satFat": 0.85,
+   "sugars": 0.67
+  }
+ },
+ {
+  "id": "tortilla-chips-yellow-plain-salted",
+  "fdcId": 173143,
+  "name": "Tortilla chips, yellow, plain, salted",
+  "category": "Snacks",
+  "usdaName": "Tortilla chips, yellow, plain, salted",
+  "per100g": {
+   "protein": 6.62,
+   "fat": 22.33,
+   "carbs": 67.38,
+   "kcal": 497,
+   "fibre": 4.7,
+   "sodium": 310,
+   "satFat": 2.776,
+   "sugars": 1.21
+  }
+ },
+ {
   "id": "trout-cooked",
   "fdcId": 173718,
   "name": "Trout, cooked",
@@ -3465,6 +7868,91 @@
    "sodium": 1,
    "satFat": 0.016,
    "sugars": 6.2
+  }
+ },
+ {
+  "id": "wendy-s-classic-single-hamburger-no-cheese",
+  "fdcId": 170722,
+  "name": "WENDY'S, CLASSIC SINGLE Hamburger, no cheese",
+  "category": "Prepared",
+  "usdaName": "WENDY'S, CLASSIC SINGLE Hamburger, no cheese",
+  "per100g": {
+   "protein": 12.63,
+   "fat": 10.6,
+   "carbs": 16.82,
+   "kcal": 213,
+   "fibre": 1.3,
+   "sodium": 395,
+   "satFat": 3.689,
+   "sugars": null
+  }
+ },
+ {
+  "id": "wendy-s-classic-single-hamburger-with-cheese",
+  "fdcId": 170322,
+  "name": "WENDY'S, CLASSIC SINGLE Hamburger, with cheese",
+  "category": "Prepared",
+  "usdaName": "WENDY'S, CLASSIC SINGLE Hamburger, with cheese",
+  "per100g": {
+   "protein": 14.87,
+   "fat": 11.6,
+   "carbs": 14.2,
+   "kcal": 221,
+   "fibre": 1.4,
+   "sodium": 476,
+   "satFat": 5.191,
+   "sugars": null
+  }
+ },
+ {
+  "id": "wendy-s-french-fries",
+  "fdcId": 170726,
+  "name": "WENDY'S, french fries",
+  "category": "Prepared",
+  "usdaName": "WENDY'S, french fries",
+  "per100g": {
+   "protein": 3.73,
+   "fat": 14.1,
+   "carbs": 39.73,
+   "kcal": 301,
+   "fibre": 4,
+   "sodium": 219,
+   "satFat": 2.79,
+   "sugars": 0.4
+  }
+ },
+ {
+  "id": "wendy-s-jr-hamburger-with-cheese",
+  "fdcId": 170324,
+  "name": "WENDY'S, Jr. Hamburger, with cheese",
+  "category": "Prepared",
+  "usdaName": "WENDY'S, Jr. Hamburger, with cheese",
+  "per100g": {
+   "protein": 13.06,
+   "fat": 11.5,
+   "carbs": 24.97,
+   "kcal": 256,
+   "fibre": 1.4,
+   "sodium": 660,
+   "satFat": 5.181,
+   "sugars": null
+  }
+ },
+ {
+  "id": "wendy-s-jr-hamburger-without-cheese",
+  "fdcId": 170323,
+  "name": "WENDY'S, Jr. Hamburger, without cheese",
+  "category": "Prepared",
+  "usdaName": "WENDY'S, Jr. Hamburger, without cheese",
+  "per100g": {
+   "protein": 12.62,
+   "fat": 8.75,
+   "carbs": 28.45,
+   "kcal": 243,
+   "fibre": 1.7,
+   "sodium": 539,
+   "satFat": 3.466,
+   "sugars": null
   }
  },
  {
@@ -3670,210 +8158,5 @@
    "satFat": 0.084,
    "sugars": 2.5
   }
- },
- {"id": "pizza-pepperoni", "fdcId": null, "name": "Pizza, pepperoni", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-sausage", "fdcId": null, "name": "Pizza, sausage", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-meat-and-vegetables", "fdcId": null, "name": "Pizza, meat and vegetables", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-cheese-frozen", "fdcId": null, "name": "Pizza, cheese, frozen", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-pepperoni-frozen", "fdcId": null, "name": "Pizza, pepperoni, frozen", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-thin-crust-cheese", "fdcId": null, "name": "Pizza, thin crust, cheese", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-deep-dish-cheese", "fdcId": null, "name": "Pizza, deep dish, cheese", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-ham-and-pineapple", "fdcId": null, "name": "Pizza, ham and pineapple", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pizza-roll", "fdcId": null, "name": "Pizza roll", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "hamburger-plain", "fdcId": null, "name": "Hamburger, plain", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cheeseburger-plain", "fdcId": null, "name": "Cheeseburger, plain", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "hamburger-with-mayonnaise", "fdcId": null, "name": "Hamburger, with mayonnaise", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "double-cheeseburger", "fdcId": null, "name": "Double cheeseburger", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "bacon-cheeseburger", "fdcId": null, "name": "Bacon cheeseburger", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "veggie-burger", "fdcId": null, "name": "Veggie burger", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chicken-burger", "fdcId": null, "name": "Chicken burger", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "fish-burger", "fdcId": null, "name": "Fish burger", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "french-fries-fried", "fdcId": null, "name": "French fries, fried", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "french-fries-oven-baked", "fdcId": null, "name": "French fries, oven-baked", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "french-fries-frozen", "fdcId": null, "name": "French fries, frozen", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sweet-potato-fries", "fdcId": null, "name": "Sweet potato fries", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "curly-fries", "fdcId": null, "name": "Curly fries", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "potato-wedges", "fdcId": null, "name": "Potato wedges", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pasta-with-meat-sauce", "fdcId": null, "name": "Pasta with meat sauce", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pasta-with-tomato-sauce", "fdcId": null, "name": "Pasta with tomato sauce", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "macaroni-and-cheese", "fdcId": null, "name": "Macaroni and cheese", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "lasagna-with-meat", "fdcId": null, "name": "Lasagna with meat", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "lasagna-vegetarian", "fdcId": null, "name": "Lasagna, vegetarian", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "spaghetti-with-meatballs", "fdcId": null, "name": "Spaghetti with meatballs", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ravioli-cheese-filled", "fdcId": null, "name": "Ravioli, cheese-filled", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "tortellini-cheese-filled", "fdcId": null, "name": "Tortellini, cheese-filled", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pasta-salad", "fdcId": null, "name": "Pasta salad", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "noodles-egg-cooked", "fdcId": null, "name": "Noodles, egg, cooked", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ramen-noodles-cooked", "fdcId": null, "name": "Ramen noodles, cooked", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chicken-sandwich", "fdcId": null, "name": "Chicken sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "tuna-salad-sandwich", "fdcId": null, "name": "Tuna salad sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ham-and-cheese-sandwich", "fdcId": null, "name": "Ham and cheese sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "peanut-butter-and-jelly-sandwich", "fdcId": null, "name": "Peanut butter and jelly sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "club-sandwich", "fdcId": null, "name": "Club sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "submarine-sandwich", "fdcId": null, "name": "Submarine sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "egg-salad-sandwich", "fdcId": null, "name": "Egg salad sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "roast-beef-sandwich", "fdcId": null, "name": "Roast beef sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "turkey-sandwich", "fdcId": null, "name": "Turkey sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "grilled-cheese-sandwich", "fdcId": null, "name": "Grilled cheese sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "blt-sandwich", "fdcId": null, "name": "BLT sandwich", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chicken-nuggets", "fdcId": null, "name": "Chicken nuggets", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "fried-chicken", "fdcId": null, "name": "Fried chicken", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chicken-wings", "fdcId": null, "name": "Chicken wings", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "fish-and-chips", "fdcId": null, "name": "Fish and chips", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "taco-beef", "fdcId": null, "name": "Taco, beef", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "burrito-bean-and-cheese", "fdcId": null, "name": "Burrito, bean and cheese", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "enchilada-cheese", "fdcId": null, "name": "Enchilada, cheese", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "quesadilla-cheese", "fdcId": null, "name": "Quesadilla, cheese", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "nachos-with-cheese", "fdcId": null, "name": "Nachos with cheese", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "egg-roll", "fdcId": null, "name": "Egg roll", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "spring-roll", "fdcId": null, "name": "Spring roll", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "fried-rice", "fdcId": null, "name": "Fried rice", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "lo-mein", "fdcId": null, "name": "Lo mein", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chow-mein", "fdcId": null, "name": "Chow mein", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sushi-roll-california", "fdcId": null, "name": "Sushi roll, California", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sushi-roll-salmon", "fdcId": null, "name": "Sushi roll, salmon", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "doner-kebab", "fdcId": null, "name": "Doner kebab", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "falafel", "fdcId": null, "name": "Falafel", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "shawarma-chicken", "fdcId": null, "name": "Shawarma, chicken", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "curry-chicken", "fdcId": null, "name": "Curry, chicken", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pad-thai", "fdcId": null, "name": "Pad thai", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "dumplings-pork", "fdcId": null, "name": "Dumplings, pork", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "hot-dog", "fdcId": null, "name": "Hot dog", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "corn-dog", "fdcId": null, "name": "Corn dog", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "meat-pie", "fdcId": null, "name": "Meat pie", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "shepherd-s-pie", "fdcId": null, "name": "Shepherd's pie", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "mozzarella-sticks", "fdcId": null, "name": "Mozzarella sticks", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "onion-rings", "fdcId": null, "name": "Onion rings", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "garlic-bread", "fdcId": null, "name": "Garlic bread", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "baked-beans-canned", "fdcId": null, "name": "Baked beans, canned", "category": "Pantry", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chili-con-carne", "fdcId": null, "name": "Chili con carne", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "soup-chicken-noodle", "fdcId": null, "name": "Soup, chicken noodle", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "soup-tomato", "fdcId": null, "name": "Soup, tomato", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "soup-minestrone", "fdcId": null, "name": "Soup, minestrone", "category": "Prepared", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ice-cream-chocolate", "fdcId": null, "name": "Ice cream, chocolate", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ice-cream-strawberry", "fdcId": null, "name": "Ice cream, strawberry", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ice-cream-cookies-and-cream", "fdcId": null, "name": "Ice cream, cookies and cream", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ice-cream-cone-vanilla", "fdcId": null, "name": "Ice cream cone, vanilla", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ice-cream-sandwich", "fdcId": null, "name": "Ice cream sandwich", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ice-cream-sundae", "fdcId": null, "name": "Ice cream sundae", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "frozen-yogurt-vanilla", "fdcId": null, "name": "Frozen yogurt, vanilla", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "gelato-vanilla", "fdcId": null, "name": "Gelato, vanilla", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sorbet-lemon", "fdcId": null, "name": "Sorbet, lemon", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "popsicle", "fdcId": null, "name": "Popsicle", "category": "Frozen", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "milkshake-vanilla", "fdcId": null, "name": "Milkshake, vanilla", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "milkshake-chocolate", "fdcId": null, "name": "Milkshake, chocolate", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chocolate-cake-with-frosting", "fdcId": null, "name": "Chocolate cake with frosting", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "vanilla-cake-with-frosting", "fdcId": null, "name": "Vanilla cake with frosting", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cheesecake", "fdcId": null, "name": "Cheesecake", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "carrot-cake", "fdcId": null, "name": "Carrot cake", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "angel-food-cake", "fdcId": null, "name": "Angel food cake", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pound-cake", "fdcId": null, "name": "Pound cake", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "coffee-cake", "fdcId": null, "name": "Coffee cake", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "brownie", "fdcId": null, "name": "Brownie", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "doughnut-glazed", "fdcId": null, "name": "Doughnut, glazed", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "doughnut-chocolate", "fdcId": null, "name": "Doughnut, chocolate", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "muffin-blueberry", "fdcId": null, "name": "Muffin, blueberry", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "muffin-chocolate-chip", "fdcId": null, "name": "Muffin, chocolate chip", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "croissant", "fdcId": null, "name": "Croissant", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "bagel-plain", "fdcId": null, "name": "Bagel, plain", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pancakes", "fdcId": null, "name": "Pancakes", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "waffle", "fdcId": null, "name": "Waffle", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "french-toast", "fdcId": null, "name": "French toast", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pie-apple", "fdcId": null, "name": "Pie, apple", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pie-pumpkin", "fdcId": null, "name": "Pie, pumpkin", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pie-pecan", "fdcId": null, "name": "Pie, pecan", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "apple-crisp", "fdcId": null, "name": "Apple crisp", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pudding-chocolate", "fdcId": null, "name": "Pudding, chocolate", "category": "Dairy", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "custard", "fdcId": null, "name": "Custard", "category": "Dairy", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "danish-pastry", "fdcId": null, "name": "Danish pastry", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cinnamon-roll", "fdcId": null, "name": "Cinnamon roll", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "bread-pudding", "fdcId": null, "name": "Bread pudding", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "tiramisu", "fdcId": null, "name": "Tiramisu", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cannoli", "fdcId": null, "name": "Cannoli", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "macaron", "fdcId": null, "name": "Macaron", "category": "Bakery", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "oatmeal-cookies", "fdcId": null, "name": "Oatmeal cookies", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sugar-cookies", "fdcId": null, "name": "Sugar cookies", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "shortbread-cookies", "fdcId": null, "name": "Shortbread cookies", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "peanut-butter-cookies", "fdcId": null, "name": "Peanut butter cookies", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chocolate-sandwich-cookies", "fdcId": null, "name": "Chocolate sandwich cookies", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "vanilla-wafers", "fdcId": null, "name": "Vanilla wafers", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "graham-crackers", "fdcId": null, "name": "Graham crackers", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "animal-crackers", "fdcId": null, "name": "Animal crackers", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chocolate-milk", "fdcId": null, "name": "Chocolate, milk", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chocolate-dark", "fdcId": null, "name": "Chocolate, dark", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chocolate-white", "fdcId": null, "name": "Chocolate, white", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chocolate-candy-bar", "fdcId": null, "name": "Chocolate candy bar", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "chocolate-with-almonds", "fdcId": null, "name": "Chocolate with almonds", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cocoa-powder", "fdcId": null, "name": "Cocoa powder", "category": "Pantry", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "caramel-candy", "fdcId": null, "name": "Caramel candy", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "gummy-bears", "fdcId": null, "name": "Gummy bears", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "marshmallows", "fdcId": null, "name": "Marshmallows", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "peanut-brittle", "fdcId": null, "name": "Peanut brittle", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "licorice", "fdcId": null, "name": "Licorice", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "jelly-beans", "fdcId": null, "name": "Jelly beans", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "tortilla-chips", "fdcId": null, "name": "Tortilla chips", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "corn-chips", "fdcId": null, "name": "Corn chips", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cheese-puffs", "fdcId": null, "name": "Cheese puffs", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "popcorn-microwave", "fdcId": null, "name": "Popcorn, microwave", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pretzel-sticks", "fdcId": null, "name": "Pretzel sticks", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "trail-mix", "fdcId": null, "name": "Trail mix", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "granola-cereal", "fdcId": null, "name": "Granola cereal", "category": "Pantry", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cereal-bar", "fdcId": null, "name": "Cereal bar", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "fruit-snacks", "fdcId": null, "name": "Fruit snacks", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "rice-crackers", "fdcId": null, "name": "Rice crackers", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pork-rinds", "fdcId": null, "name": "Pork rinds", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "saltine-crackers", "fdcId": null, "name": "Saltine crackers", "category": "Snacks", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cola-soft-drink", "fdcId": null, "name": "Cola, soft drink", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cola-diet", "fdcId": null, "name": "Cola, diet", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cola-cherry", "fdcId": null, "name": "Cola, cherry", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "lemon-lime-soda", "fdcId": null, "name": "Lemon-lime soda", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "orange-soda", "fdcId": null, "name": "Orange soda", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "root-beer", "fdcId": null, "name": "Root beer", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "ginger-ale", "fdcId": null, "name": "Ginger ale", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cream-soda", "fdcId": null, "name": "Cream soda", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "tonic-water", "fdcId": null, "name": "Tonic water", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "energy-drink", "fdcId": null, "name": "Energy drink", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sports-drink", "fdcId": null, "name": "Sports drink", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "lemonade", "fdcId": null, "name": "Lemonade", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "fruit-punch", "fdcId": null, "name": "Fruit punch", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "iced-tea-sweetened", "fdcId": null, "name": "Iced tea, sweetened", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sparkling-water", "fdcId": null, "name": "Sparkling water", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "beer-regular", "fdcId": null, "name": "Beer, regular", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "beer-light", "fdcId": null, "name": "Beer, light", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "beer-ale", "fdcId": null, "name": "Beer, ale", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "beer-stout", "fdcId": null, "name": "Beer, stout", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "beer-wheat", "fdcId": null, "name": "Beer, wheat", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "wine-red", "fdcId": null, "name": "Wine, red", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "wine-white", "fdcId": null, "name": "Wine, white", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "wine-rose", "fdcId": null, "name": "Wine, rose", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "champagne", "fdcId": null, "name": "Champagne", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "sherry", "fdcId": null, "name": "Sherry", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "whiskey", "fdcId": null, "name": "Whiskey", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "vodka", "fdcId": null, "name": "Vodka", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cocktail-margarita", "fdcId": null, "name": "Cocktail, margarita", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "coffee-espresso", "fdcId": null, "name": "Coffee, espresso", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "coffee-decaffeinated", "fdcId": null, "name": "Coffee, decaffeinated", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "latte", "fdcId": null, "name": "Latte", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cappuccino", "fdcId": null, "name": "Cappuccino", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "mocha", "fdcId": null, "name": "Mocha", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "coffee-instant-prepared", "fdcId": null, "name": "Coffee, instant, prepared", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "grapefruit-juice", "fdcId": null, "name": "Grapefruit juice", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "grape-juice", "fdcId": null, "name": "Grape juice", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "cranberry-juice", "fdcId": null, "name": "Cranberry juice", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "tomato-juice", "fdcId": null, "name": "Tomato juice", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "pineapple-juice", "fdcId": null, "name": "Pineapple juice", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "vegetable-juice", "fdcId": null, "name": "Vegetable juice", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "coconut-water", "fdcId": null, "name": "Coconut water", "category": "Beverages", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "guava-raw", "fdcId": null, "name": "Guava, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "lychee-raw", "fdcId": null, "name": "Lychee, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "passion-fruit-raw", "fdcId": null, "name": "Passion fruit, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "persimmon-raw", "fdcId": null, "name": "Persimmon, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "tangerine-raw", "fdcId": null, "name": "Tangerine, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "clementine-raw", "fdcId": null, "name": "Clementine, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "starfruit-raw", "fdcId": null, "name": "Starfruit, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "coconut-meat-raw", "fdcId": null, "name": "Coconut meat, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "dried-figs", "fdcId": null, "name": "Dried figs", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "dried-mango", "fdcId": null, "name": "Dried mango", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "plantain-raw", "fdcId": null, "name": "Plantain, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}},
- {"id": "kumquat-raw", "fdcId": null, "name": "Kumquat, raw", "category": "Produce", "usdaName": null, "per100g": {"kcal": null, "protein": null, "fat": null, "satFat": null, "carbs": null, "fibre": null, "sugars": null, "sodium": null}}
+ }
 ]

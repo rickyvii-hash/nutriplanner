@@ -57,15 +57,23 @@ function wordForms(word) {
   return [...forms];
 }
 
-/** True when one word of the food matches one word of the query. */
+/**
+ * True when one word of the food matches one word of the query.
+ * Short query words (under 5 letters) must match a whole food word, so "cola"
+ * never matches "colada" or the "cola" inside "chocolate".
+ */
 function wordMatches(foodWord, queryWord) {
   if (foodWord === queryWord) return true;
-  if (foodWord.startsWith(queryWord)) return true;
   for (const form of wordForms(queryWord)) {
-    if (form.length >= 3 && foodWord.startsWith(form)) return true;
+    if (foodWord === form) return true;
   }
   for (const form of wordForms(foodWord)) {
-    if (queryWord.length >= 4 && form.startsWith(queryWord)) return true;
+    if (form === queryWord) return true;
+  }
+  // Prefix match only for longer stems (pizza → pizzas is fine; cola → colada is not).
+  if (queryWord.length >= 5 && foodWord.startsWith(queryWord)) return true;
+  for (const form of wordForms(queryWord)) {
+    if (form.length >= 5 && foodWord.startsWith(form)) return true;
   }
   return false;
 }
