@@ -121,6 +121,13 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
   padding: 10px 0; border-bottom: 1px solid var(--line);
 }
 .meal-item:last-child, .plan-meal-row:last-child { border-bottom: none; }
+.plan-meal-row.is-skipped { opacity: 0.72; }
+.meal-actions {
+  display: flex; flex-direction: column; gap: 6px; flex-shrink: 0;
+}
+@media (min-width: 480px) {
+  .meal-actions { flex-direction: row; }
+}
 .meal-slot {
   display: inline-block; font-size: 0.72rem; background: var(--green-soft); color: var(--green);
   padding: 2px 8px; border-radius: 99px; text-transform: capitalize; margin-bottom: 4px;

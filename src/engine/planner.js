@@ -129,18 +129,28 @@ function cooldownDays(recipes, slot) {
  * Best combination of one recipe per slot for a day, judged on the whole day at once
  * (a few thousand combinations, plain arithmetic).
  * avoidBySlot: { slot: Set(recipeId) } recipes still "resting", skipped for variety.
+ * capBySlot: { slot: { nutrient: value } } swap only for a meal with less of that nutrient (maxima).
+ * floorBySlot: { slot: { nutrient: value } } swap only for a meal with more of that nutrient (minima).
  */
-function fillDay(recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBySlot = {}) {
+function fillDay(recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBySlot = {}, floorBySlot = {}) {
   const options = SLOTS.map((slot) => {
     const all = recipesForSlot(recipes, slot);
     if (all.length === 0) throw new Error(`No recipes for slot ${slot}`);
-    // capBySlot: { slot: { nutrient: value } } a meal may only be swapped for one that
-    // does not have more of that nutrient than the meal it replaces.
     const cap = capBySlot[slot];
+    const floor = floorBySlot[slot];
     const totalsOf = new Map(all.map((r) => [r.id, recipeNutrients(r, foodsById).totals]));
-    const allowed = cap
-      ? all.filter((r) => Object.entries(cap).every(([n, v]) => totalsOf.get(r.id)[n] <= v + 1e-9))
-      : all;
+    let allowed = all;
+    if (cap) {
+      allowed = allowed.filter((r) => Object.entries(cap).every(([n, v]) => totalsOf.get(r.id)[n] <= v + 1e-9));
+    }
+    if (floor) {
+      allowed = allowed.filter((r) => Object.entries(floor).every(([n, v]) => totalsOf.get(r.id)[n] >= v - 1e-9));
+    }
+    // Prefer a meal with strictly more of a shortfall nutrient when a floor is set.
+    if (floor && allowed.length > 0) {
+      const stricter = allowed.filter((r) => Object.entries(floor).every(([n, v]) => totalsOf.get(r.id)[n] > v + 1e-9));
+      if (stricter.length > 0) allowed = stricter;
+    }
     const pool = allowed.length > 0 ? allowed : all;
     const avoid = avoidBySlot[slot];
     const rested = avoid && avoid.size > 0 ? pool.filter((r) => !avoid.has(r.id)) : pool;
@@ -194,12 +204,21 @@ export function buildPlan(targets, recipes, month, foodsById, bought = []) {
   };
 }
 
-/** Nutrients already logged on or before `throughDate` (inclusive). */
+/** True when a log entry only records skipped planned meals (never counted as eaten). */
+export function isSkipEntry(entry) {
+  return Array.isArray(entry?.skipped) && entry.skipped.length > 0
+    && (!entry.items || entry.items.length === 0);
+}
+
+/** Nutrients already logged on or before `throughDate` (inclusive). Skipped meals add nothing. */
 export function consumedFromLog(log, foodsById, throughDate = null) {
   let totals = emptyTotals();
   for (const entry of log || []) {
     if (throughDate && entry.date > throughDate) continue;
-    const r = loggedNutrients(entry.items, foodsById);
+    if (isSkipEntry(entry)) continue;
+    const items = entry.items || [];
+    if (items.length === 0) continue;
+    const r = loggedNutrients(items, foodsById);
     totals = addTotals(totals, r.totals);
   }
   return totals;
@@ -281,9 +300,14 @@ function formatDelta(key, absDelta) {
   return `${absDelta.toFixed(1)} g`;
 }
 
+/** Shown when the user skips a meal but the profile has no minimum targets to raise. */
+export const SKIP_NO_MIN_REASON = 'Skipping a meal does not affect your maximum targets.';
+
 function buildReason({
   effects, changed, keptForBought, unreachable, nothingToChange, targets, recentTotals,
+  skippedNames = [], shortfall = {}, skipNoMin = false,
 }) {
+  if (skipNoMin) return SKIP_NO_MIN_REASON;
   if (nothingToChange) {
     return 'No changes needed — the rest of the month still meets your targets.';
   }
@@ -308,6 +332,32 @@ function buildReason({
     return `${closestNote}You logged ${formatAmount(over.t.nutrient, over.recent)} of ${nutrientWords(over.t.nutrient)} today `
       + `(goal: max ${formatAmount(over.t.nutrient, over.t.daily)}), so the next ${daysTouched} days are lower in `
       + `${nutrientWords(over.t.nutrient)}${less}.${keptNote}`;
+  }
+
+  // Skipped meals under a minimum: raise the next days and quote the real numbers.
+  // Prefer calories when that was part of the shortfall (clearest for Recovery/Athlete);
+  // otherwise the minimum that fell furthest short relative to its daily value.
+  let under = null;
+  for (const t of targets) {
+    if (t.kind !== 'min') continue;
+    const missed = shortfall[t.nutrient] || 0;
+    if (missed <= 0) continue;
+    const ratio = missed / t.daily;
+    const prefer = t.nutrient === 'kcal' ? 2 : 0;
+    const score = ratio + prefer;
+    if (!under || score > under.score) under = { t, missed, ratio, score };
+  }
+  if (under && skippedNames.length > 0) {
+    const e = effects.find((x) => x.nutrient === under.t.nutrient);
+    const more = e && e.delta > 0.05
+      ? ` (about ${formatAmount(under.t.nutrient, e.delta)} more per day on average)`
+      : '';
+    const names = skippedNames.length === 1
+      ? skippedNames[0]
+      : `${skippedNames.slice(0, -1).join(', ')} and ${skippedNames[skippedNames.length - 1]}`;
+    return `${closestNote}You skipped ${names} today `
+      + `(about ${formatAmount(under.t.nutrient, under.missed)} of your ${formatAmount(under.t.nutrient, under.t.daily)} minimum), `
+      + `so the next ${daysTouched} days are higher in ${nutrientWords(under.t.nutrient)}${more}.${keptNote}`;
   }
 
   // No maximum was exceeded: the change comes from food already bought.
@@ -362,25 +412,83 @@ export function replan(state) {
   const elapsedDates = allDates.filter((d) => d < fromDate);
 
   // Nutrients eaten this month: the real log where there is one, otherwise the plan.
-  const loggedDates = new Set((log || []).map((e) => e.date));
+  // Skipped meals never count as eaten.
+  const eatenDates = new Set(
+    (log || []).filter((e) => !isSkipEntry(e) && (e.items || []).length > 0).map((e) => e.date),
+  );
   let consumedMonth = emptyTotals();
   for (const date of elapsedDates) {
-    if (loggedDates.has(date)) {
-      for (const entry of (log || []).filter((e) => e.date === date)) {
-        consumedMonth = addTotals(consumedMonth, loggedNutrients(entry.items, foodsById).totals);
+    if (eatenDates.has(date)) {
+      for (const entry of (log || []).filter((e) => e.date === date && !isSkipEntry(e))) {
+        const items = entry.items || [];
+        if (items.length === 0) continue;
+        consumedMonth = addTotals(consumedMonth, loggedNutrients(items, foodsById).totals);
       }
     } else {
       consumedMonth = addTotals(consumedMonth, dayTotals(plan.days[date], recipesById, foodsById).totals);
     }
   }
-  // What was logged on the log date (the meal that triggered this replan).
+  // What was logged on the log date (food eaten — skipped meals add nothing here).
   let recentTotals = emptyTotals();
   for (const entry of log || []) {
-    if (entry.date === fromDate) {
-      const r = loggedNutrients(entry.items, foodsById);
-      recentTotals = addTotals(recentTotals, r.totals);
-      consumedMonth = addTotals(consumedMonth, r.totals);
+    if (entry.date !== fromDate || isSkipEntry(entry)) continue;
+    const items = entry.items || [];
+    if (items.length === 0) continue;
+    const r = loggedNutrients(items, foodsById);
+    recentTotals = addTotals(recentTotals, r.totals);
+    consumedMonth = addTotals(consumedMonth, r.totals);
+  }
+
+  // Planned meals marked skipped today: their known nutrients are the shortfall for minima.
+  const skippedIds = [];
+  for (const entry of log || []) {
+    if (entry.date !== fromDate || !Array.isArray(entry.skipped)) continue;
+    for (const id of entry.skipped) {
+      if (id && !skippedIds.includes(id)) skippedIds.push(id);
     }
+  }
+  const skippedNames = skippedIds.map((id) => recipesById.get(id)?.name || id);
+  const shortfall = {};
+  for (const t of targets) {
+    if (t.kind !== 'min') continue;
+    let sum = 0;
+    for (const id of skippedIds) {
+      const recipe = recipesById.get(id);
+      if (!recipe) continue;
+      const r = recipeNutrients(recipe, foodsById);
+      if (!r.unknown[t.nutrient]) sum += r.totals[t.nutrient];
+    }
+    if (sum > 0) shortfall[t.nutrient] = sum;
+  }
+  const hasMinTarget = targets.some((t) => t.kind === 'min');
+  const skipNoMin = skippedIds.length > 0
+    && Object.keys(shortfall).length === 0
+    && !hasMinTarget
+    && Object.keys(recentTotals).every((k) => !recentTotals[k]);
+
+  // When the only action was skipping and there are no minimums, leave the plan alone.
+  if (skipNoMin) {
+    return {
+      plan: {
+        month: plan.month,
+        days: Object.fromEntries(Object.entries(plan.days).map(([d, m]) => [d, { ...m }])),
+      },
+      changed: [],
+      effects: effectOnTargets(
+        averageDailyTotals(plan, recipesById, foodsById, allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS)),
+        averageDailyTotals(plan, recipesById, foodsById, allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS)),
+        targets.map((t) => ({ ...t, originalDaily: t.daily })),
+      ),
+      reason: SKIP_NO_MIN_REASON,
+      unreachable: false,
+      nothingToChange: true,
+      keptForBought: [],
+      adjustedTargets: targets,
+      consumedMonth,
+      recentTotals,
+      windowDates: [],
+      skipNoMin: true,
+    };
   }
 
   const windowDates = allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS);
@@ -395,12 +503,19 @@ export function replan(state) {
   }
   // Logged on the last planned day and over a maximum: no window is left to adjust.
   const lastDayOverMax = windowDates.length === 0 && Object.keys(overshoot).length > 0;
-  const adjusted = windowDates.length > 0 && Object.keys(overshoot).length > 0;
+  const adjustedMax = windowDates.length > 0 && Object.keys(overshoot).length > 0;
+  const adjustedMin = windowDates.length > 0 && Object.keys(shortfall).length > 0;
+  const adjusted = adjustedMax || adjustedMin;
   const targetsForDay = (date) => targets.map((t) => {
     const out = { ...t, originalDaily: t.daily };
-    if (adjusted && overshoot[t.nutrient]) {
+    if (adjustedMax && overshoot[t.nutrient]) {
       const planned = dayTotals(plan.days[date], recipesById, foodsById).totals[t.nutrient];
       out.daily = Math.max(t.daily * 0.4, Math.min(t.daily, planned) - overshoot[t.nutrient] / windowDates.length);
+    }
+    if (adjustedMin && shortfall[t.nutrient]) {
+      // Raise the day's minimum by shortfall / window, capped at +25% of the daily value.
+      const bump = Math.min(shortfall[t.nutrient] / windowDates.length, t.daily * 0.25);
+      out.daily = t.daily + bump;
     }
     return out;
   });
@@ -422,9 +537,11 @@ export function replan(state) {
         avoid[slot] = new Set([...before, ...after]);
       }
       const dayTargets = targetsForDay(date);
-      // Only swap towards less of the nutrient that went over (never more than the old meal had).
+      // Maxima: only swap towards less of the nutrient that went over.
+      // Minima: only swap towards more of the nutrient that fell short.
       const caps = {};
-      if (adjusted) {
+      const floors = {};
+      if (adjustedMax) {
         for (const slot of SLOTS) {
           const old = recipesById.get(plan.days[date]?.[slot]);
           if (!old) continue;
@@ -432,7 +549,15 @@ export function replan(state) {
           caps[slot] = Object.fromEntries(Object.keys(overshoot).map((n) => [n, totals[n]]));
         }
       }
-      const day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps);
+      if (adjustedMin) {
+        for (const slot of SLOTS) {
+          const old = recipesById.get(plan.days[date]?.[slot]);
+          if (!old) continue;
+          const totals = recipeNutrients(old, foodsById).totals;
+          floors[slot] = Object.fromEntries(Object.keys(shortfall).map((n) => [n, totals[n]]));
+        }
+      }
+      const day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors);
       const prev = plan.days[date];
       const merged = { ...day };
       for (const slot of SLOTS) {
@@ -508,6 +633,9 @@ export function replan(state) {
       nothingToChange,
       targets,
       recentTotals,
+      skippedNames,
+      shortfall,
+      skipNoMin: false,
     });
 
   return {
@@ -522,6 +650,8 @@ export function replan(state) {
     consumedMonth,
     recentTotals,
     windowDates,
+    shortfall,
+    skippedNames,
   };
 }
 

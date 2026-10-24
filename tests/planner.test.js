@@ -10,6 +10,7 @@ import {
   daysInMonth,
   scoreAgainstTargets,
   localTime,
+  SKIP_NO_MIN_REASON,
 } from '../src/engine/planner.js';
 
 const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
@@ -261,5 +262,63 @@ test('regression: pizza and ice cream on Cholesterol is NOT reported as unreacha
     const r = replan({ targets: profile.targets, recipes, plan: p, log, bought: [], foodsById, fromDate });
     assert.equal(r.unreachable, false, `${profile.id} should not be flagged unreachable after a normal off-plan meal`);
   }
+});
+
+test('Recovery: skipping lunch and dinner raises calories on the next 3–5 days', () => {
+  const targets = profileById('recovery').targets;
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  const recipesById = new Map(recipes.map((r) => [r.id, r]));
+  const fromDate = '2026-10-21';
+  const lunchId = plan.days[fromDate].lunch;
+  const dinnerId = plan.days[fromDate].dinner;
+  const log = [{
+    date: fromDate,
+    time: '19:00',
+    skipped: [lunchId, dinnerId],
+  }];
+  const result = replan({ targets, recipes, plan, log, bought: [], foodsById, fromDate });
+
+  assert.equal(result.nothingToChange, false, 'skipping under a minimum must change the plan');
+  const changedDays = [...new Set(result.changed.map((c) => c.date))].sort();
+  assert.ok(changedDays.length >= 3 && changedDays.length <= 5, `changed days: ${changedDays.length}`);
+  for (const d of changedDays) assert.ok(d > fromDate);
+
+  // Next days have more calories than before.
+  for (const d of changedDays) {
+    const before = dayTotals(plan.days[d], recipesById, foodsById).totals.kcal;
+    const after = dayTotals(result.plan.days[d], recipesById, foodsById).totals.kcal;
+    assert.ok(after > before, `${d}: ${after} should be above ${before}`);
+  }
+  // Every swapped meal has more of the shortfall nutrient (calories) than the one it replaces.
+  for (const c of result.changed) {
+    const before = recipeNutrients(recipesById.get(c.before), foodsById).totals.kcal;
+    const after = recipeNutrients(recipesById.get(c.after), foodsById).totals.kcal;
+    assert.ok(after > before, `${c.date} ${c.slot}: ${before} -> ${after}`);
+  }
+  const kcal = result.effects.find((e) => e.nutrient === 'kcal');
+  assert.ok(kcal.after > kcal.before);
+  assert.match(result.reason, /skipped/i);
+  assert.match(result.reason, /minimum/i);
+  assert.match(result.reason, /higher in calories/i);
+});
+
+test('skipping with only maximum targets does not change the plan', () => {
+  const targets = [
+    { nutrient: 'satFat', kind: 'max', daily: 13 },
+    { nutrient: 'kcal', kind: 'max', daily: 2000 },
+    { nutrient: 'sodium', kind: 'max', daily: 2300 },
+  ];
+  const plan = buildPlan(targets, recipes, month, foodsById);
+  const fromDate = '2026-10-21';
+  const log = [{
+    date: fromDate,
+    time: '13:00',
+    skipped: [plan.days[fromDate].lunch],
+  }];
+  const result = replan({ targets, recipes, plan, log, bought: [], foodsById, fromDate });
+  assert.equal(result.nothingToChange, true);
+  assert.equal(result.changed.length, 0);
+  assert.equal(result.reason, SKIP_NO_MIN_REASON);
+  assert.match(result.reason, /does not affect your maximum targets/i);
 });
 

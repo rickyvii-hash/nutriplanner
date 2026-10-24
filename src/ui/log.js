@@ -35,7 +35,8 @@ export function renderLog(ctx) {
     return root;
   }
 
-  const draft = ctx.logDraft || { items: [] };
+  const draft = ctx.logDraft || { items: [], skipped: [] };
+  if (!Array.isArray(draft.skipped)) draft.skipped = [];
   ctx.logDraft = draft;
 
   const mode = el(`<section class="card">
@@ -54,12 +55,17 @@ export function renderLog(ctx) {
   planBody.appendChild(el(`<p class="field-label" data-plan-date>Today's planned meals (${planDate})</p>`));
   for (const slot of SLOTS) {
     const recipe = recipesById.get(todayMeals[slot]);
-    const row = el(`<div class="plan-meal-row">
+    const alreadySkipped = draft.skipped.includes(recipe?.id);
+    const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}">
       <div>
         <div class="meal-slot">${slot}</div>
         <div>${recipe?.icon || ''} ${escapeHtml(recipe?.name || '')}</div>
+        ${alreadySkipped ? '<div class="muted tiny">Marked as skipped</div>' : ''}
       </div>
-      <button type="button" class="btn-secondary btn-small" data-add-recipe="${recipe?.id}">Add as eaten</button>
+      <div class="meal-actions">
+        <button type="button" class="btn-secondary btn-small" data-add-recipe="${recipe?.id}" ${alreadySkipped ? 'disabled' : ''}>Add as eaten</button>
+        <button type="button" class="btn-secondary btn-small" data-skip-recipe="${recipe?.id}" ${alreadySkipped ? 'disabled' : ''}>Skipped</button>
+      </div>
     </div>`);
     planBody.appendChild(row);
   }
@@ -105,8 +111,17 @@ export function renderLog(ctx) {
       </li>`);
       ul.appendChild(li);
     });
-    empty.style.display = draft.items.length ? 'none' : 'block';
-    saveBtn.disabled = draft.items.length === 0;
+    draft.skipped.forEach((recipeId) => {
+      const recipe = recipesById.get(recipeId);
+      const li = el(`<li class="logged-item is-skipped">
+        <span>Skipped · ${escapeHtml(recipe?.name || recipeId)}</span>
+        <button type="button" class="btn-icon" data-unskip="${escapeHtml(recipeId)}" aria-label="Remove skip">×</button>
+      </li>`);
+      ul.appendChild(li);
+    });
+    const hasAnything = draft.items.length > 0 || draft.skipped.length > 0;
+    empty.style.display = hasAnything ? 'none' : 'block';
+    saveBtn.disabled = !hasAnything;
     ul.querySelectorAll('[data-edit]').forEach((input) => {
       input.addEventListener('change', () => {
         const index = Number(input.dataset.edit);
@@ -123,6 +138,12 @@ export function renderLog(ctx) {
       btn.addEventListener('click', () => {
         draft.items.splice(Number(btn.dataset.del), 1);
         paintItems();
+      });
+    });
+    ul.querySelectorAll('[data-unskip]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        draft.skipped = draft.skipped.filter((id) => id !== btn.dataset.unskip);
+        ctx.refresh();
       });
     });
   };
@@ -148,6 +169,15 @@ export function renderLog(ctx) {
       const recipe = recipesById.get(btn.dataset.addRecipe);
       if (!recipe) return;
       for (const ing of recipe.ingredients) addFood(ing.foodId, ing.grams);
+    });
+  });
+
+  root.querySelectorAll('[data-skip-recipe]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.skipRecipe;
+      if (!id || draft.skipped.includes(id)) return;
+      draft.skipped.push(id);
+      ctx.refresh();
     });
   });
 
@@ -193,7 +223,10 @@ export function renderLog(ctx) {
   });
 
   root.querySelector('[data-save]').addEventListener('click', () => {
-    ctx.saveLogAndReplan([...draft.items]);
+    ctx.saveLogAndReplan({
+      items: [...draft.items],
+      skipped: [...draft.skipped],
+    });
   });
   root.querySelector('[data-back]').addEventListener('click', () => ctx.navigate('plan'));
 

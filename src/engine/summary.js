@@ -52,9 +52,16 @@ function averagesFrom(acc, days) {
   return { averages, incomplete };
 }
 
-/** Totals and per-day averages of the logged meals, one day = one distinct date. */
+/** True when the entry only records skipped planned meals (never counted as eaten). */
+function isSkipOnly(entry) {
+  return Array.isArray(entry?.skipped) && entry.skipped.length > 0
+    && (!entry.items || entry.items.length === 0);
+}
+
+/** Totals and per-day averages of the logged meals, one day = one distinct date.
+ * Skipped meals never contribute nutrients and do not create an "eaten" day. */
 export function loggedAverages(log, foodsById) {
-  const entries = Array.isArray(log) ? log : [];
+  const entries = (Array.isArray(log) ? log : []).filter((e) => !isSkipOnly(e) && (e.items || []).length > 0);
   const dates = new Set(entries.map((e) => e.date));
   const acc = emptyAccumulator();
   for (const entry of entries) {
@@ -103,18 +110,33 @@ export function planAverages(plan, recipesById, foodsById) {
   };
 }
 
-function mealRows(log, foodsById) {
+function mealRows(log, foodsById, recipesById = new Map()) {
   return (Array.isArray(log) ? log : [])
     .slice()
     .sort((a, b) => `${a.date} ${a.time || ''}`.localeCompare(`${b.date} ${b.time || ''}`))
-    .map((entry) => ({
-      date: entry.date,
-      time: entry.time || '',
-      items: (entry.items || []).map((item) => ({
-        name: foodsById.get(item.foodId)?.name || item.foodId,
-        grams: item.grams,
-      })),
-    }));
+    .map((entry) => {
+      if (isSkipOnly(entry)) {
+        return {
+          date: entry.date,
+          time: entry.time || '',
+          skipped: true,
+          items: entry.skipped.map((id) => ({
+            name: recipesById.get(id)?.name || id,
+            grams: null,
+            skipped: true,
+          })),
+        };
+      }
+      return {
+        date: entry.date,
+        time: entry.time || '',
+        skipped: false,
+        items: (entry.items || []).map((item) => ({
+          name: foodsById.get(item.foodId)?.name || item.foodId,
+          grams: item.grams,
+        })),
+      };
+    });
 }
 
 /**
@@ -143,9 +165,10 @@ export function buildSummary({
     counted = entries.filter((e) => Boolean(e.date));
   }
 
-  const source = counted.length > 0 ? 'log' : 'plan';
+  const eaten = counted.filter((e) => !isSkipOnly(e) && (e.items || []).length > 0);
+  const source = eaten.length > 0 ? 'log' : 'plan';
   const measured = source === 'log'
-    ? loggedAverages(counted, foodsById)
+    ? loggedAverages(eaten, foodsById)
     : planAverages(plan, recipesById, foodsById);
   const averages = measured.averages || Object.fromEntries(NUTRIENT_KEYS.map((k) => [k, null]));
   const incomplete = measured.incomplete || {};
@@ -163,14 +186,17 @@ export function buildSummary({
     };
   });
 
+  // Meal list shows eaten foods and skipped planned meals; averages ignore skips.
+  const meals = counted.length > 0 ? mealRows(counted, foodsById, recipesById) : [];
+
   return {
     source,
     days: measured.days,
-    loggedDays: new Set(counted.map((e) => e.date)).size,
+    loggedDays: new Set(eaten.map((e) => e.date)).size,
     period,
     averages,
     incomplete,
     rows,
-    meals: source === 'log' ? mealRows(counted, foodsById) : [],
+    meals,
   };
 }

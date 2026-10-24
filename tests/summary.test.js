@@ -235,6 +235,50 @@ test('with no plan the period runs from the first to the last logged date', () =
   assert.equal(summary.loggedDays, 2);
 });
 
+test('skipped meals appear as Skipped and do not change summary averages', () => {
+  const profile = profileById('recovery');
+  const plan = buildPlan(profile.targets, recipes, month, foodsById);
+  const lunchId = plan.days['2026-10-21'].lunch;
+  const pizzaLog = {
+    date: '2026-10-21',
+    time: '20:00',
+    items: [
+      { foodId: 'pizza-cheese', grams: 350 },
+      { foodId: 'ice-cream-vanilla', grams: 100 },
+    ],
+  };
+  const skipLog = {
+    date: '2026-10-21',
+    time: '13:00',
+    skipped: [lunchId],
+  };
+  const withSkip = buildSummary({
+    targets: profile.targets,
+    plan,
+    log: [pizzaLog, skipLog],
+    recipesById,
+    foodsById,
+  });
+  const pizzaOnly = buildSummary({
+    targets: profile.targets,
+    plan,
+    log: [pizzaLog],
+    recipesById,
+    foodsById,
+  });
+
+  assert.equal(withSkip.source, 'log');
+  assert.equal(withSkip.days, pizzaOnly.days);
+  for (const row of withSkip.rows) {
+    const other = pizzaOnly.rows.find((r) => r.nutrient === row.nutrient);
+    assert.equal(row.average, other.average, `${row.nutrient} average must ignore the skip`);
+  }
+  const skippedMeal = withSkip.meals.find((m) => m.skipped);
+  assert.ok(skippedMeal, 'skipped entry must appear in the meal list');
+  assert.ok(skippedMeal.items.every((i) => i.skipped));
+  assert.ok(skippedMeal.items.some((i) => i.name === recipesById.get(lunchId).name));
+});
+
 test('plan averages with a recipe that has a missing nutrient are marked incomplete, not certain', () => {
   // "Nut and dried fruit mix" has no saturated-fat value in the USDA data for one of its foods.
   const days = {};

@@ -50,14 +50,16 @@ const ctx = {
     ctx.selectedDate = todayIso();
     ctx.navigate('plan');
   },
-  saveLogAndReplan: (items) => {
-    if (!items?.length || !ctx.state.plan) return;
-    const entry = {
-      date: todayIso(),
-      time: localTime(),
-      items,
-    };
-    const log = [...(ctx.state.log || []), entry];
+  saveLogAndReplan: (payload) => {
+    if (!ctx.state.plan) return;
+    // Accept either a food-item array (older callers) or { items, skipped }.
+    const items = Array.isArray(payload) ? payload : (payload?.items || []);
+    const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
+    if (!items.length && !skipped.length) return;
+    const log = [...(ctx.state.log || [])];
+    const when = { date: todayIso(), time: localTime() };
+    if (items.length) log.push({ ...when, items });
+    if (skipped.length) log.push({ ...when, skipped: [...skipped] });
     const result = replan({
       targets: ctx.state.targets,
       recipes: ctx.recipes,
