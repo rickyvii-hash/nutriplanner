@@ -9,10 +9,10 @@ status: approved
 NutriPlanner is a small web app that runs in your browser on your own computer. There is no server, no account and no cloud.
 
 It has four simple pieces:
-1. **A food list**: a file with about 250 foods and their nutrients, taken from the public USDA FoodData Central dataset. Think of it as a spreadsheet the app reads.
-2. **A recipe list**: a second file with about 20 recipes. Each recipe is a list of foods with amounts. The nutrients of a recipe are simply the sum of its foods.
+1. **A food list**: a file with about 480 foods and their nutrients, taken from the public USDA FoodData Central SR Legacy dataset. Think of it as a spreadsheet the app reads.
+2. **A recipe list**: a second file with about 40 recipes. Each recipe is a list of foods with amounts. The nutrients of a recipe are simply the sum of its foods.
 3. **The planner**: a small piece of code, readable and testable, that does the arithmetic. It builds the month plan, and after you log a meal it works out how much of each target is still missing for the rest of the month and picks the recipes for the remaining meals that get closest, preferring recipes whose ingredients you already bought.
-4. **The screens**: the five screens from the PRD. They show what the planner worked out.
+4. **The screens**: the screens from the PRD, with a bottom bar (Plan, Shopping, Targets) plus Log, Plan updated, the Summary for your doctor, the recipe detail overlay and the Start over / Change profile confirmations. They show what the planner worked out.
 
 Your choices (targets, plan, meals you logged, ticked items) are kept in the browser's own memory ("localStorage", a sticky note the browser keeps for one site), so they are still there when you come back.
 
@@ -24,7 +24,7 @@ PRD ref: `prd.md > The Core Journey`.
 2. The user picks a profile and edits targets. Targets are saved. "Build my month plan" calls the planner, which assigns a recipe to each meal slot of each day of the month and saves the plan.
 3. The Month plan screen reads the plan and the food data and shows today's meals and the progress bars.
 4. The Shopping list is derived from the plan: all ingredients of the planned meals, grouped by category, minus items ticked as bought. Ticks are saved.
-5. The user logs a meal (grouped eaten block, free search, skip, or replace). Portions are converted to nutrients using the food data, and the entry is saved in the log.
+5. The user logs a meal: a grouped eaten block from the plan, a free-search food (an Extra / outside meal or "I ate something else" inside Replace), a skip, or a replacement with another recipe. Portions are converted to nutrients using the food data, and the entry is saved in the log. Saved entries can later be corrected (remove, change portion, switch Eaten and Skipped), and Start over / Change profile are confirmed before they erase anything.
 6. The planner is called with the targets, the log, the ticked items and the current plan. It returns a proposed new plan, the list of changed meals and a reason built from the numbers (same rounding as the Effect rows).
 7. The Plan updated screen shows before and after. "Use updated plan" saves the proposal as the plan, and "Keep my original plan" discards it.
 8. The Shopping list and Month plan redraw from the new saved plan.
@@ -34,7 +34,7 @@ PRD ref: `prd.md > The Core Journey`.
 - **HTML, CSS and plain JavaScript (ES modules)**, no framework. Rationale: fewest moving parts for a five-day build, and no build step to break.
 - **Node.js** (already installed, v24) for two things only: a one-off script that builds `foods.json` from the USDA download, and the built-in test runner (`node --test`) for the planner. Node docs: https://nodejs.org/api/test.html
 - **A tiny local web server** to open the app, because browsers do not load ES modules from a double-clicked file. `npx serve` (https://www.npmjs.com/package/serve), or `python -m http.server` as an alternative. This is flagged to verify at the start of the build.
-- **Data:** USDA FoodData Central, public domain (CC0). Downloads: https://fdc.nal.usda.gov/download-datasets.html. Exact file and column names are not verified yet; check this first in the build.
+- **Data:** USDA FoodData Central, public domain (CC0). Downloads: https://fdc.nal.usda.gov/download-datasets.html. The build uses the SR Legacy dataset; the column names are mapped once by `scripts/build-foods.js`.
 - **Charts and icons:** none. Progress bars are plain CSS. Foods and nutrients use emoji or simple inline icons (no photographs).
 
 Accepted tradeoff: less powerful than a database-backed app, but more reliable and quicker for a proof of concept. A real product would rebuild the data layer.
@@ -42,7 +42,7 @@ Accepted tradeoff: less powerful than a database-backed app, but more reliable a
 ## Where It Runs and How Someone Tries It
 - Runs locally in a desktop or mobile-sized browser window, no API keys, no accounts.
 - Start: from the project folder, `npx serve .` and open the address it prints (for example `http://localhost:3000`). A reviewer does not need to run it: the demo video shows it working.
-- Demo recording: a screen recording of the five screens in the core journey, under 3 minutes.
+- Demo recording: a screen recording of the core journey in the PRD, under 3 minutes.
 - Deployment is optional and not planned. A static host would work later, since the app has no server.
 
 ## Look and Feel
@@ -81,8 +81,13 @@ PRD ref: `prd.md > Shopping list`.
 PRD ref: `prd.md > States and Boundaries` (persistence).
 
 ### Screens
-`src/ui/`: `targets.js`, `plan.js`, `log.js`, `updated.js`, `shopping.js`, `summary.js`, `recipe_detail.js`, plus `app.js` as a small router with the bottom bar (Plan, Shopping, Targets).
+`src/ui/`: `targets.js`, `plan.js`, `log.js`, `updated.js`, `shopping.js`, `summary.js`, `recipe_detail.js`, `reset.js` (Start over and Change profile confirmations), plus `app.js` as a small router with the bottom bar (Plan, Shopping, Targets).
 PRD ref: `prd.md > Screens and Layout`.
+
+### Logging actions
+`log.js` builds one grouped block per planned recipe and tags free-search food as an extra. `log_corrections.js` corrects saved entries without mutating the state passed in: change portions, remove an entry, switch a planned meal between Eaten and Skipped, then recalculate from the corrected log. Replace can pick another recipe for the slot or log a searched food as "I ate something else" (`replaced`), which counts as replaced, not skipped and not an extra. Extras carry `extra: true`, count in the day totals and feed the adaptive replan.
+`store.js` holds the reset actions: Start over clears the plan, log and ticks; Change profile clears the plan and keeps the log unless the user also chooses Start over.
+PRD ref: `prd.md > Logging a meal`, `prd.md > Starting over and changing profile`.
 
 ### Recipe detail and outside links
 `src/ui/recipe_detail.js`. Pure helpers build three URLs from the dish name with `encodeURIComponent`:
@@ -97,7 +102,7 @@ PRD ref: `prd.md > Recipe detail`.
 - **Recipe**: `{ id, name, slot (breakfast/lunch/dinner/snack), icon?, ingredients: [{ foodId, grams }] }`. Lives in `recipes.json`, fixed.
 - **Targets**: `[{ nutrient, kind: "min" | "max", daily }]`. Live in localStorage, change when the user edits.
 - **Plan**: `{ month, days: { "YYYY-MM-DD": { breakfast: recipeId, lunch, dinner, snack } } }`. In localStorage, replaced on "Use updated plan".
-- **Log**: `[{ date, time, items: [{ foodId, grams }], skipped?, replaced? }]`. In localStorage, appended on "Save and update plan" or Replace.
+- **Log**: `[{ date, time, items: [{ foodId, grams }], skipped?, eaten?, replaced?, extra? }]`. `skipped` lists planned recipe ids not eaten; `eaten` records the planned blocks that were eaten; `replaced` lists the slot a food stands for (`{ slot, recipeId, fromRecipeId }`, with `recipeId: null` and a `name` when the person ate something else); `extra: true` marks free-search food eaten outside the planned slots. In localStorage, appended on "Save and update plan" or Replace, and corrected in place from the Plan screen.
 - **Bought**: `[foodId]`. In localStorage, changed by ticking items.
 All user data survives closing and reopening the browser. Fixed data is read from the files each time.
 
@@ -116,8 +121,8 @@ nutriplanner_hackathon/
 │   │   └── shopping.js   # shopping list
 │   └── ui/               # one file per screen, including recipe_detail.js
 ├── data/
-│   ├── foods.json        # about 250 USDA foods
-│   ├── recipes.json      # recipes (36+) built from those foods
+│   ├── foods.json        # about 480 USDA SR Legacy foods
+│   ├── recipes.json      # about 40 recipes built from those foods
 │   └── curated_foods.json  # list of USDA ids chosen for the data build
 ├── scripts/
 │   └── build-foods.js    # one-off: USDA download -> foods.json
@@ -139,8 +144,8 @@ nutriplanner_hackathon/
 - **localStorage unavailable** → the app works for the session and says data will not be kept.
 
 ## What Was Simplified and Why
-- **A fixed set of about 250 foods** instead of the full USDA database — the values can be checked by hand and the files stay small. The fuller version would need search over thousands of foods and translations.
-- **About 20 recipes** instead of a recipe database — enough to show the plan changing.
+- **A fixed set of about 480 foods** from USDA SR Legacy instead of the full USDA database — the values can be checked and the files stay small enough for a local app. The fuller version would need search over thousands of foods and translations.
+- **About 40 recipes** instead of a recipe database — enough to show the plan changing and to reach the Athlete minimums.
 - **Local browser storage** instead of accounts and sync — no login needed to prove the idea.
 - **Plain arithmetic scoring** instead of a machine-learning model — explainable and testable, and the reason text comes from real numbers.
 - **"Prepared food" is treated as ticked ingredients** — the user ticks what is bought; separate "cooked leftovers" tracking is deferred.
@@ -157,6 +162,5 @@ nutriplanner_hackathon/
 - None was stated when asked. The planner's scoring is the most likely place for questions, so the build will show its numbers on the Plan updated screen and tests will cover one worked example.
 
 **Open issues**
-- Exact USDA file and column names to be verified first in the build (flagged above).
-- Final list of about 250 foods and about 20 recipes; the working assumption is to include foods that appear in the recipes plus common extras.
+- None for the proof of concept: the USDA SR Legacy columns are mapped by the build script, and the food and recipe lists are settled at about 480 foods and about 40 recipes, all built from foods already in the data.
 - Carried over from the PRD: the recalculation approach is as described under Planner; the recipe count is as above.

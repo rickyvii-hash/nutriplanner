@@ -14,13 +14,13 @@ Build mode: fast
   Why now: The USDA files are the biggest unknown, so the data build comes first. It also proves the whole path end to end (scaffold, data, calculation, screen) and every later slice depends on these numbers.
   PRD ref: `prd.md > Month plan`, `prd.md > States and Boundaries` (missing nutrient value)
   Spec ref: `spec.md > Food and recipe data`, `spec.md > Nutrient calculator`, `spec.md > File Structure`, `spec.md > Stack`
-  Build: Scaffold the project per the spec's file structure. Check the real USDA download format first, then write `scripts/build-foods.js` to produce `data/foods.json` (about 250 foods, nutrients per 100 g, missing values as null) from `data/curated_foods.json`. Write about 20 recipes in `data/recipes.json`. Add `src/engine/nutrients.js` and a simple page that lists recipes with their totals.
-  Verify (mechanical): `node --test` passes for the nutrient calculator, including a missing-value case; `data/foods.json` contains at least 200 foods and every recipe ingredient resolves to a food; the local server starts and the page lists the recipes.
+  Build: Scaffold the project per the spec's file structure. Check the real USDA download format first, then write `scripts/build-foods.js` to produce `data/foods.json` (about 480 foods, nutrients per 100 g, missing values as null) from `data/curated_foods.json`. Write about 40 recipes in `data/recipes.json`. Add `src/engine/nutrients.js` and a simple page that lists recipes with their totals.
+  Verify (mechanical): `node --test` passes for the nutrient calculator, including a missing-value case; `data/foods.json` contains at least 400 foods and every recipe ingredient resolves to a food; the local server starts and the page lists the recipes.
   Learner check: Open the app and look at three recipes you know. Say whether the calories and protein look believable.
   Commit: `Add USDA food data, recipes and nutrient calculator`
 
 - [x] **2. You can set targets and get a month plan**
-  Becomes usable: Pick a profile (Weight loss, Cholesterol, Recovery), edit the targets, add a custom target, press "Build my month plan" and see a Month plan screen with today's meals and daily progress bars. Everything is saved and still there after a reload.
+  Becomes usable: Pick a profile (Weight loss, Cholesterol, Recovery, Athlete), edit the targets, add a custom target, press "Build my month plan" and see a Month plan screen with today's meals and daily progress bars. Everything is saved and still there after a reload.
   Why now: The plan is what the kernel later changes, and it needs real targets. Saving it here also tests the data model early.
   PRD ref: `prd.md > Targets`, `prd.md > Month plan`, `prd.md > Screens and Layout` (screens 1 and 2)
   Spec ref: `spec.md > Planner`, `spec.md > Storage`, `spec.md > Screens`, `spec.md > Data Model`
@@ -55,7 +55,7 @@ Build mode: fast
   PRD ref: `prd.md > Look and Feel`, `prd.md > States and Boundaries`, `prd.md > What We're Building`
   Spec ref: `spec.md > Look and Feel`, `spec.md > Where It Runs and How Someone Tries It`, `spec.md > Important Failure Modes`
   Build: Apply the colours, type and spacing from the spec to every screen, add first-use, empty and error states, the footer disclaimer, icons or emoji instead of photos, and write the README with the start command.
-  Verify (mechanical): Walk the core journey in the browser at a phone width and a desktop width and compare against the mockups; confirm the disclaimer appears on all five screens; run all tests.
+  Verify (mechanical): Walk the core journey in the browser at a phone width and a desktop width and compare against the mockups; confirm the disclaimer appears on every screen; run all tests.
   Learner check: Go through the whole journey once as if recording the demo, and say what you would change.
   Commit: `Polish design, states and README`
 
@@ -98,3 +98,4 @@ Activity mode: not started
 
 
 - 2026-10-24: Owner defects D1–D5 on v2: Start over with confirmation; undo/edit saved log entries; improved free search and ~480 real USDA SR Legacy foods; Replace "I ate something else"; Extra / outside meals path.
+- 2026-10-24: Stage-1 judge review doc sync: planning docs and README now state about 480 USDA SR Legacy foods and about 40 recipes, all four profiles (including Athlete), the real screen set (bottom bar plus Log, Plan updated, recipe detail, summary and confirmations), and the v2 log flows (Start over, Change profile, undo/edit, Replace with something else, Extra meals).
