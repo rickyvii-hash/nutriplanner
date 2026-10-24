@@ -96,3 +96,5 @@ Activity mode: not started
 - 2026-10-24: Grouped "Add as eaten" blocks on the log screen; Replace next to Skipped with Plan updated preview (reason quotes Effect rounding).
 - 2026-10-24: v2 — Recipe detail panel from Plan and Log (ingredients, target nutrients) with three honest outside-search links (Full recipe, Find nearby, Order delivery); no API keys, no fake cart. Planning docs updated to match.
 
+
+- 2026-10-24: Owner defects D1–D5 on v2: Start over with confirmation; undo/edit saved log entries; improved free search and ~480 real USDA SR Legacy foods; Replace "I ate something else"; Extra / outside meals path.
