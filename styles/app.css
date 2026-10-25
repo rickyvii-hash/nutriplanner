@@ -445,7 +445,8 @@ input[type="checkbox"], input[type="radio"] { min-width: 28px; min-height: 28px;
 .summary-status { font-weight: 600; white-space: normal; }
 .summary-status.status-within { color: var(--green); }
 .summary-status.status-above, .summary-status.status-below { color: #7a5a1e; background: var(--tan-soft); }
-.summary-status.status-incomplete { color: var(--muted); font-style: italic; }
+.summary-status.status-incomplete,
+.summary-status.status-not { color: var(--muted); font-style: italic; }
 
 /* Confirmation panel: what a Start over / Change profile will erase, with Cancel first. */
 .confirm-overlay {

@@ -55,9 +55,10 @@ export function renderSummary(ctx) {
     <h2>Targets</h2>
     <p class="muted tiny" data-source>${escapeHtml(sourceNote)}</p>
     <table class="summary-table">
-      <thead><tr><th>Objective</th><th>Average per day</th><th>Status</th></tr></thead>
+      <thead><tr><th>Objective</th><th>${escapeHtml(summary.averageLabel)}</th><th>Status</th></tr></thead>
       <tbody></tbody>
     </table>
+    ${summary.averagesNote ? `<p class="muted tiny" data-averages-note>${escapeHtml(summary.averagesNote)}</p>` : ''}
   </section>`);
   const tbody = table.querySelector('tbody');
   for (const row of summary.rows) {

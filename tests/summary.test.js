@@ -49,7 +49,8 @@ test('with nothing logged the summary uses plan averages and says so', () => {
     const expected = sum / Object.keys(plan.days).length;
     const row = summary.rows.find((r) => r.nutrient === target.nutrient);
     assert.ok(Math.abs(row.average - expected) < 1e-9, `${target.nutrient} average`);
-    assert.equal(row.status, targetStatus(target.kind, expected, target.daily, row.incomplete));
+    // Planned food is not eaten food: with nothing logged no target status is claimed.
+    assert.equal(row.status, 'Not logged yet', `${target.nutrient} status`);
   }
 });
 
@@ -294,5 +295,5 @@ test('plan averages with a recipe that has a missing nutrient are marked incompl
   const summary = buildSummary({ targets, plan: { month: '2026-10', days }, log: [], recipesById, foodsById });
   const row = summary.rows.find((r) => r.nutrient === 'satFat');
   assert.equal(row.incomplete, true, 'the missing value must be flagged');
-  assert.equal(row.status, 'Incomplete data', 'a partial average below the max must not say Within target');
+  assert.equal(row.status, 'Not logged yet', 'planned averages never claim a target status');
 });

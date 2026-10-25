@@ -1,6 +1,7 @@
-// Doctor summary arithmetic. Averages come from the plan when nothing is
-// logged, and from the logged meals once there are some. Missing values stay
-// null (shown as "n/a"), never zero.
+// Doctor summary arithmetic. Once at least one day has logged meals, averages
+// come from those logged days only; with nothing logged the planned averages are
+// shown but clearly labelled as planned and no target status is claimed, because
+// planned food is not eaten food. Missing values stay null (shown as "n/a"), never zero.
 
 import { NUTRIENT_KEYS, foodNutrients, recipeNutrients } from './nutrients.js';
 
@@ -9,7 +10,16 @@ export const SUMMARY_STATUS = {
   above: 'Above target',
   below: 'Below target',
   incomplete: 'Incomplete data',
+  notLogged: 'Not logged yet',
 };
+
+export const PLANNED_AVERAGE_LABEL = 'Planned average per day (not eaten)';
+export const LOGGED_AVERAGE_LABEL = 'Average per day';
+
+/** One line under the table: how many days the averages are based on. */
+export function averagesNote(days) {
+  return `Averages are over the ${days} day${days === 1 ? '' : 's'} with logged meals.`;
+}
 
 /**
  * Comparison of one average with its target. No other judgement is added.
@@ -174,6 +184,8 @@ export function buildSummary({
   const averages = measured.averages || Object.fromEntries(NUTRIENT_KEYS.map((k) => [k, null]));
   const incomplete = measured.incomplete || {};
 
+  const loggedDays = new Set(eaten.map((e) => e.date)).size;
+
   const rows = targets.map((t) => {
     const average = averages[t.nutrient] ?? null;
     const isIncomplete = Boolean(incomplete[t.nutrient]);
@@ -183,7 +195,10 @@ export function buildSummary({
       daily: t.daily,
       average,
       incomplete: isIncomplete,
-      status: targetStatus(t.kind, average, t.daily, isIncomplete),
+      // Planned food is not eaten food: with zero logged days no target status is claimed.
+      status: loggedDays === 0
+        ? SUMMARY_STATUS.notLogged
+        : targetStatus(t.kind, average, t.daily, isIncomplete),
     };
   });
 
@@ -193,10 +208,12 @@ export function buildSummary({
   return {
     source,
     days: measured.days,
-    loggedDays: new Set(eaten.map((e) => e.date)).size,
+    loggedDays,
     period,
     averages,
     incomplete,
+    averageLabel: loggedDays === 0 ? PLANNED_AVERAGE_LABEL : LOGGED_AVERAGE_LABEL,
+    averagesNote: loggedDays === 0 ? null : averagesNote(loggedDays),
     rows,
     meals,
   };
