@@ -50,15 +50,18 @@ function logDates(log) {
 }
 
 function emptyDay() {
-  return { total: 0, known: 0 };
+  return { total: 0, known: 0, incomplete: false };
 }
 
 /**
  * One point per day: the intake of `nutrient` from the meals logged that day.
- * A day with nothing logged is a gap with value null. A day whose logged foods
- * all lack this nutrient is also null, because "n/a" is not zero.
- * `from` and `to` are YYYY-MM-DD and both included; without them the logged
- * dates define the range.
+ * A day with nothing logged is a gap: { value: null, incomplete: false }.
+ * A day where some logged food has no value for this nutrient is incomplete:
+ * the partial sum is not shown as an exact value, so the point is
+ * { value: null, incomplete: true } — never a made-up zero.
+ * A day whose logged foods all lack this nutrient is incomplete as well, because
+ * "n/a" is not zero. `from` and `to` are YYYY-MM-DD and both included; without
+ * them the logged dates define the range.
  */
 export function weeklyIntakeSeries(log, nutrient, foodsById, { from, to } = {}) {
   if (!NUTRIENT_KEYS.includes(nutrient)) return [];
@@ -76,12 +79,16 @@ export function weeklyIntakeSeries(log, nutrient, foodsById, { from, to } = {}) 
     if (items.length === 0) continue;
     const day = byDate.get(entry.date) || emptyDay();
     for (const item of items) {
-      const food = lookupFood(foodsById, item ? item.foodId : null);
-      if (!food || !food.per100g) continue;
-      const grams = Number(item.grams);
+      const grams = Number(item ? item.grams : null);
       if (!Number.isFinite(grams) || grams <= 0) continue;
-      const per100 = food.per100g[nutrient];
-      if (per100 === null || per100 === undefined || !Number.isFinite(per100)) continue;
+      const food = lookupFood(foodsById, item ? item.foodId : null);
+      const per100 = food && food.per100g ? food.per100g[nutrient] : null;
+      // A food the data does not know, or a nutrient it has no value for, leaves
+      // the day's total partial: mark the day instead of summing the rest as exact.
+      if (!food || !food.per100g || per100 === null || per100 === undefined || !Number.isFinite(per100)) {
+        day.incomplete = true;
+        continue;
+      }
       day.total += (per100 * grams) / 100;
       day.known += 1;
     }
@@ -90,10 +97,9 @@ export function weeklyIntakeSeries(log, nutrient, foodsById, { from, to } = {}) 
 
   return range.map((date) => {
     const day = byDate.get(date);
-    return {
-      date,
-      value: day && day.known > 0 ? round3(day.total) : null,
-    };
+    if (!day) return { date, value: null, incomplete: false };
+    if (day.incomplete) return { date, value: null, incomplete: true };
+    return { date, value: day.known > 0 ? round3(day.total) : null, incomplete: false };
   });
 }
 

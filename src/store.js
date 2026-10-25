@@ -211,6 +211,20 @@ export function applyStaleMonthOnStart(state, now = new Date()) {
   };
 }
 
+/**
+ * The state and start screen after a confirmed restore. A restored plan for another
+ * calendar month follows the same path as a reload: it is cleared with the Targets
+ * banner, so the old month's first day is never treated as Today.
+ */
+export function restoredStateAndScreen(imported, now = new Date()) {
+  const stale = applyStaleMonthOnStart(imported, now);
+  return {
+    state: stale.state,
+    banner: stale.banner,
+    screen: stale.banner ? 'targets' : startScreenFor(stale.state),
+  };
+}
+
 export function loadState() {
   storageNotice = null;
   try {

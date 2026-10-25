@@ -290,14 +290,20 @@ export function renderPlan(ctx) {
     const actions = el(`<div class="log-edit-actions">
       <button type="button" class="btn-secondary btn-small" data-correct-remove="${index}">Remove entry</button>
     </div>`);
+    // The slot is passed along: with two snacks the same recipe can fill both, and a
+    // correction on one must not touch the other.
+    const skippedSlot = (Array.isArray(entry.skippedSlots) ? entry.skippedSlots : [])
+      .find((info) => info && info.recipeId === recipe?.id)?.slot || '';
+    const eatenSlot = (Array.isArray(entry.eaten) ? entry.eaten : [])
+      .find((info) => info && info.recipeId === recipe?.id)?.slot || '';
     if (replaced) {
       // A replaced meal is removed and re-done through Replace, never turned into a skip.
     } else if (skipped && recipe) {
-      actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-eat="${index}" data-recipe="${escapeHtml(recipe.id)}">Add as eaten</button>`));
+      actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-eat="${index}" data-recipe="${escapeHtml(recipe.id)}" data-slot="${escapeHtml(skippedSlot)}">Add as eaten</button>`));
     } else if (!skipped && !extra && recipe) {
       // Extras hold no slot, and turning a mixed entry into Skipped would drop the
       // extra foods: neither offers "Mark as skipped".
-      actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-skip="${index}" data-recipe="${escapeHtml(recipe.id)}">Mark as skipped</button>`));
+      actions.appendChild(el(`<button type="button" class="btn-secondary btn-small" data-correct-skip="${index}" data-recipe="${escapeHtml(recipe.id)}" data-slot="${escapeHtml(eatenSlot)}">Mark as skipped</button>`));
     }
     li.appendChild(actions);
     editList.appendChild(li);
@@ -336,7 +342,10 @@ export function renderPlan(ctx) {
       const index = Number(btn.dataset.correctSkip);
       const entry = ctx.state.log?.[index];
       if (!entry) return;
-      updateAfterCorrection(convertLogEntryToSkipped(ctx.state, index, btn.dataset.recipe), entry);
+      updateAfterCorrection(
+        convertLogEntryToSkipped(ctx.state, index, btn.dataset.recipe, btn.dataset.slot || null),
+        entry,
+      );
     });
   });
   editList.querySelectorAll('[data-correct-eat]').forEach((btn) => {
@@ -345,7 +354,10 @@ export function renderPlan(ctx) {
       const entry = ctx.state.log?.[index];
       const recipe = recipesById.get(btn.dataset.recipe);
       if (!entry || !recipe) return;
-      updateAfterCorrection(convertSkippedEntryToEaten(ctx.state, index, recipe), entry);
+      updateAfterCorrection(
+        convertSkippedEntryToEaten(ctx.state, index, recipe, btn.dataset.slot || null),
+        entry,
+      );
     });
   });
 

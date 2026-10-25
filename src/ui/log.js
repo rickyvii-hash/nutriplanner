@@ -154,39 +154,75 @@ export function ensureDraft(draft) {
   return d;
 }
 
+/**
+ * The planned slot and recipe together are the identity of a meal: with two snacks
+ * the same snack recipe can fill both `snack` and `snack2`, so the recipe id alone
+ * is not enough to keep them apart.
+ */
+function slotKey(slot, recipeId) {
+  return `${slot || ''}|${recipeId || ''}`;
+}
+
+/** The recipe id of one entry of `draft.skipped` (a plain id or { recipeId, slot }). */
+export function skippedEntryRecipeId(entry) {
+  if (typeof entry === 'string') return entry || null;
+  return (entry && typeof entry === 'object' && entry.recipeId) || null;
+}
+
+/** The planned slot of one entry of `draft.skipped`, or null when it is not known. */
+export function skippedEntrySlot(entry) {
+  if (!entry || typeof entry !== 'object') return null;
+  return entry.slot || null;
+}
+
+/** True when the recipe is already in `draft.skipped`; with a slot, only for that slot. */
+export function isRecipeSkipped(draft, recipeId, slot = null) {
+  if (!recipeId) return false;
+  return (Array.isArray(draft?.skipped) ? draft.skipped : []).some((entry) => (
+    skippedEntryRecipeId(entry) === recipeId
+    && (!slot || skippedEntrySlot(entry) === slot)
+  ));
+}
+
 /** The eaten block for a planned recipe, or null when it was not added. */
-export function draftGroupForRecipe(draft, recipeId) {
+export function draftGroupForRecipe(draft, recipeId, slot = null) {
   if (!recipeId || !Array.isArray(draft?.groups)) return null;
-  return draft.groups.find((g) => g.recipeId === recipeId) || null;
+  return draft.groups.find((g) => g.recipeId === recipeId && (!slot || g.slot === slot)) || null;
 }
 
 /** True while the planned recipe is shown as "In this meal". */
-export function isRecipeInDraft(draft, recipeId) {
-  return Boolean(draftGroupForRecipe(draft, recipeId));
+export function isRecipeInDraft(draft, recipeId, slot = null) {
+  return Boolean(draftGroupForRecipe(draft, recipeId, slot));
 }
 
-/** Remove a planned recipe from the skipped list. */
-export function unskipRecipe(draft, recipeId) {
+/** Remove a planned recipe from the skipped list; with a slot, only that slot's skip. */
+export function unskipRecipe(draft, recipeId, slot = null) {
   if (!draft || !Array.isArray(draft.skipped)) return draft;
-  draft.skipped = draft.skipped.filter((id) => id !== recipeId);
+  draft.skipped = draft.skipped.filter((entry) => {
+    if (skippedEntryRecipeId(entry) !== recipeId) return true;
+    return slot ? skippedEntrySlot(entry) !== slot : false;
+  });
   return draft;
 }
 
 /**
  * Add a planned meal as one block. Its ingredients stay together so the block can be
- * removed in one tap; adding the same recipe twice never duplicates it.
- * A recipe cannot be eaten and skipped at the same time, so its skip is cleared.
+ * removed in one tap; adding the same meal twice never duplicates it.
+ * `slot` is the planned slot (a second snack is `snack2`); without it the recipe's
+ * own slot is used. A meal cannot be eaten and skipped at the same time, so its
+ * skip is cleared — only for that slot.
  */
-export function addRecipeGroup(draft, recipe) {
+export function addRecipeGroup(draft, recipe, slot = null) {
   if (!recipe) return null;
   const d = ensureDraft(draft);
-  unskipRecipe(d, recipe.id);
-  const existing = draftGroupForRecipe(d, recipe.id);
+  const plannedSlot = slot || recipe.slot || null;
+  unskipRecipe(d, recipe.id, slot ? plannedSlot : null);
+  const existing = draftGroupForRecipe(d, recipe.id, slot ? plannedSlot : null);
   if (existing) return existing;
   const group = {
-    id: `eaten-${recipe.slot}-${recipe.id}`,
+    id: `eaten-${plannedSlot}-${recipe.id}`,
     kind: 'eaten',
-    slot: recipe.slot,
+    slot: plannedSlot,
     recipeId: recipe.id,
     recipeName: recipe.name,
     items: recipe.ingredients.map((ing) => ({ foodId: ing.foodId, grams: ing.grams })),
@@ -196,16 +232,40 @@ export function addRecipeGroup(draft, recipe) {
 }
 
 /**
- * Mark a planned recipe as skipped. Eaten and skipped are mutually exclusive, so any
- * eaten block of the same recipe is removed.
+ * Mark a planned meal as skipped. Eaten and skipped are mutually exclusive, so any
+ * eaten block of the same meal is removed. With a slot, only that slot is touched:
+ * two snacks sharing one recipe stay independent.
  */
-export function skipRecipeGroup(draft, recipeId) {
+export function skipRecipeGroup(draft, recipeId, slot = null) {
   if (!recipeId) return draft;
   const d = ensureDraft(draft);
-  const group = draftGroupForRecipe(d, recipeId);
+  const group = draftGroupForRecipe(d, recipeId, slot);
   if (group) removeDraftGroup(d, group.id);
-  if (!d.skipped.includes(recipeId)) d.skipped.push(recipeId);
+  if (!isRecipeSkipped(d, recipeId, slot)) d.skipped.push(slot ? { recipeId, slot } : recipeId);
   return d;
+}
+
+/**
+ * The meals to save as skipped, as { recipeId, slot }: a meal already eaten as a
+ * block is never also skipped, so the log cannot count it as both.
+ */
+export function draftSkipRecords(draft) {
+  const groups = Array.isArray(draft?.groups) ? draft.groups : [];
+  const records = [];
+  const seen = new Set();
+  for (const entry of Array.isArray(draft?.skipped) ? draft.skipped : []) {
+    const recipeId = skippedEntryRecipeId(entry);
+    if (!recipeId) continue;
+    const slot = skippedEntrySlot(entry);
+    // The same meal, in the same slot, cannot be eaten and skipped at once.
+    const eaten = groups.some((g) => g.recipeId === recipeId && (!slot || g.slot === slot));
+    if (eaten) continue;
+    const key = slotKey(slot, recipeId);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    records.push({ recipeId, slot });
+  }
+  return records;
 }
 
 /**
@@ -213,8 +273,7 @@ export function skipRecipeGroup(draft, recipeId) {
  * skipped, so the log cannot count it as both.
  */
 export function draftSkippedIds(draft) {
-  const eaten = new Set((draft?.groups || []).map((g) => g.recipeId).filter(Boolean));
-  return (Array.isArray(draft?.skipped) ? draft.skipped : []).filter((id) => id && !eaten.has(id));
+  return [...new Set(draftSkipRecords(draft).map((record) => record.recipeId))];
 }
 
 /**
@@ -251,11 +310,14 @@ export function draftSavePayload(draft) {
   }));
   // Free-search foods are the extras: they are not tied to a planned slot.
   const extras = d.items.map((it) => ({ foodId: it.foodId, grams: it.grams }));
+  // The slot is saved with each skip, so a skipped `snack2` is not read back as `snack`.
+  const skipRecords = draftSkipRecords(d);
   return {
     items: flatDraftItems(d),
     groups,
     extras,
-    skipped: draftSkippedIds(d),
+    skipped: skipRecords.map((record) => record.recipeId),
+    skippedSlots: skipRecords,
     eaten: d.groups.map((g) => ({ recipeId: g.recipeId, slot: g.slot })),
     extra: d.items.length > 0,
   };
@@ -333,8 +395,22 @@ export function logEntriesForSave(payload, when) {
   }
 
   // One skip entry per skipped planned meal: a later correction touches only that slot.
+  // The slot is recorded when the payload names it (a second snack is `snack2`),
+  // because the recipe id alone cannot tell two snacks of the same recipe apart.
+  const skipRecords = (Array.isArray(payload?.skippedSlots) ? payload.skippedSlots : [])
+    .filter((record) => record && record.recipeId)
+    .map((record) => ({ recipeId: record.recipeId, slot: record.slot || null }));
   for (const recipeId of new Set(skipped.filter(Boolean))) {
-    entries.push({ ...when, skipped: [recipeId], items: [] });
+    if (skipRecords.some((record) => record.recipeId === recipeId)) continue;
+    skipRecords.push({ recipeId, slot: null });
+  }
+  for (const record of skipRecords) {
+    entries.push({
+      ...when,
+      skipped: [record.recipeId],
+      items: [],
+      ...(record.slot ? { skippedSlots: [{ recipeId: record.recipeId, slot: record.slot }] } : {}),
+    });
   }
   return entries;
 }
@@ -354,6 +430,17 @@ export function slotForRecipeId(recipeId, planDay, recipesById) {
 }
 
 /**
+ * The { recipeId, slot } pairs a saved skip entry names. Newer entries carry
+ * `skippedSlots` because a recipe id alone cannot tell `snack` from `snack2`
+ * when both snacks use the same snack recipe.
+ */
+export function entrySkipSlots(entry) {
+  return (Array.isArray(entry?.skippedSlots) ? entry.skippedSlots : [])
+    .filter((info) => info && info.recipeId && info.slot)
+    .map((info) => ({ recipeId: info.recipeId, slot: info.slot }));
+}
+
+/**
  * The planned slots a saved log entry settles. Free-search extras settle no slot,
  * so they never block or overwrite a planned meal.
  */
@@ -367,7 +454,12 @@ export function entrySlots(entry, planDay, recipesById) {
   for (const replaced of Array.isArray(entry.replaced) ? entry.replaced : []) {
     if (replaced?.slot) slots.add(replaced.slot);
   }
+  // A skip saves the planned slot it stands for, so two snacks of the same recipe
+  // never settle each other's slot; older entries name only the recipe.
+  const skipSlots = entrySkipSlots(entry);
+  for (const info of skipSlots) slots.add(info.slot);
   for (const recipeId of Array.isArray(entry.skipped) ? entry.skipped : []) {
+    if (skipSlots.some((info) => info.recipeId === recipeId)) continue;
     const slot = slotForRecipeId(recipeId, planDay, recipesById);
     if (slot) slots.add(slot);
   }
@@ -389,7 +481,13 @@ export function savedSlotOutcomes(log, date, planDay, recipesById) {
   const entries = Array.isArray(log) ? log : [];
   entries.forEach((entry, index) => {
     if (!entry || entry.date !== date) return;
+    // The recorded slot wins: the same snack recipe can fill both snack slots.
+    const skipSlots = entrySkipSlots(entry);
+    for (const info of skipSlots) {
+      outcomes.set(info.slot, { kind: 'skipped', slot: info.slot, recipeId: info.recipeId, index, entry });
+    }
     for (const recipeId of Array.isArray(entry.skipped) ? entry.skipped : []) {
+      if (skipSlots.some((info) => info.recipeId === recipeId)) continue;
       const slot = slotForRecipeId(recipeId, planDay, recipesById);
       if (slot) outcomes.set(slot, { kind: 'skipped', slot, recipeId, index, entry });
     }
@@ -537,10 +635,12 @@ export function renderLog(ctx) {
     if (!recipe) continue;
     const saved = savedOutcomes.get(slot) || null;
     const savedKind = saved?.kind || null;
+    // Both checks look at the planned slot: with two snacks a shared recipe id
+    // must not make one row look eaten or skipped when only the other one is.
     const alreadySkipped = savedKind
       ? savedKind === 'skipped'
-      : draft.skipped.includes(recipe?.id);
-    const inDraft = isRecipeInDraft(draft, recipe?.id);
+      : isRecipeSkipped(draft, recipe?.id, slot);
+    const inDraft = isRecipeInDraft(draft, recipe?.id, slot);
     // A saved slot is locked: changes go through the correction path on Plan.
     const locked = Boolean(savedKind) || alreadySkipped || inDraft;
     const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}${inDraft ? ' is-in-draft' : ''}${savedKind ? ' is-logged' : ''}" data-slot="${escapeHtml(slot)}">
@@ -661,11 +761,12 @@ export function renderLog(ctx) {
       ul.appendChild(li);
     });
 
-    draft.skipped.forEach((recipeId) => {
-      const recipe = recipesById.get(recipeId);
+    draft.skipped.forEach((skip, index) => {
+      const recipeId = skippedEntryRecipeId(skip);
+      const recipe = recipeId ? recipesById.get(recipeId) : null;
       const li = el(`<li class="logged-item is-skipped">
-        <span>Skipped · ${escapeHtml(recipe?.name || recipeId)}</span>
-        <button type="button" class="btn-icon" data-unskip="${escapeHtml(recipeId)}" aria-label="Remove skip">×</button>
+        <span>Skipped · ${escapeHtml(recipe?.name || recipeId || '')}</span>
+        <button type="button" class="btn-icon" data-unskip="${index}" aria-label="Remove skip">×</button>
       </li>`);
       ul.appendChild(li);
     });
@@ -731,7 +832,10 @@ export function renderLog(ctx) {
     });
     ul.querySelectorAll('[data-unskip]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        unskipRecipe(draft, btn.dataset.unskip);
+        // The row index names one skip, so removing one snack's skip keeps the other.
+        const index = Number(btn.dataset.unskip);
+        if (!Number.isInteger(index) || !draft.skipped[index]) return;
+        draft.skipped.splice(index, 1);
         ctx.refresh();
       });
     });
@@ -757,7 +861,8 @@ export function renderLog(ctx) {
     btn.addEventListener('click', () => {
       const recipe = recipesById.get(btn.dataset.addRecipe);
       if (!recipe) return;
-      addRecipeGroup(draft, recipe);
+      // The row's stored slot (a second snack is "snack2") keeps the meal apart.
+      addRecipeGroup(draft, recipe, btn.closest('.plan-meal-row')?.dataset.slot || null);
       // The plan row must show "In this meal" right away.
       ctx.refresh();
     });
@@ -767,8 +872,9 @@ export function renderLog(ctx) {
     btn.addEventListener('click', () => {
       const id = btn.dataset.skipRecipe;
       if (!id) return;
-      // Skipping drops any eaten block of the same recipe: the two choices are exclusive.
-      skipRecipeGroup(draft, id);
+      // Skipping drops any eaten block of the same meal in the same slot: the two
+      // choices are exclusive, and the other snack stays untouched.
+      skipRecipeGroup(draft, id, btn.closest('.plan-meal-row')?.dataset.slot || null);
       ctx.refresh();
     });
   });

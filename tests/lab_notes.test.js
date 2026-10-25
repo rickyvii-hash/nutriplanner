@@ -37,6 +37,38 @@ test('missing intake days are gaps (null), never zero', () => {
   assert.equal(byDay['2026-10-02'], null, 'gap must be null, not 0');
   assert.equal(typeof byDay['2026-10-03'], 'number');
   assert.notEqual(byDay['2026-10-02'], 0);
+  const gap = series.find((p) => p.date === '2026-10-02');
+  assert.equal(gap.incomplete, false, 'a day with no log is a gap, not an incomplete sum');
+  assert.equal(series.find((p) => p.date === '2026-10-01').incomplete, false);
+});
+
+test('a day where a logged food lacks the nutrient is incomplete, not a partial exact value', () => {
+  // This beer has no satFat value in the food data: the day's sum would be partial.
+  const log = [
+    {
+      date: '2026-10-01',
+      items: [
+        { foodId: 'pizza-cheese', grams: 100 },
+        { foodId: 'alcoholic-beverage-beer-light-bud-light', grams: 200 },
+      ],
+    },
+    // A day whose only logged foods have no value for this nutrient is incomplete too.
+    { date: '2026-10-02', items: [{ foodId: 'alcoholic-beverage-beer-light-bud-light', grams: 200 }] },
+    { date: '2026-10-03', items: [{ foodId: 'pizza-cheese', grams: 100 }] },
+  ];
+  const series = weeklyIntakeSeries(log, 'satFat', foodsById, {
+    from: '2026-10-01',
+    to: '2026-10-03',
+  });
+  const partial = series.find((p) => p.date === '2026-10-01');
+  assert.equal(partial.incomplete, true, 'a missing value marks the day incomplete');
+  assert.equal(partial.value, null, 'a partial sum is never shown as an exact value');
+  const missingOnly = series.find((p) => p.date === '2026-10-02');
+  assert.equal(missingOnly.incomplete, true);
+  assert.equal(missingOnly.value, null, 'unknown is never turned into zero');
+  const known = series.find((p) => p.date === '2026-10-03');
+  assert.equal(known.incomplete, false);
+  assert.equal(typeof known.value, 'number');
 });
 
 test('labSeriesByName groups entered values by date', () => {

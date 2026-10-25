@@ -2,7 +2,7 @@ import {
   loadState, saveState, getStorageNotice, clearState,
   proposalToStore, pendingProposalForPlan, withoutPendingProposal,
   acceptUpdatedPlan, applyStaleMonthOnStart, startOverState, changeProfileState,
-  startScreenFor,
+  restoredStateAndScreen,
 } from './store.js';
 import { buildExportPayload, applyImportPayload, EXPORT_FILE_NAME } from './engine/export_import.js';
 import {
@@ -176,16 +176,19 @@ const ctx = {
   // Restore from file asks for confirmation before replacing anything.
   openRestore: (data, summary) => openRestorePanel(ctx, data, summary),
   confirmRestore: (data) => {
-    const next = applyImportPayload(ctx.state, data);
+    const imported = applyImportPayload(ctx.state, data);
     // applyImportPayload returns the same state when the file is not valid.
-    if (next === ctx.state) return;
-    ctx.state = next;
+    if (imported === ctx.state) return;
+    // A restored plan for another month is cleared exactly like on start: the
+    // Targets banner explains it, instead of opening the old month as Today.
+    const restored = restoredStateAndScreen(imported);
+    ctx.state = restored.state;
     saveState(ctx.state);
     ctx.proposal = null;
     ctx.logDraft = null;
     ctx.selectedDate = null;
-    ctx.monthBanner = null;
-    ctx.screen = startScreenFor(ctx.state);
+    ctx.monthBanner = restored.banner;
+    ctx.screen = restored.screen;
     render();
   },
   confirmChangeProfile: ({ keepLog = true } = {}) => {
