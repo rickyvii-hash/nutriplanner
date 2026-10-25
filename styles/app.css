@@ -135,7 +135,9 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .meal-actions .btn-small { flex: 1 1 auto; min-width: 5.2rem; padding: 8px 10px; }
 /* Day screen: status chip and the row actions, kept inline and wrapping on a phone. */
 .meal-item { flex-wrap: wrap; }
-.meal-item .meal-open { flex-wrap: wrap; min-width: 0; }
+/* The meal name takes the full row; the buttons sit under it in equal columns, so a
+   long recipe name is never squeezed into a narrow column beside them on a phone. */
+.meal-item .meal-open { flex: 1 1 100%; flex-wrap: wrap; min-width: 0; }
 .meal-status {
   display: inline-block; font-size: 0.72rem; font-weight: 600; line-height: 1.4;
   padding: 2px 8px; border-radius: 99px; background: var(--line); color: var(--muted);
@@ -145,9 +147,9 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .meal-status-replaced { background: var(--tan-soft); color: #7a5a2b; }
 .meal-row-actions {
   display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end;
-  flex: 1 1 auto; max-width: 100%;
+  flex: 1 1 100%; max-width: 100%;
 }
-.meal-row-actions .btn-small { flex: 1 1 auto; min-height: 44px; padding: 8px 10px; }
+.meal-row-actions .btn-small { flex: 1 1 0; min-width: 5.2rem; min-height: 44px; padding: 8px 10px; }
 .meal-progress { margin: 0 0 6px; }
 .meal-log-hint { margin: 8px 0 0; }
 .meal-item .replace-picker { flex: 1 1 100%; min-width: 0; }
