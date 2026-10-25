@@ -169,6 +169,30 @@ export function dayValueText(result, nutrient) {
 }
 
 /**
+ * The one-line summary above the day's meal list: how many planned meals already
+ * have a saved outcome. `slots` is the day's own list of on slots (the day screen
+ * passes exactly the slots its rows show), and `outcomes` is the map returned by
+ * savedSlotOutcomes, the same source the row status chips read. Eaten and replaced
+ * meals count as logged; a skipped meal is counted apart, never as eaten.
+ * Returns { total, logged, skipped, text }.
+ */
+export function dayMealProgress({ planDay = null, slots = null, outcomes = null } = {}) {
+  const planned = (Array.isArray(slots) ? slots : Object.keys(planDay || {}))
+    .filter((slot) => planDay?.[slot]);
+  let logged = 0;
+  let skipped = 0;
+  for (const slot of planned) {
+    const kind = outcomes?.get?.(slot)?.kind || null;
+    if (kind === 'eaten' || kind === 'replaced') logged += 1;
+    else if (kind === 'skipped') skipped += 1;
+  }
+  const text = skipped > 0
+    ? `${logged} of ${planned.length} logged, ${skipped} skipped`
+    : `${logged} of ${planned.length} meals logged`;
+  return { total: planned.length, logged, skipped, text };
+}
+
+/**
  * What the day's progress bars show, and the line that explains it.
  * Progress is what was actually logged for the day: planned meals are a plan,
  * not food already eaten, so they are never counted here. A skipped meal is not
@@ -301,6 +325,7 @@ export function renderPlan(ctx) {
       <h2>${selected === today ? 'Today' : selected}</h2>
       <button type="button" class="btn-primary btn-small" data-action="log">Log a meal</button>
     </div>
+    <p class="muted tiny meal-progress" data-day-progress></p>
     <ul class="meal-list"></ul>
     <p class="muted tiny meal-log-hint">Food outside your meals? Use Log a meal.</p>
   </section>`);
@@ -311,6 +336,11 @@ export function renderPlan(ctx) {
     : Object.keys(meals || {}).filter((slot) => meals[slot]);
   // One saved outcome per planned slot, read exactly as the Log screen reads it.
   const outcomes = savedSlotOutcomes(state.log, selected, meals, recipesById);
+  // "N of M meals logged" reads the same saved outcomes as the row status chips.
+  const progress = dayMealProgress({ planDay: meals, slots: daySlots, outcomes });
+  const progressEl = mealCard.querySelector('[data-day-progress]');
+  progressEl.textContent = progress.text;
+  progressEl.setAttribute('data-day-progress-total', String(progress.total));
   let openPicker = null;
   const closePicker = () => {
     if (openPicker) openPicker.remove();
