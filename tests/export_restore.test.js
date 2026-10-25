@@ -26,7 +26,7 @@ test('export version is a positive integer', () => {
   assert.ok(EXPORT_VERSION >= 1);
 });
 
-test('round trip: export then restore restores plan, logs, targets, meals, lab notes', () => {
+test('round trip: export then restore restores plan, logs, targets and meals', () => {
   memoryStorage();
   clearState();
   const state = {
@@ -51,6 +51,8 @@ test('round trip: export then restore restores plan, logs, targets, meals, lab n
   for (const key of Object.keys(payload)) {
     assert.ok(allowedFields.has(key), `unexpected field in the backup: ${key}`);
   }
+  // The schema keeps the field, always as an empty list: no screen records lab notes.
+  assert.deepEqual(payload.labNotes, []);
 
   clearState();
   saveState(emptyAppState());
@@ -62,7 +64,7 @@ test('round trip: export then restore restores plan, logs, targets, meals, lab n
   assert.deepEqual(next.mealPrefs, state.mealPrefs);
   assert.deepEqual(next.plan, state.plan);
   assert.deepEqual(next.log, state.log);
-  assert.deepEqual(next.labNotes, state.labNotes);
+  assert.deepEqual(next.labNotes, []);
   assert.deepEqual(next.bought, state.bought);
 });
 

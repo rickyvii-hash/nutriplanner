@@ -109,7 +109,6 @@ function restoreLines(summary) {
     `Your meal choices (${count(s.meals)} meals a day)`,
     planLine,
     `Your meal logs (${count(s.logs)} entries)`,
-    `Your lab notes (${count(s.labNotes)} notes)`,
   ];
 }
 

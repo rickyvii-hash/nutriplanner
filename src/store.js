@@ -1,6 +1,8 @@
 // Device-local persistence. No accounts, no cloud.
 
-import { defaultMealPrefs, normalizeMealPrefs, activeSlots } from './engine/meal_prefs.js';
+import {
+  defaultMealPrefs, normalizeMealPrefs, activeSlots, MAX_SNACKS,
+} from './engine/meal_prefs.js';
 
 const KEY = 'nutriplanner-v1';
 
@@ -23,8 +25,8 @@ export function emptyAppState() {
     shopEvery: 7,
     shopStart: null,
     pendingProposal: null,
-    // Notes from blood tests the person chooses to record. Kept in a backup
-    // even before the lab notes screen exists.
+    // Reserved as an empty list in the backup schema for forward compatibility;
+    // no screen records these in this version.
     labNotes: [],
   };
 }
@@ -46,6 +48,7 @@ export const START_OVER_ITEMS = [
   'Shopping ticks (items you marked bought)',
   'A pending plan update proposal',
   'Notes about meals kept because you bought the ingredients',
+  'Lab notes you recorded',
 ];
 
 /** Title, list and footnote shown before a Start over is confirmed. */
@@ -189,14 +192,18 @@ export function withoutSecondSnack(state) {
   if (!state) return state;
   const prefs = normalizeMealPrefs(state.mealPrefs);
   if (activeSlots(prefs).includes('snack2')) return state;
+  // A saved snack count above the current maximum is the legacy two-snack
+  // version. The plan is trimmed AND any proposal worked out for those days is
+  // dropped entirely, so an update from before the cut can never be applied.
+  const legacySnacks = Number(state.mealPrefs?.snacks) > MAX_SNACKS;
   const plan = withoutSecondSnackDays(state.plan);
   const planBase = withoutSecondSnackDays(state.planBase);
-  const pending = state.pendingProposal;
+  const pending = legacySnacks ? null : state.pendingProposal;
   const pendingPlan = pending?.plan ? withoutSecondSnackDays(pending.plan) : null;
   const pendingProposal = pendingPlan && pendingPlan !== pending.plan
     ? { ...pending, plan: pendingPlan }
     : pending;
-  if (plan === state.plan && planBase === state.planBase && pendingProposal === pending) {
+  if (plan === state.plan && planBase === state.planBase && pendingProposal === state.pendingProposal) {
     return state;
   }
   return { ...state, plan, planBase, pendingProposal };
@@ -293,7 +300,9 @@ export function loadState() {
       profileId: data.profileId ?? null,
       guideDismissed: data.guideDismissed === true,
       targets: Array.isArray(data.targets) ? data.targets : [],
-      mealPrefs: normalizeMealPrefs(data.mealPrefs),
+      // Kept raw until after the snack migration check, so an older saved
+      // snacks: 2 can still be recognised and its proposal dropped.
+      mealPrefs: data.mealPrefs ?? {},
       plan: data.plan ?? null,
       planBase: data.planBase && typeof data.planBase === 'object' ? data.planBase : null,
       log: Array.isArray(data.log) ? data.log : [],
@@ -304,10 +313,14 @@ export function loadState() {
       pendingProposal: data.pendingProposal && typeof data.pendingProposal === 'object'
         ? data.pendingProposal
         : null,
-      labNotes: Array.isArray(data.labNotes) ? data.labNotes : [],
+      // The field stays in the schema but is always empty: no screen records these.
+      labNotes: [],
     };
     // An older saved plan may still hold a second snack; the screens offer one.
-    return withoutSecondSnack(loaded);
+    return {
+      ...withoutSecondSnack(loaded),
+      mealPrefs: normalizeMealPrefs(data.mealPrefs),
+    };
   } catch {
     storageNotice = 'Saved data could not be read; starting fresh for this session.';
     return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [] };
@@ -336,7 +349,8 @@ export function saveState(state) {
         shopEvery: state.shopEvery || 7,
         shopStart: state.shopStart || null,
         pendingProposal: state.pendingProposal || null,
-        labNotes: Array.isArray(state.labNotes) ? state.labNotes : [],
+        // Always empty: kept in the schema for forward compatibility only.
+        labNotes: [],
       }),
     );
     return true;

@@ -48,7 +48,8 @@ export function buildExportPayload(state) {
     keptForBought: Array.isArray(s.keptForBought) ? s.keptForBought : [],
     shopEvery: s.shopEvery ?? 7,
     shopStart: s.shopStart ?? null,
-    labNotes: Array.isArray(s.labNotes) ? s.labNotes : [],
+    // Kept as an empty list in the schema for forward compatibility.
+    labNotes: [],
   };
 }
 
@@ -135,7 +136,8 @@ export function applyImportPayload(currentState, data) {
     shopEvery: [2, 3, 5, 7].includes(data.shopEvery) ? data.shopEvery : 7,
     shopStart: typeof data.shopStart === 'string' ? data.shopStart : null,
     pendingProposal: null,
-    labNotes: (data.labNotes ?? []).map((note) => ({ ...note })),
+    // The field is accepted for older files but the restored state keeps it empty.
+    labNotes: [],
   };
   // An older backup may hold a second snack: the restored plan shows one snack only.
   return withoutSecondSnack(restored);

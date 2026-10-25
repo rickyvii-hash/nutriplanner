@@ -66,7 +66,7 @@ test('load: a saved snacks: 2 plan keeps one snack and loses snack2 in every day
   assert.equal(state.plan.month, '2026-10', 'the month is unchanged');
 });
 
-test('load: planBase and a pending proposal lose snack2 too', () => {
+test('load: planBase loses snack2 and a legacy pending proposal is dropped entirely', () => {
   installMemoryStorage();
   clearState();
   localStorage.setItem('nutriplanner-v1', JSON.stringify(legacySavedData({
@@ -82,10 +82,11 @@ test('load: planBase and a pending proposal lose snack2 too', () => {
   const state = loadState();
   for (const date of Object.keys(legacyPlan.days)) {
     assert.equal(state.planBase.days[date].snack2, undefined, `planBase ${date}`);
-    assert.equal(state.pendingProposal.plan.days[date].snack2, undefined, `proposal ${date}`);
   }
-  // The proposal still belongs to the plan month, so the screen can still show it.
-  assert.ok(pendingProposalForPlan(state));
+  // The proposal was worked out for the two-snack version: it cannot be applied
+  // to the one-snack plan shown now, so it is cleared instead of migrated.
+  assert.equal(state.pendingProposal, null);
+  assert.equal(pendingProposalForPlan(state), null);
 });
 
 test('a plan without snack2 is returned untouched, and the input is never mutated', () => {

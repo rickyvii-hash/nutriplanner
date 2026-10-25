@@ -14,12 +14,6 @@ import { renderLog, logEntriesForSave, mergeLogEntries } from './ui/log.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
-import { renderLabNotes } from './ui/lab_notes.js';
-import {
-  addLabNote as addLabNoteEntry,
-  updateLabNote as updateLabNoteEntry,
-  removeLabNote as removeLabNoteEntry,
-} from './engine/lab_notes.js';
 import { shouldShowNav } from './ui/nav.js';
 import { openStartOverPanel, openChangeProfilePanel, openRestorePanel } from './ui/reset.js';
 import { shouldShowGuide, dismissGuideState } from './engine/guide.js';
@@ -125,22 +119,6 @@ const ctx = {
     ctx.proposal = null;
     ctx.navigate('plan');
   },
-  // Lab notes are kept on this device like the rest of the state.
-  addLabNote: (note) => {
-    ctx.state = { ...ctx.state, labNotes: addLabNoteEntry(ctx.state.labNotes, note) };
-    saveState(ctx.state);
-    render();
-  },
-  updateLabNote: (id, patch) => {
-    ctx.state = { ...ctx.state, labNotes: updateLabNoteEntry(ctx.state.labNotes, id, patch) };
-    saveState(ctx.state);
-    render();
-  },
-  removeLabNote: (id) => {
-    ctx.state = { ...ctx.state, labNotes: removeLabNoteEntry(ctx.state.labNotes, id) };
-    saveState(ctx.state);
-    render();
-  },
   // The guide opens from the Targets "How it works" link, without touching the dismiss flag.
   openGuide: () => openGuide(ctx, { firstRun: false }),
   // Closing the first-run guide keeps it from opening automatically on later visits.
@@ -212,7 +190,6 @@ function navBar() {
     { id: 'plan', label: 'Plan', icon: '📅' },
     { id: 'shopping', label: 'Shopping', icon: '🛒' },
     { id: 'targets', label: 'Targets', icon: '🎯' },
-    { id: 'lab-notes', label: 'Lab notes', icon: '🧪' },
   ];
   const nav = document.createElement('nav');
   nav.className = 'bottom-nav';
@@ -247,7 +224,6 @@ function render() {
   else if (ctx.screen === 'updated') screen = renderUpdated(ctx);
   else if (ctx.screen === 'shopping') screen = renderShopping(ctx);
   else if (ctx.screen === 'summary') screen = renderSummary(ctx);
-  else if (ctx.screen === 'lab-notes') screen = renderLabNotes(ctx);
   else screen = renderTargets(ctx);
 
   app.appendChild(screen);
