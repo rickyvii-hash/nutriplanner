@@ -3,8 +3,9 @@
  * screen. Nothing changes: a short status line under the meal list (announced,
  * it disappears on its own). The plan would change: an inline banner with
  * Review the update / Not now, and the proposal stays pending across a reload.
- * Skipped and Replace still open the Plan updated screen because they need a
- * decision. Undo stays on the day screen too and the row reads Planned again.
+ * Skipped and Replace open the Plan updated screen only when the plan would
+ * change (D19); with no change they stay inline too. Undo stays on the day
+ * screen and the row reads Planned again.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -106,13 +107,17 @@ test('D15 decision: a save that would change the plan shows the inline banner', 
   assert.equal(decision.proposal, proposal);
 });
 
-test('D15 decision: Skipped and Replace still end on the Plan updated screen', () => {
+test('D19 supersedes D15: Skipped and Replace stay inline unless the plan changes', () => {
   for (const action of ['skip', 'replace']) {
-    for (const proposal of [null, { nothingToChange: false, changed: [{}] }]) {
-      const decision = daySaveDecision({ action, slot: 'lunch', proposal });
-      assert.equal(decision.mode, 'navigate', action + ': needs a decision');
-      assert.equal(decision.stays, false);
-    }
+    const unchanged = daySaveDecision({ action, slot: 'lunch', proposal: null });
+    assert.equal(unchanged.mode, 'inline', action + ': no screen for a no-change save');
+    assert.equal(unchanged.stays, true);
+
+    const changed = daySaveDecision({
+      action, slot: 'lunch', proposal: { nothingToChange: false, changed: [{}] },
+    });
+    assert.equal(changed.mode, 'navigate', action + ': a decision opens Plan updated');
+    assert.equal(changed.stays, false);
   }
 });
 

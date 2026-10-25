@@ -13,7 +13,7 @@ import {
   buildPlan, replan, todayIso, localTime,
 } from './engine/planner.js';
 import { renderTargets } from './ui/targets.js';
-import { renderPlan } from './ui/plan.js';
+import { renderPlan, daySaveDecision } from './ui/plan.js';
 import { renderLog, logEntriesForSave, mergeLogEntries } from './ui/log.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
@@ -162,13 +162,22 @@ const ctx = {
     };
     // A day-screen save asks to stay: the day screen decides what to show (a
     // short status line, or the pending banner it can review later). The result
-    // is stored either way, so a Skipped / Replace save still opens the usual
-    // Plan updated screen; a save that changed nothing never shows a banner.
+    // is stored either way, so a Skipped / Replace save that changes the plan
+    // still opens the usual Plan updated screen.
     ctx.state = { ...ctx.state, log, pendingProposal: proposalToStore(result) };
     saveState(ctx.state);
     ctx.proposal = result;
     ctx.logDraft = null;
     if (options.stay) return result;
+    // An outside-the-menu save never passes `stay`. A real change still opens
+    // Plan updated; a save that changed nothing comes back to the day screen
+    // with a short status line instead of a Plan checked screen with no news.
+    const decision = daySaveDecision({ action: options.action || 'extra', proposal: result });
+    if (decision.mode === 'inline') {
+      ctx.dayStatus = decision.statusText;
+      ctx.navigate('plan');
+      return result;
+    }
     ctx.navigate('updated');
     return result;
   },

@@ -64,41 +64,54 @@ function mealLabel(slot) {
 
 /**
  * The short status line under the meal list after a save that changed nothing.
- * "Breakfast logged. Plan unchanged." / "Dinner is planned again. Plan unchanged."
+ * "Breakfast logged. Plan unchanged." / "Lunch skipped. Plan unchanged." /
+ * "Breakfast replaced. Plan unchanged." / "Dinner is planned again. Plan
+ * unchanged." / "Added. Plan unchanged."
  */
 export function dayStatusText(action, slot = null) {
+  if (action === 'extra') return 'Added. Plan unchanged.';
   const label = mealLabel(slot);
   if (action === 'undo') return `${label} is planned again. Plan unchanged.`;
+  if (action === 'skip') return `${label} skipped. Plan unchanged.`;
+  if (action === 'replace') return `${label} replaced. Plan unchanged.`;
   return `${label} logged. Plan unchanged.`;
 }
+
+/** Actions whose save has a status line of its own when the plan does not change. */
+const STATUS_ACTIONS = new Set(['eat', 'skip', 'replace', 'undo']);
 
 /**
  * What the day screen does right after one meal action.
  *
- * Ate it and Undo stay on the day screen. With no real change (`proposal` is
- * null or nothingToChange) the decision carries the short status line; when the
- * plan would change it carries the inline banner and its two buttons. Skipped
- * and Replace keep today's behaviour and open the Plan updated screen, because
- * they need a decision.
+ * A save that leaves the plan alone (`proposal` is null or nothingToChange)
+ * stays on the day screen and carries a short status line: the row chip and the
+ * counter already show the outcome, so no screen that only says "nothing changed"
+ * opens. A save that would change the plan keeps the existing destination:
+ * Ate it shows the inline banner with its two buttons, while Skipped, Replace and
+ * an extra open the Plan updated screen because the person must choose. An extra
+ * with no change comes back to the day screen with "Added. Plan unchanged."
  */
 export function daySaveDecision({ action = 'eat', slot = null, proposal = null } = {}) {
-  if (action === 'skip' || action === 'replace') {
-    return {
-      mode: 'navigate',
-      stays: false,
-      action,
-      statusText: null,
-      bannerText: null,
-      reviewLabel: null,
-      notNowLabel: null,
-      proposal: null,
-    };
-  }
   const changesPlan = Boolean(proposal && proposal.nothingToChange !== true);
   if (changesPlan) {
+    // Skipped, Replace and an extra need a decision when the plan would change.
+    if (action === 'skip' || action === 'replace' || action === 'extra') {
+      return {
+        mode: 'navigate',
+        stays: false,
+        target: 'updated',
+        action,
+        statusText: null,
+        bannerText: null,
+        reviewLabel: null,
+        notNowLabel: null,
+        proposal: null,
+      };
+    }
     return {
       mode: 'banner',
       stays: true,
+      target: null,
       action,
       statusText: null,
       bannerText: DAY_CHANGE_BANNER,
@@ -107,13 +120,29 @@ export function daySaveDecision({ action = 'eat', slot = null, proposal = null }
       proposal,
     };
   }
+  // An extra is saved from Outside the menu, so a no-change save returns to the
+  // day screen to show the status there instead of a Plan checked screen.
+  if (action === 'extra') {
+    return {
+      mode: 'inline',
+      stays: false,
+      target: 'plan',
+      action,
+      statusText: dayStatusText('extra'),
+      bannerText: null,
+      reviewLabel: null,
+      notNowLabel: null,
+      proposal: null,
+    };
+  }
   return {
     mode: 'inline',
     stays: true,
+    target: null,
     action,
     // A Change (eaten ↔ skipped) has no line of its own: the row chip and the
     // counter already say what happened.
-    statusText: action === 'eat' || action === 'undo' ? dayStatusText(action, slot) : null,
+    statusText: STATUS_ACTIONS.has(action) ? dayStatusText(action, slot) : null,
     bannerText: null,
     reviewLabel: null,
     notNowLabel: null,
@@ -124,16 +153,21 @@ export function daySaveDecision({ action = 'eat', slot = null, proposal = null }
 /**
  * Put a save decision on screen. Stay decisions redraw the day screen in place
  * (the status line or the pending banner comes from the state); a decision that
- * needs one opens the Plan updated screen. Returns the decision.
+ * needs one opens the Plan updated screen. An extra with no change navigates
+ * back to the day screen and shows its status there. Returns the decision.
  */
 export function applyDaySaveDecision(ctx, decision) {
   if (!ctx || !decision) return decision;
   if (decision.mode === 'navigate') {
-    if (typeof ctx.navigate === 'function') ctx.navigate('updated');
+    if (typeof ctx.navigate === 'function') ctx.navigate(decision.target || 'updated');
     return decision;
   }
   ctx.dayStatus = decision.statusText || null;
   ctx.dayBannerMinimized = false;
+  if (decision.target === 'plan' && typeof ctx.navigate === 'function') {
+    ctx.navigate('plan');
+    return decision;
+  }
   if (typeof ctx.refresh === 'function') ctx.refresh();
   return decision;
 }
@@ -506,8 +540,9 @@ export function renderPlan(ctx) {
   // Meal rows on this day, so a hand-off can find the slot it asks for.
   const rowsBySlot = new Map();
   // A day-screen save takes the same path the Log screen uses; only the selected
-  // date changes, so a meal chosen on a day ahead is saved for that day. Ate it
-  // stays on this screen; Skipped and Replace still need the Plan updated screen.
+  // date changes, so a meal chosen on a day ahead is saved for that day. Every
+  // action stays on this screen when the plan does not change; only a real
+  // proposal opens the Plan updated screen (Ate it shows the inline banner).
   const saveOneMeal = (payload, action = 'eat', slot = null) => {
     runDaySave(ctx, { action, slot, payload, date: selected });
   };
