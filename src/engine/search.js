@@ -3,6 +3,8 @@
 // prefix of the food name or id, so "cola" never matches "chocolate chip cookies".
 // Foods that match all words directly rank above foods found through a synonym.
 
+import { displayFoodName } from './food_display.js';
+
 /** Small English synonym map for the off-plan foods people search for most. */
 export const SYNONYMS = {
   cola: ['cola', 'coke', 'soda', 'soft drink'],
@@ -94,31 +96,38 @@ function scoreFood(food, query, queryWords) {
   const id = normalizeText(food.id || '');
   const nameWords = words(food.name);
   const idWords = words(food.id || '');
+  // The label the UI actually shows, so a query also matches the brand-free name.
+  const displayWords = words(displayFoodName(food));
 
   if (name === query || (id && id === query.replace(/\s+/g, '-'))) return 100;
   if (name.startsWith(query)) return 80;
 
-  // Direct match: every query word is a word or word prefix of name/id.
+  // Direct match: every query word is a word or word prefix of name/id/display.
   const direct = queryWords.every((qw) => nameWords.some((fw) => wordMatches(fw, qw)))
+    || queryWords.every((qw) => displayWords.some((fw) => wordMatches(fw, qw)))
     || queryWords.every((qw) => idWords.some((fw) => wordMatches(fw, qw)));
   if (direct) {
     const wholeWords = queryWords.every(
-      (qw) => nameWords.includes(qw) || idWords.includes(qw),
+      (qw) => nameWords.includes(qw) || displayWords.includes(qw) || idWords.includes(qw),
     );
     return wholeWords ? 70 : 60;
   }
 
   // Synonym match: every query word is either direct or covered by a synonym.
   const synonymOnly = queryWords.every((qw) => {
-    if (nameWords.some((fw) => wordMatches(fw, qw)) || idWords.some((fw) => wordMatches(fw, qw))) return true;
+    if (nameWords.some((fw) => wordMatches(fw, qw))
+      || displayWords.some((fw) => wordMatches(fw, qw))
+      || idWords.some((fw) => wordMatches(fw, qw))) return true;
     const alternatives = SYNONYMS[qw] || [];
-    return alternatives.some((alt) => phraseMatches(nameWords, alt) || phraseMatches(idWords, alt));
+    return alternatives.some((alt) => phraseMatches(nameWords, alt)
+      || phraseMatches(displayWords, alt)
+      || phraseMatches(idWords, alt));
   });
   if (synonymOnly) return 40;
 
   // A phrase synonym such as "ice cream" taken as a whole.
   const phrase = SYNONYMS[query];
-  if (phrase && phrase.some((alt) => phraseMatches(nameWords, alt))) return 30;
+  if (phrase && phrase.some((alt) => phraseMatches(nameWords, alt) || phraseMatches(displayWords, alt))) return 30;
   return 0;
 }
 
@@ -134,6 +143,8 @@ export function searchFoods(foods, query, { limit = 12 } = {}) {
   const scored = [];
   for (const food of foods) {
     if (!food || !food.name) continue;
+    // A food whose label cannot be made brand-free is not offered in search.
+    if (!displayFoodName(food)) continue;
     const score = scoreFood(food, text, queryWords);
     if (score > 0) scored.push({ food, score });
   }

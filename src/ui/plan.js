@@ -21,6 +21,23 @@ function isSkippedEntry(entry) {
 }
 
 /**
+ * The headline of a saved log entry. A planned meal is named by its slot
+ * ("Eaten · breakfast"), so food eaten outside the plan never hides which meal
+ * it was; that food keeps its own "Extra / outside meals" entry. `recipe` is the
+ * planned recipe already matched for the entry, if any.
+ */
+export function logEntryKind(entry, recipe = null) {
+  if (isSkippedEntry(entry)) return 'Skipped';
+  if (Array.isArray(entry?.replaced) && entry.replaced.length > 0) return 'Eaten · replaced';
+  const hasEaten = Array.isArray(entry?.eaten) && entry.eaten.length > 0;
+  // An extra with no planned meal is food eaten outside the plan, not a slot.
+  if (entry?.extra && !hasEaten) return 'Extra / outside meals';
+  if (!hasEaten) return 'Eaten';
+  const slot = entry.eaten.find((info) => info?.slot)?.slot || recipe?.slot || null;
+  return slot ? `Eaten · ${slotLabel(slot)}` : 'Eaten';
+}
+
+/**
  * Text for a daily nutrient value: "n/a" when nothing is known, "≥12.2" when a meal
  * of the day has no value for it (a partial sum is never printed as certain).
  */
@@ -231,13 +248,7 @@ export function renderPlan(ctx) {
       : (extra && !hasEaten)
         ? null
         : findPlannedRecipeForEntry(entry, planDay, recipesById);
-    const kind = skipped
-      ? 'Skipped'
-      : replaced
-        ? 'Eaten · replaced'
-        : extra
-          ? (hasEaten ? 'Eaten · extra' : 'Extra / outside meals')
-          : 'Eaten';
+    const kind = logEntryKind(entry, recipe);
     const when = [entry.date, entry.time].filter(Boolean).join(' · ');
     const li = el(`<li class="log-edit" data-entry="${index}">
       <div class="log-edit-head">

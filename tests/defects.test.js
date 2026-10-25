@@ -164,3 +164,15 @@ test('plan progress: a logged meal still wins over the planned values', () => {
   assert.ok(result.totals.kcal > 0);
   assert.match(note, /logged/i);
 });
+
+test('nothing to change: Back to Plan is the single primary, never a disabled Use updated plan', () => {
+  const src = fs.readFileSync(new URL('../src/ui/updated.js', import.meta.url), 'utf8');
+  assert.ok(src.includes('>Back to Plan</button>'), 'the screen needs a Back to Plan button');
+  assert.equal(/data-use[^>]*\bdisabled\b/.test(src), false, 'Use updated plan must not be refused via disabled');
+  assert.ok(
+    src.includes("nothingToChange ? 'Plan checked' : 'Plan updated'"),
+    'the title must not claim the plan was updated when nothing changed',
+  );
+  const app = fs.readFileSync(new URL('../src/app.js', import.meta.url), 'utf8');
+  assert.ok(app.includes('dismissUpdatedPlan:'), 'Back to Plan closes the stored proposal and returns to the plan');
+});

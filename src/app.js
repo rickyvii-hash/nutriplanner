@@ -142,6 +142,14 @@ const ctx = {
     ctx.proposal = null;
     ctx.navigate('plan');
   },
+  dismissUpdatedPlan: () => {
+    // Nothing changed, so there is nothing to accept or refuse: close the notice
+    // and go back, leaving the plan untouched.
+    ctx.state = withoutPendingProposal(ctx.state);
+    saveState(ctx.state);
+    ctx.proposal = null;
+    ctx.navigate('plan');
+  },
   // The guide opens from the Targets "How it works" link, without touching the dismiss flag.
   openGuide: () => openGuide(ctx, { firstRun: false }),
   // Closing the first-run guide keeps it from opening automatically on later visits.

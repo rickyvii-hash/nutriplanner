@@ -4,28 +4,51 @@
  * every on-screen label goes through `displayFoodName`.
  */
 
-/** Brand tokens found in this app's USDA food list (case-insensitive match). */
+/**
+ * Brand and product-trademark tokens found in this app's USDA food list
+ * (case-insensitive match). Restaurant names and signature product lines are
+ * both listed, because neither may reach an on-screen label.
+ */
 export const FOOD_BRAND_TOKENS = [
   "APPLEBEE'S",
   "ARBY'S",
+  'BIG DADDY',
+  "BIG DADDY'S",
+  "BIG DADDY'S LS 16",
   'BREYERS',
   'BUD LIGHT',
   'BUDWEISER',
   'BURGER KING',
+  'CHOBANI',
+  'CLASSIC SINGLE',
   "DENNY'S",
   'DIGIORNO',
   "DOMINO'S",
+  'EXTRAVAGANZZA',
+  'EXTRAVAGANZZA FEAST',
+  'FAST BREAK',
   'LITTLE CAESARS',
   "MCDONALD'S",
   "MOTT'S",
   'MOTTS',
   'OCEAN SPRAY',
+  'ORIGINAL ROUND',
   "PAPA JOHN'S",
   'PAPA JOHN',
   'PIZZA HUT',
+  'RALSTON',
   "REESE'S",
+  'SMARTPIZZA',
+  'SUPER SUPREME',
   "T.G.I. FRIDAY'S",
   "TGI FRIDAY'S",
+  'THE WORKS',
+  "THIN 'N CRISPY",
+  'THIN N CRISPY',
+  'TONY',
+  "TONY'S",
+  "TONY'S SMARTPIZZA",
+  'ULTIMATE DEEP DISH',
   "WENDY'S",
   'ZEVIA',
 ];

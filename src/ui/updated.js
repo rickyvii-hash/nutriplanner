@@ -11,9 +11,12 @@ export function renderUpdated(ctx) {
   const { proposal } = ctx;
   const root = el(`<div class="screen screen-updated"></div>`);
 
+  // With nothing to accept, the screen is a check, not an update: the title says so.
+  const nothingToChange = Boolean(proposal?.nothingToChange);
+  const title = nothingToChange ? 'Plan checked' : 'Plan updated';
   root.appendChild(el(`<header class="brand brand-compact">
     <span class="logo" aria-hidden="true">🌿</span>
-    <div><h1>Plan updated</h1><p>Adaptive meal planning that flexes with real life.</p></div>
+    <div><h1>${title}</h1><p>Adaptive meal planning that flexes with real life.</p></div>
   </header>`));
 
   if (!proposal) {
@@ -26,7 +29,7 @@ export function renderUpdated(ctx) {
     return root;
   }
 
-  if (proposal.nothingToChange) {
+  if (nothingToChange) {
     root.appendChild(el(`<section class="card success-banner soft">
       <h2>No changes needed</h2>
       <p>${escapeHtml(proposal.reason)}</p>
@@ -95,18 +98,29 @@ export function renderUpdated(ctx) {
     root.appendChild(note);
   }
 
+  if (nothingToChange) {
+    // Nothing was accepted or rejected, so there is one clear primary: go back.
+    const actions = el(`<div class="stack-actions">
+      <button type="button" class="btn-primary" data-back-to-plan>Back to Plan</button>
+    </div>`);
+    root.appendChild(actions);
+    actions.querySelector('[data-back-to-plan]').addEventListener('click', () => {
+      if (typeof ctx.dismissUpdatedPlan === 'function') ctx.dismissUpdatedPlan();
+      else ctx.navigate('plan');
+    });
+    root.appendChild(el(`<p class="footer-note">Support tool, not medical advice.</p>`));
+    return root;
+  }
+
   const actions = el(`<div class="stack-actions dual">
     <button type="button" class="btn-secondary" data-keep>Keep my original plan</button>
-    <button type="button" class="btn-primary" data-use ${proposal.nothingToChange ? 'disabled' : ''}>Use updated plan</button>
+    <button type="button" class="btn-primary" data-use>Use updated plan</button>
   </div>`);
   root.appendChild(actions);
-  root.appendChild(el(`<p class="footer-note">Support tool, not medical advice.</p>`));
 
   actions.querySelector('[data-keep]').addEventListener('click', () => ctx.keepOriginalPlan());
-  actions.querySelector('[data-use]').addEventListener('click', () => {
-    if (!proposal.nothingToChange) ctx.useUpdatedPlan();
-    else ctx.navigate('plan');
-  });
+  actions.querySelector('[data-use]').addEventListener('click', () => ctx.useUpdatedPlan());
+  root.appendChild(el(`<p class="footer-note">Support tool, not medical advice.</p>`));
 
   return root;
 }

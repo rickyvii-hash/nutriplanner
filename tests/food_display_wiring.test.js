@@ -19,3 +19,10 @@ test('log.js, shopping.js and plan.js import and call displayFoodName', () => {
     assert.ok(src.includes('displayFoodName('), file + ' must call displayFoodName');
   }
 });
+
+test('the drink shortcut picks and labels drinks by the same brand-free name', () => {
+  const src = fs.readFileSync(path.join(root, 'src', 'ui', 'log.js'), 'utf8');
+  const body = src.slice(src.indexOf('function drinkPreview'), src.indexOf('function hasOwnMeasure'));
+  assert.ok(body.includes('displayFoodName('), 'drinkPreview must pick on the display name');
+  assert.doesNotMatch(body, /f\.name/, 'drinkPreview must not match the raw USDA name');
+});

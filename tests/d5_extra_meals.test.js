@@ -13,6 +13,7 @@ import {
   draftSavePayload,
   logEntriesForSave,
 } from '../src/ui/log.js';
+import { logEntryKind } from '../src/ui/plan.js';
 
 const root = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
 const foods = JSON.parse(fs.readFileSync(path.join(root, 'data', 'foods.json'), 'utf8'));
@@ -89,7 +90,7 @@ test('extra-only save: the entry is marked extra, has no skipped/replaced, and r
   }
 });
 
-test('extra and an eaten planned meal can be saved together without replacing a slot', () => {
+test('an eaten planned meal keeps its slot while outside food gets its own entry', () => {
   assert.ok(pizza, 'data needs a pizza food');
   const state = scenario();
   const lunchId = state.plan.days[FROM].lunch;
@@ -104,14 +105,38 @@ test('extra and an eaten planned meal can be saved together without replacing a 
   assert.deepEqual(payload.eaten, [{ recipeId: lunch.id, slot: lunch.slot }]);
 
   const entries = logEntriesForSave(payload, when);
-  assert.equal(entries.length, 1, 'eaten food and extras share one entry');
-  const entry = entries[0];
-  assert.equal(entry.extra, true);
-  assert.equal(entry.eaten.length, 1);
-  assert.equal(entry.items.length, lunch.ingredients.length + 1, 'planned meal plus the extra');
-  assert.equal('replaced' in entry, false);
-  assert.equal('skipped' in entry, false);
-  assert.deepEqual(entry.items.at(-1), { foodId: pizza.id, grams: 200 });
+  assert.equal(entries.length, 2, 'the planned meal and the outside food are separate entries');
+
+  const plannedEntry = entries.find((e) => Array.isArray(e.eaten));
+  const extraEntry = entries.find((e) => e.extra);
+  assert.ok(plannedEntry, 'the planned meal keeps an eaten record');
+  assert.ok(extraEntry, 'the free-search food is stored as an extra');
+
+  // The planned entry is exactly the planned meal: no extra flag, no outside food.
+  assert.equal('extra' in plannedEntry, false, 'an eaten planned meal is never "extra"');
+  assert.deepEqual(plannedEntry.eaten, [{ recipeId: lunch.id, slot: lunch.slot }]);
+  assert.equal(plannedEntry.items.length, lunch.ingredients.length, 'only the planned ingredients');
+  assert.equal('replaced' in plannedEntry, false);
+  assert.equal('skipped' in plannedEntry, false);
+
+  // The outside food is its own entry and settles no slot.
+  assert.deepEqual(extraEntry.items, [{ foodId: pizza.id, grams: 200 }]);
+  assert.equal('eaten' in extraEntry, false);
+  assert.equal('replaced' in extraEntry, false);
+  assert.equal('skipped' in extraEntry, false);
+
+  // Labels on the Plan screen: the slot survives, the outside food reads as an extra.
+  assert.equal(logEntryKind(plannedEntry, lunch), `Eaten · ${lunch.slot}`);
+  assert.equal(logEntryKind(extraEntry, null), 'Extra / outside meals');
+
+  // Both entries still count in the day totals.
+  const averages = loggedAverages(entries, foodsById);
+  assert.equal(averages.days, 1);
+  const logged = loggedNutrients(
+    entries.flatMap((entry) => entry.items),
+    foodsById,
+  ).totals;
+  assert.equal(averages.totals.kcal, logged.kcal);
 
   const result = run(state, entries);
   assert.equal(result.replacements.length, 0, 'the extra does not replace the lunch');

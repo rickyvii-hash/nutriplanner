@@ -43,6 +43,41 @@ test('no displayed food name contains a brand token', () => {
   assert.ok(checked > 300, `expected hundreds of displayable foods, got ${checked}`);
 });
 
+test('restaurant product trademarks never survive the strip', () => {
+  const productTerms = [
+    'EXTRAVAGANZZA',
+    "THIN 'N CRISPY",
+    'CLASSIC SINGLE',
+    'FAST BREAK',
+    'BIG DADDY',
+    "TONY'S",
+    'SMARTPIZZA',
+    'THE WORKS',
+    'SUPER SUPREME',
+    'ORIGINAL ROUND',
+    'ULTIMATE DEEP DISH',
+  ];
+  const sourceRows = foods.filter((food) => new RegExp(
+    productTerms.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'),
+    'i',
+  ).test(food.name));
+  assert.ok(sourceRows.length >= 5, 'fixture: the USDA extract has branded product rows');
+
+  for (const food of sourceRows) {
+    const shown = displayFoodName(food);
+    for (const term of productTerms) {
+      const re = new RegExp(`\\b${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
+      assert.equal(re.test(shown), false, `"${shown}" (source: ${food.name}) still shows ${term}`);
+    }
+  }
+});
+
+test('a food whose whole name is a brand is hidden from display', () => {
+  for (const name of ["McDONALD'S", "BIG DADDY'S", 'SMARTPIZZA', 'THIN \'N CRISPY']) {
+    assert.equal(displayFoodName(name), '', `"${name}" cannot be shown without the trademark`);
+  }
+});
+
 test('branded USDA rows keep nutrients but lose the brand on screen', () => {
   const hut = foods.find((f) => /PIZZA HUT/i.test(f.name));
   assert.ok(hut, 'fixture: a Pizza Hut row exists in the USDA extract');

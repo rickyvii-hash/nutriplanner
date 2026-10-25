@@ -34,9 +34,11 @@ function drinkPreview(foods, limit) {
   const picked = [];
   const seen = new Set();
   for (const word of DRINK_FIRST) {
-    // Prefer a name that starts with the word ("Milk, whole"), then any whole word match.
-    const match = all.find((f) => !seen.has(f.id) && String(f.name || '').toLowerCase().startsWith(word))
-      || all.find((f) => !seen.has(f.id) && words(f.name).includes(word));
+    // Pick on the same brand-free label the button shows, so a trademark in the
+    // USDA source string cannot bias the choice.
+    const match = all.find((f) => !seen.has(f.id)
+      && displayFoodName(f).toLowerCase().startsWith(word))
+      || all.find((f) => !seen.has(f.id) && words(displayFoodName(f)).includes(word));
     if (!match) continue;
     picked.push(match);
     seen.add(match.id);
@@ -329,9 +331,10 @@ export function draftSavePayload(draft) {
  * so a correction on one slot never rewrites a sibling slot saved at the same
  * time. Skipped planned meals also get one entry each. Free-search foods are
  * extras: they are marked `extra: true` and never replace or skip a planned
- * slot; they join a single planned entry, or keep their own entry when several
- * planned meals are saved together. When the food came from a replacement, the
- * entry names the slot it stands for instead.
+ * slot, so they always get their own entry. Keeping them apart means a planned
+ * meal stays labeled by its slot ("Eaten · breakfast") even when the same save
+ * also holds food eaten outside the plan. When the food came from a replacement,
+ * the entry names the slot it stands for instead.
  */
 export function logEntriesForSave(payload, when) {
   const items = Array.isArray(payload?.items) ? payload.items : [];
@@ -357,16 +360,15 @@ export function logEntriesForSave(payload, when) {
   if (planned.length > 0) {
     // One entry per planned eaten slot, carrying only that slot's food.
     planned.forEach((group) => {
-      // A single planned meal may share its entry with the extras, as before.
-      const groupExtras = planned.length === 1 ? extras : [];
       entries.push({
         ...when,
-        items: [...group.items, ...groupExtras],
+        items: group.items,
         eaten: [{ recipeId: group.recipeId, slot: group.slot }],
-        ...(extra && groupExtras.length > 0 ? { extra: true } : {}),
       });
     });
-    if (planned.length > 1 && extras.length > 0) {
+    // Food eaten outside the plan is its own entry: merging it into a planned
+    // entry would drop the slot name the user needs to read on the Plan screen.
+    if (extras.length > 0) {
       entries.push({
         ...when,
         items: extras,
