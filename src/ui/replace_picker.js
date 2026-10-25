@@ -5,7 +5,7 @@
 import { searchFoods } from '../engine/search.js';
 import { slotRecipeKind, slotLabel } from '../engine/meal_prefs.js';
 import {
-  customFoodRemovalNote, customFoodUsedInLog, portionsFromGrams, shownFoodName,
+  customFoodInUse, customFoodRemovalNote, portionsFromGrams, shownFoodName,
 } from '../engine/custom_foods.js';
 import { el, escapeHtml } from './dom.js';
 import { createDrinkPicker, parsePortion, stateAfterFoodAdd } from './log.js';
@@ -188,7 +188,10 @@ export function createReplacePicker({
       const row = searchResultRow(food, {
         onSelect: (picked) => choose(picked),
         onRemove: (removed) => {
-          const used = customFoodUsedInLog(ctx?.state?.log || [], removed.id);
+          const used = customFoodInUse(removed.id, {
+            log: ctx?.state?.log || [],
+            plannedExtras: ctx?.state?.plannedExtras || [],
+          });
           ctx?.removeCustomFood?.(removed.id);
           showNote(customFoodRemovalNote(removed.name, used));
           runSearch();

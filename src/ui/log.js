@@ -3,7 +3,7 @@ import { searchFoods, words } from '../engine/search.js';
 import { DRINK_PRESETS, mlToGrams, listDrinkFoods } from '../engine/drinks.js';
 import { displayFoodName } from '../engine/food_display.js';
 import {
-  customFoodUsedInLog, customFoodRemovalNote, gramsForPortions, portionsFromGrams, shownFoodName,
+  customFoodInUse, customFoodRemovalNote, gramsForPortions, portionsFromGrams, shownFoodName,
 } from '../engine/custom_foods.js';
 import {
   NO_RESULTS_TEXT, amountError, amountGrams, createCustomFoodForm, isUserFood,
@@ -1069,7 +1069,10 @@ export function renderLog(ctx) {
       const row = searchResultRow(food, {
         onSelect: (picked) => choose(picked),
         onRemove: (removed) => {
-          const used = customFoodUsedInLog(ctx.state.log, removed.id);
+          const used = customFoodInUse(removed.id, {
+            log: ctx.state.log || [],
+            plannedExtras: ctx.state.plannedExtras || [],
+          });
           ctx.removeCustomFood(removed.id);
           showNote(customFoodRemovalNote(removed.name, used));
           runSearch();

@@ -77,8 +77,9 @@ export function loggedAverages(log, foodsById) {
   const acc = emptyAccumulator();
   for (const entry of entries) {
     for (const item of entry.items || []) {
-      const food = foodsById.get(item.foodId);
-      if (!food) continue;
+      // An unknown food still contributes an unknown value: the average stays a
+      // partial sum or "n/a", never a zero.
+      const food = foodsById.get(item.foodId) || null;
       addNutrients(acc, foodNutrients(food, item.grams));
     }
   }
@@ -144,9 +145,9 @@ function mealRows(log, foodsById, recipesById = new Map()) {
         time: entry.time || '',
         skipped: false,
         items: (entry.items || []).map((item) => {
-          const food = foodsById.get(item.foodId);
+          const food = foodsById.get(item.foodId) || null;
           return {
-            name: food ? shownFoodName(food, item.name) : (item.name || item.foodId),
+            name: shownFoodName(food, item.name),
             grams: item.grams,
             custom: Boolean(food?.custom),
           };

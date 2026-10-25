@@ -376,8 +376,10 @@ export function dayProgressTotals(dayMeals, dayLog, recipesById, foodsById) {
   let hasSkipped = false;
   for (const entry of dayLog || []) {
     for (const it of entry.items || []) {
-      const food = foodsById.get(it.foodId);
-      if (food) parts.push(foodNutrients(food, it.grams));
+      // An unknown food adds an all-unknown part: the bars read "n/a" (or a
+      // partial sum), never a made-up zero.
+      const food = foodsById.get(it.foodId) || null;
+      parts.push(foodNutrients(food, it.grams));
     }
     if ((entry.skipped || []).length > 0) hasSkipped = true;
   }

@@ -259,8 +259,12 @@ function buildDisplayIndex(foods) {
       if (label) {
         names.set(key, label);
         labels.set(food, label);
-        visibleIds.add(key);
-        visibleFoods.add(food);
+        // A food removed from the list but kept for the log or a planned meal
+        // still resolves by id, yet is never offered again.
+        if (food.removedFromList !== true) {
+          visibleIds.add(key);
+          visibleFoods.add(food);
+        }
       }
       return;
     }
@@ -393,7 +397,9 @@ export function displayFoodName(foodOrName) {
 /** True when a food may appear in search results, pickers and the drinks list. */
 export function isFoodDisplayVisible(food) {
   if (!food || typeof food !== 'object') return Boolean(displayFoodName(food));
-  if (food.custom) return Boolean(String(food.name ?? '').trim());
+  if (food.custom) {
+    return food.removedFromList !== true && Boolean(String(food.name ?? '').trim());
+  }
   if (!registeredFoods) return Boolean(displayFoodName(food));
   const index = displayIndexFor(registeredFoods);
   if (index.labels.has(food)) return index.visibleFoods.has(food);

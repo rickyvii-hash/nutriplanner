@@ -23,6 +23,12 @@ export const CUSTOM_ENTRY_LABEL = '(your entry)';
 export const CUSTOM_FORM_NOTE = 'Values are your own estimate.';
 export const DEFAULT_PORTION_LABEL = '1 portion';
 export const REMOVED_CUSTOM_LABEL = 'Removed custom food';
+/**
+ * A food the person removed from the list but that something already uses keeps
+ * its definition with this mark: hidden from search and pickers, still resolving
+ * by id for the log and the planned meals.
+ */
+export const REMOVED_FROM_LIST_FLAG = 'removedFromList';
 
 /** The optional nutrient fields of the form: label, unit and where the value goes. */
 export const CUSTOM_OPTIONAL_NUTRIENTS = [
@@ -184,56 +190,77 @@ export function normalizeCustomFoods(list) {
       const value = source[key];
       return [key, typeof value === 'number' && Number.isFinite(value) ? value : null];
     }));
-    out.push({
+    const food = {
       id,
       name,
       portionLabel: String(raw.portionLabel ?? '').trim() || DEFAULT_PORTION_LABEL,
       custom: true,
       nutrients: { ...per100g },
       per100g,
-    });
+    };
+    // A hidden definition still belongs to what already uses it, through a reload
+    // and through a backup: the mark travels with the food.
+    if (raw[REMOVED_FROM_LIST_FLAG] === true) food[REMOVED_FROM_LIST_FLAG] = true;
+    out.push(food);
   }
   return out;
 }
 
-/** A food-shaped placeholder for a log line whose custom food is gone. */
-function missingCustomFood(id, name) {
+/**
+ * A food-shaped placeholder for an id whose definition is gone. Every nutrient
+ * is unknown (never zero), so a calculation stays a partial sum or "n/a".
+ */
+function missingFood(id, name) {
   const per100g = Object.fromEntries(NUTRIENT_KEYS.map((key) => [key, null]));
   return {
     id,
     name: String(name ?? '').trim() || REMOVED_CUSTOM_LABEL,
     portionLabel: DEFAULT_PORTION_LABEL,
-    custom: true,
+    custom: isCustomFoodId(id),
     missingCustom: true,
     per100g,
     nutrients: { ...per100g },
   };
 }
 
-/** Database foods plus the foods the person added, in search order. */
+/**
+ * Database foods plus the foods the person added, in search order.
+ * A definition kept only for what already uses it is not offered again.
+ */
 export function allFoodsWithCustomFoods(foods, customFoods = []) {
   return [
     ...(Array.isArray(foods) ? foods : []),
-    ...(Array.isArray(customFoods) ? customFoods : []),
+    ...(Array.isArray(customFoods) ? customFoods : []).filter(
+      (food) => food && food[REMOVED_FROM_LIST_FLAG] !== true,
+    ),
   ];
 }
 
+/** Every food id an entry list (the log or the planned meals) refers to. */
+function referencedItems(entries) {
+  const out = [];
+  for (const entry of Array.isArray(entries) ? entries : []) {
+    for (const item of entry?.items || []) out.push(item);
+  }
+  return out;
+}
+
 /**
- * The food lookup every screen uses. It also resolves an id whose custom food
- * is gone (a restored log, or a food removed after it was logged) to a
- * placeholder with every nutrient unknown, so no calculation crashes and no
- * value is made up.
+ * The food lookup every screen uses. It also resolves an id whose definition is
+ * gone (a restored log, a database food missing from an older backup, or a food
+ * removed after it was logged or planned) to a placeholder with every nutrient
+ * unknown, so no calculation crashes and no value is made up.
  */
-export function foodIndexWithCustomFoods(foods, customFoods = [], log = []) {
+export function foodIndexWithCustomFoods(foods, customFoods = [], log = [], plannedExtras = []) {
   const index = new Map((Array.isArray(foods) ? foods : []).map((food) => [food.id, food]));
   for (const food of Array.isArray(customFoods) ? customFoods : []) {
     if (food?.id) index.set(food.id, food);
   }
-  for (const entry of Array.isArray(log) ? log : []) {
-    for (const item of entry?.items || []) {
-      if (!item?.foodId || index.has(item.foodId) || !isCustomFoodId(item.foodId)) continue;
-      index.set(item.foodId, missingCustomFood(item.foodId, item.name));
-    }
+  // The log and the planned meals both keep their own food ids: whatever they
+  // still point to must resolve, or the next replan would throw.
+  for (const item of [...referencedItems(log), ...referencedItems(plannedExtras)]) {
+    if (!item?.foodId || index.has(item.foodId)) continue;
+    index.set(item.foodId, missingFood(item.foodId, item.name));
   }
   return index;
 }
@@ -268,15 +295,41 @@ export function customFoodUsedInLog(log, id) {
   ));
 }
 
-/** The list without one food the person added. Past log lines are untouched. */
-export function removeCustomFoodFromList(customFoods, id) {
-  return (Array.isArray(customFoods) ? customFoods : []).filter((food) => food?.id !== id);
+/** True when a planned outside-the-menu meal already holds this food. */
+export function customFoodUsedInPlannedExtras(plannedExtras, id) {
+  if (!id) return false;
+  return (Array.isArray(plannedExtras) ? plannedExtras : []).some((extra) => (
+    (extra?.items || []).some((item) => item?.foodId === id)
+  ));
+}
+
+/** True when the log or a planned meal already uses this food. */
+export function customFoodInUse(id, { log = [], plannedExtras = [] } = {}) {
+  return customFoodUsedInLog(log, id) || customFoodUsedInPlannedExtras(plannedExtras, id);
+}
+
+/**
+ * Remove one food the person added from the searchable list.
+ * A food the log or a planned meal already uses keeps its definition, hidden
+ * from search and pickers but still resolving by id, so nothing breaks; a food
+ * nothing uses is really removed. Past log lines are untouched either way.
+ */
+export function removeCustomFoodFromList(
+  customFoods, id, { log = [], plannedExtras = [] } = {},
+) {
+  const list = Array.isArray(customFoods) ? customFoods : [];
+  if (!customFoodInUse(id, { log, plannedExtras })) {
+    return list.filter((food) => food?.id !== id);
+  }
+  return list.map((food) => (
+    food?.id === id ? { ...food, [REMOVED_FROM_LIST_FLAG]: true } : food
+  ));
 }
 
 /** What the screen says after a food the person added was removed from the list. */
-export function customFoodRemovalNote(name, usedInLog) {
+export function customFoodRemovalNote(name, used) {
   const label = String(name || 'Your food');
-  return usedInLog
-    ? `${label} was removed from the food list. Meals you already logged keep it and stay in your past logs.`
+  return used
+    ? `${label} was removed from the food list. It stays in your log and planned meals. The meals you already logged stay in your past logs.`
     : `${label} was removed from the food list.`;
 }

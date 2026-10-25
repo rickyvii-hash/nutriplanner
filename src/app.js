@@ -97,7 +97,12 @@ const ctx = {
     const customFoods = Array.isArray(ctx.state.customFoods) ? ctx.state.customFoods : [];
     ctx.foods.length = 0;
     ctx.foods.push(...allFoodsWithCustomFoods(ctx.dbFoods, customFoods));
-    ctx.foodsById = foodIndexWithCustomFoods(ctx.dbFoods, customFoods, ctx.state.log || []);
+    ctx.foodsById = foodIndexWithCustomFoods(
+      ctx.dbFoods,
+      customFoods,
+      ctx.state.log || [],
+      ctx.state.plannedExtras || [],
+    );
   },
   // Save a food the person typed. The values are for one portion, so one portion
   // equals exactly what was entered; a nutrient left empty stays unknown.
@@ -109,10 +114,17 @@ const ctx = {
     ctx.refreshFoods();
     return food;
   },
-  // Remove a food from the searchable list; meals already logged keep it.
+  // Remove a food from the searchable list. A food the log or a planned meal
+  // already uses keeps its definition, hidden but resolving by id, so the next
+  // replan never meets an unknown food; a food nothing uses is really removed.
   removeCustomFood: (id) => {
     const customFoods = Array.isArray(ctx.state.customFoods) ? ctx.state.customFoods : [];
-    ctx.state = { ...ctx.state, customFoods: removeCustomFoodFromList(customFoods, id) };
+    const log = ctx.state.log || [];
+    const plannedExtras = ctx.state.plannedExtras || [];
+    ctx.state = {
+      ...ctx.state,
+      customFoods: removeCustomFoodFromList(customFoods, id, { log, plannedExtras }),
+    };
     saveState(ctx.state);
     ctx.refreshFoods();
   },

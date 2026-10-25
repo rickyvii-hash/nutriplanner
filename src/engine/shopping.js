@@ -5,6 +5,7 @@
 
 import { todayIso } from './planner.js';
 import { displayFoodName } from './food_display.js';
+import { REMOVED_CUSTOM_LABEL } from './custom_foods.js';
 
 const CATEGORY_ORDER = ['Produce', 'Protein', 'Dairy', 'Pantry', 'Frozen', 'Other'];
 
@@ -202,10 +203,11 @@ export function buildShoppingList({
   const missing = [];
 
   for (const [foodId, grams] of gramsByFood) {
-    const food = foodsById.get(foodId);
+    const food = foodsById.get(foodId) || null;
     const item = {
       foodId,
-      name: displayFoodName(food) || foodId,
+      // A missing definition still gets a readable label instead of a raw id.
+      name: displayFoodName(food) || (food ? foodId : REMOVED_CUSTOM_LABEL),
       category: food?.category || 'Other',
       grams: Math.round(grams),
     };
