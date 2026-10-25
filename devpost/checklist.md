@@ -99,3 +99,5 @@ Activity mode: not started
 
 - 2026-10-24: Owner defects D1â€“D5 on v2: Start over with confirmation; undo/edit saved log entries; improved free search and ~480 real USDA SR Legacy foods; Replace "I ate something else"; Extra / outside meals path.
 - 2026-10-24: Stage-1 judge review doc sync: planning docs and README now state about 480 USDA SR Legacy foods and about 40 recipes, all four profiles (including Athlete), the real screen set (bottom bar plus Log, Plan updated, recipe detail, summary and confirmations), and the v2 log flows (Start over, Change profile, undo/edit, Replace with something else, Extra meals).
+
+- 2026-10-25: Last feature round on v2: My meals (0–1 snack); Drinks shortcut; Download/Restore; first-run guide; closed multi-accept and multi-slot P1s. Two snacks and Lab notes cut after review stayed red. Open: day-progress without log; same-day second log replan.
