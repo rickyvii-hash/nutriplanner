@@ -296,7 +296,7 @@ export function canReplaceMeal(draft) {
   return !draftHasPending(draft);
 }
 
-export const REPLACE_BLOCKED_MESSAGE = 'Clear This meal first, or save it, before replacing another meal.';
+export const REPLACE_BLOCKED_MESSAGE = 'You have choices waiting in “This meal”. Tap Save, or Clear on the highlighted meal (or Clear all), then try Replace again.';
 
 /**
  * The save payload for the current draft. Free-search foods are extras: they are
@@ -568,6 +568,28 @@ export function removeDraftGroup(draft, groupId) {
   return draft;
 }
 
+/**
+ * Clear one planned meal's choice from the row it was made on: its eaten block, or
+ * its skip, for that slot only. Every other meal in the draft is left as it is, so
+ * two snacks that share a recipe stay independent.
+ */
+export function clearDraftChoice(draft, recipeId, slot = null) {
+  if (!draft || !recipeId) return draft;
+  const group = draftGroupForRecipe(draft, recipeId, slot);
+  if (group) removeDraftGroup(draft, group.id);
+  unskipRecipe(draft, recipeId, slot);
+  return draft;
+}
+
+/** Empty the draft (planned meals, free-search foods and skips) without saving. */
+export function clearDraft(draft) {
+  const d = ensureDraft(draft);
+  d.items = [];
+  d.groups = [];
+  d.skipped = [];
+  return d;
+}
+
 /** Remove one ingredient of a block; a block that loses its last ingredient disappears. */
 export function removeGroupItem(draft, groupId, index) {
   const group = (draft?.groups || []).find((g) => g.id === groupId);
@@ -661,6 +683,7 @@ export function renderLog(ctx) {
         <button type="button" class="btn-secondary btn-small" data-add-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Add as eaten</button>
         <button type="button" class="btn-secondary btn-small" data-replace-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Replace</button>
         <button type="button" class="btn-secondary btn-small" data-skip-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Skipped</button>
+        ${!savedKind && (inDraft || alreadySkipped) ? `<button type="button" class="btn-secondary btn-small" data-clear-choice="${escapeHtml(recipe?.id || '')}" aria-label="Clear my choice for ${escapeHtml(slotLabel(slot))}">Clear</button>` : ''}
         ${savedKind ? `<button type="button" class="btn-text btn-small" data-change-saved="${escapeHtml(slot)}">Change it</button>` : ''}
       </div>
     </div>`);
@@ -703,7 +726,10 @@ export function renderLog(ctx) {
   root.appendChild(mode);
 
   const loggedCard = el(`<section class="card">
-    <h3>This meal</h3>
+    <div class="logged-card-header">
+      <h3>This meal</h3>
+      <button type="button" class="btn-text btn-small" data-clear-all hidden>Clear all</button>
+    </div>
     <ul class="logged-items" data-items></ul>
     <p class="muted tiny empty-hint" data-empty>Nothing added yet.</p>
     <button type="button" class="btn-primary" data-save disabled>Save and update plan</button>
@@ -777,6 +803,8 @@ export function renderLog(ctx) {
     const hasAnything = draft.items.length > 0 || draft.groups.length > 0 || draft.skipped.length > 0;
     empty.style.display = hasAnything ? 'none' : 'block';
     saveBtn.disabled = !hasAnything;
+    // Clear all only exists while the draft holds something to clear.
+    root.querySelector('[data-clear-all]').hidden = !hasAnything;
 
     // The "Eaten · …" header opens the detail panel of that group's recipe.
     ul.querySelectorAll('[data-open-group-recipe]').forEach((btn) => {
@@ -882,6 +910,25 @@ export function renderLog(ctx) {
     });
   });
 
+  // Clear takes back the choice made on one row only: that slot's eaten block or
+  // skip goes, every other meal in the draft stays. The row becomes neutral again.
+  root.querySelectorAll('[data-clear-choice]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const row = btn.closest('.plan-meal-row');
+      const slot = row?.dataset.slot;
+      const recipeId = btn.dataset.clearChoice;
+      if (!slot || !recipeId) return;
+      clearDraftChoice(draft, recipeId, slot);
+      ctx.refresh();
+    });
+  });
+
+  // Clear all empties "This meal" straight away: it is only a draft, so nothing to confirm.
+  root.querySelector('[data-clear-all]').addEventListener('click', () => {
+    clearDraft(draft);
+    ctx.refresh();
+  });
+
   // Replace a planned meal with another recipe for the same slot: log it right away
   // and open the updated plan preview. The replaced meal is eaten, never skipped.
   const closeReplacePickers = () => {
@@ -891,7 +938,12 @@ export function renderLog(ctx) {
   // Replace must never throw away what is already in "This meal": say so under the row.
   const showReplaceBlocked = (row) => {
     closeReplacePickers();
-    row.after(el(`<p class="field-error replace-blocked" data-replace-blocked>${REPLACE_BLOCKED_MESSAGE}</p>`));
+    const notice = el(`<p class="field-error replace-blocked" data-replace-blocked>${REPLACE_BLOCKED_MESSAGE}</p>`);
+    row.after(notice);
+    // The notice is about this tap only: the next tap anywhere takes it away.
+    setTimeout(() => {
+      if (notice.isConnected) document.addEventListener('click', () => notice.remove(), { once: true, capture: true });
+    }, 0);
   };
   const replaceMeal = (slot, fromRecipeId, recipe) => {
     if (draftHasPending(draft)) {

@@ -180,6 +180,10 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 
 /* A planned meal added as eaten stays one block, with its ingredients indented. */
 .logged-group { padding: 8px 0; border-bottom: 1px solid var(--line); }
+/* "This meal" title and its Clear all control sit on one line. */
+.logged-card-header {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+}
 .logged-group-header {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }

@@ -194,7 +194,7 @@ test('replace is blocked while "This meal" has something and allowed when it is 
 test('the blocked notice tells the user how to unblock Replace', () => {
   assert.equal(
     REPLACE_BLOCKED_MESSAGE,
-    'Clear This meal first, or save it, before replacing another meal.',
+    'You have choices waiting in “This meal”. Tap Save, or Clear on the highlighted meal (or Clear all), then try Replace again.',
   );
 });
 
