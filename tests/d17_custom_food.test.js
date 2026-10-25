@@ -391,3 +391,14 @@ test('D17: damaged saved custom foods are cleaned, never invented', () => {
   assert.equal(cleaned[0].nutrients.sodium, null);
   assert.deepEqual(normalizeCustomFoods(undefined), []);
 });
+
+test('D17: the validated value the form hands over builds the same food as raw input', async () => {
+  const { validateCustomFood, buildCustomFood } = await import('../src/engine/custom_foods.js');
+  const raw = { name: 'Lasagna', portionLabel: '1 plate', kcal: '520', saturatedFat: '11' };
+  const checked = validateCustomFood(raw);
+  assert.equal(checked.ok, true);
+  const fromValue = buildCustomFood(checked.value, []);
+  const fromRaw = buildCustomFood(raw, []);
+  assert.deepEqual(fromValue, fromRaw);
+  assert.equal(fromValue.nutrients.kcal, 520);
+});

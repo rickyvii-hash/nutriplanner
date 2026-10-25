@@ -139,7 +139,12 @@ export function nextCustomFoodId(existing = []) {
  * same numbers because one portion is the nominal 100 g reference.
  */
 export function buildCustomFood(input, existingCustomFoods = []) {
-  const check = validateCustomFood(input);
+  // The form hands over the already validated value ({ name, portionLabel, nutrients });
+  // raw form input is accepted too, so both paths build the same food.
+  const raw = input && typeof input.nutrients === 'object' && input.nutrients !== null
+    ? { name: input.name, portionLabel: input.portionLabel, ...input.nutrients }
+    : input;
+  const check = validateCustomFood(raw);
   if (!check.ok) {
     const error = new Error('Custom food is not valid: ' + Object.values(check.errors).join(' '));
     error.errors = check.errors;

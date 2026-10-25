@@ -497,6 +497,7 @@ export function renderPlan(ctx) {
       recipes: ctx.recipes,
       foods: ctx.foods,
       foodsById,
+      ctx,
       onPick: (payload) => saveOneMeal(payload, 'replace', slot),
     });
     item.appendChild(picker);
