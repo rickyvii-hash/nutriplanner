@@ -877,6 +877,18 @@ export function replan(state) {
         avoid[slot] = new Set([...before, ...after].filter(Boolean));
       }
       const dayTargets = targetsForDay(date);
+      const plannedDayTotals = dayTotals(plan.days[date], recipesById, foodsById).totals;
+      // Every maximum target is a ceiling on a changed day, so making up a minimum can
+      // never push another nutrient over its maximum. A day already above its maximum
+      // may keep that amount, but the make-up must not raise it further. The ceiling
+      // applies to the sum of the known values: a partial day is never treated as
+      // proof of being within the maximum, and the known part never goes above it.
+      const maxBounds = {};
+      for (const t of targets) {
+        if (t.kind !== 'max' || !t.daily || t.daily <= 0) continue;
+        maxBounds[t.nutrient] = Math.max(t.daily, plannedDayTotals[t.nutrient] ?? 0);
+      }
+      const hasMaxBounds = Object.keys(maxBounds).length > 0;
       // Maxima: only swap towards less of the nutrient that went over.
       // Minima: only swap towards more of the nutrient that fell short.
       const caps = {};
@@ -904,9 +916,7 @@ export function replan(state) {
       // planned total, or the raised minimum if higher, plus a multiple of the day
       // bump; the multiple is widened only if nothing fits). Bounding all four at
       // once left almost no day changeable; the others just must not go down.
-      const plannedTotals = adjustedMin
-        ? dayTotals(plan.days[date], recipesById, foodsById).totals
-        : null;
+      const plannedTotals = adjustedMin ? plannedDayTotals : null;
       const lowerBounds = {};
       if (adjustedMin) {
         for (const t of targets) {
@@ -926,7 +936,7 @@ export function replan(state) {
           const ceiling = base + factor * bump;
           day = fillDay(
             recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors,
-            { [primaryNutrient]: ceiling }, lowerBounds, slots, false,
+            { [primaryNutrient]: ceiling, ...maxBounds }, lowerBounds, slots, false,
           );
           if (day) {
             primaryCeiling = ceiling;
@@ -934,7 +944,10 @@ export function replan(state) {
           }
         }
       } else {
-        day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors, null, null, slots, false);
+        day = fillDay(
+          recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors,
+          hasMaxBounds ? maxBounds : null, null, slots, false,
+        );
       }
       // No combination fits even after the retries: leave this day as it was.
       if (!day) continue;
@@ -961,15 +974,20 @@ export function replan(state) {
           keptHere.push({ date, slot, recipeId: prevRecipe.id });
         }
       }
-      // Keeping a bought meal must not undo the raised minimums or break the ceiling.
+      // Keeping a bought meal must not undo the raised minimums, break the ceiling,
+      // or push a maximum target over the bound the make-up has to respect.
+      const mergedTotals = dayTotals(merged, recipesById, foodsById).totals;
+      const breaksMaximum = Object.entries(maxBounds)
+        .some(([n, max]) => (mergedTotals[n] ?? 0) > max + 1e-9);
       if (adjustedMin) {
-        const totals = dayTotals(merged, recipesById, foodsById).totals;
         const breaksMinimum = Object.entries(lowerBounds)
-          .some(([n, min]) => totals[n] < min - 1e-9);
+          .some(([n, min]) => mergedTotals[n] < min - 1e-9);
         const breaksCeiling = primaryCeiling !== null
-          && totals[primaryNutrient] > primaryCeiling + 1e-9;
-        if (breaksMinimum || breaksCeiling) merged = { ...day };
+          && mergedTotals[primaryNutrient] > primaryCeiling + 1e-9;
+        if (breaksMinimum || breaksCeiling || breaksMaximum) merged = { ...day };
         else keptForBought.push(...keptHere);
+      } else if (breaksMaximum) {
+        merged = { ...day };
       } else {
         keptForBought.push(...keptHere);
       }
