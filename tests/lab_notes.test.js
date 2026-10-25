@@ -10,6 +10,7 @@ import {
   labSeriesByName,
   alignSeriesWithGaps,
 } from '../src/engine/lab_notes.js';
+import { weeklyAverages } from '../src/ui/lab_notes.js';
 
 const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
 const foodsById = new Map(foods.map((f) => [f.id, f]));
@@ -69,6 +70,54 @@ test('a day where a logged food lacks the nutrient is incomplete, not a partial 
   const known = series.find((p) => p.date === '2026-10-03');
   assert.equal(known.incomplete, false);
   assert.equal(typeof known.value, 'number');
+});
+
+test('weekly averages: a week with an incomplete day has no certain mean', () => {
+  // 2026-10-01 is incomplete: its logged foods lack the nutrient, so the day has
+  // no exact value. Averaging only the complete days of that week would present
+  // a certain number the data does not support.
+  const log = [
+    { date: '2026-10-01', items: [{ foodId: 'alcoholic-beverage-beer-light-bud-light', grams: 200 }] },
+    { date: '2026-10-02', items: [{ foodId: 'pizza-cheese', grams: 100 }] },
+    { date: '2026-10-03', items: [{ foodId: 'pizza-cheese', grams: 200 }] },
+    { date: '2026-10-08', items: [{ foodId: 'pizza-cheese', grams: 100 }] },
+  ];
+  const daily = weeklyIntakeSeries(log, 'satFat', foodsById, { from: '2026-10-01', to: '2026-10-14' });
+  const weeks = weeklyAverages(daily);
+  assert.equal(weeks.length, 2);
+
+  const partialWeek = weeks[0];
+  assert.equal(partialWeek.date, '2026-10-01');
+  assert.equal(partialWeek.incomplete, true, 'the partial day makes the whole week incomplete');
+  assert.equal(partialWeek.value, null, 'an incomplete week is never an exact average');
+
+  const completeWeek = weeks[1];
+  assert.equal(completeWeek.incomplete, false);
+  assert.equal(typeof completeWeek.value, 'number', 'a week with complete days keeps its average');
+});
+
+test('weekly averages: no logged day in a week stays a gap, and complete days average', () => {
+  const series = [
+    { date: '2026-10-01', value: 10, incomplete: false },
+    { date: '2026-10-02', value: null, incomplete: false },
+    { date: '2026-10-03', value: 20, incomplete: false },
+    { date: '2026-10-04', value: null, incomplete: false },
+    { date: '2026-10-05', value: null, incomplete: false },
+    { date: '2026-10-06', value: null, incomplete: false },
+    { date: '2026-10-07', value: null, incomplete: false },
+    { date: '2026-10-08', value: null, incomplete: false },
+    { date: '2026-10-09', value: null, incomplete: false },
+    { date: '2026-10-10', value: null, incomplete: false },
+    { date: '2026-10-11', value: null, incomplete: false },
+    { date: '2026-10-12', value: null, incomplete: false },
+    { date: '2026-10-13', value: null, incomplete: false },
+    { date: '2026-10-14', value: null, incomplete: false },
+  ];
+  const weeks = weeklyAverages(series);
+  assert.equal(weeks[0].value, 15, 'the mean covers only the days that have a value');
+  assert.equal(weeks[0].incomplete, false);
+  assert.equal(weeks[1].value, null, 'a week with no logged day is a gap, not a zero');
+  assert.equal(weeks[1].incomplete, false);
 });
 
 test('labSeriesByName groups entered values by date', () => {

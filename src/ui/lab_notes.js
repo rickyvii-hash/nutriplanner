@@ -25,13 +25,22 @@ function formatValue(value) {
 
 /**
  * Average of the logged days inside each block of seven days. A block with no
- * logged day stays null: a gap in the chart, never a zero.
+ * logged day stays null: a gap in the chart, never a zero. A block that holds
+ * an incomplete day (a logged food with no value for this nutrient) has no
+ * exact mean: averaging only the complete days would present a certain number
+ * the data does not support, so the whole week point stays unavailable
+ * ({ value: null, incomplete: true }) and the chart draws a gap.
  */
 export function weeklyAverages(points) {
   const out = [];
   const series = Array.isArray(points) ? points : [];
   for (let i = 0; i < series.length; i += 7) {
     const week = series.slice(i, i + 7);
+    const incomplete = week.some((point) => point && point.incomplete);
+    if (incomplete) {
+      out.push({ date: week[0].date, value: null, incomplete: true });
+      continue;
+    }
     const values = week
       .map((point) => point.value)
       .filter((value) => typeof value === 'number' && Number.isFinite(value));
@@ -39,6 +48,7 @@ export function weeklyAverages(points) {
     out.push({
       date: week[0].date,
       value: values.length > 0 ? Math.round((total / values.length) * 1000) / 1000 : null,
+      incomplete: false,
     });
   }
   return out;
@@ -397,7 +407,7 @@ export function renderLabNotes(ctx) {
         unit: nutrientUnit(nutrient),
         title: `Intake: ${nutrientLabel(nutrient)} (weekly average per day)`,
         color: '#8a5a2b',
-        note: 'Each dot averages the days with a log in that week. A day with no log is a gap, not a zero.',
+        note: 'Each dot averages the days with a log in that week. A day with no log is a gap, not a zero. A week with a partial day is left out.',
         ariaLabel: `${nutrientLabel(nutrient)} intake over time`,
       })));
     } else {

@@ -642,18 +642,35 @@ export function replan(state) {
   const logIsPast = logFromDate < fromDate;
 
   // Planned meals marked skipped on the logged days: their known nutrients are the shortfall for minima.
-  // Every skip in the corrected log counts: the same recipe skipped on two past days is two
-  // missed meals, so both feed the shortfall (one per day, so a duplicate entry for the same
-  // day cannot double count the same planned meal).
+  // Every skipped planned slot counts: the same recipe skipped on two past days is two
+  // missed meals, and the same recipe skipped on `snack` and `snack2` of one day is two
+  // missed meals as well. The key therefore carries the planned slot, not just the
+  // recipe id; a duplicate entry for the same day and slot still counts once.
   const skippedIds = [];
   const skippedOccurrences = [];
   const skippedSeen = new Set();
   for (const entry of log || []) {
     if (!entry?.date || entry.date < logFromDate || entry.date > fromDate) continue;
     if (!Array.isArray(entry.skipped)) continue;
+    // Saved skips record their planned slot; the recipe id alone cannot tell the
+    // two snacks apart.
+    const savedSlots = new Map();
+    for (const info of Array.isArray(entry.skippedSlots) ? entry.skippedSlots : []) {
+      if (info && info.recipeId && info.slot) savedSlots.set(info.recipeId, info.slot);
+    }
+    const plannedDay = plan.days?.[entry.date] || {};
     for (const id of entry.skipped) {
       if (!id) continue;
-      const key = `${entry.date}|${id}`;
+      let slot = savedSlots.get(id) || null;
+      if (!slot) {
+        // An older entry has no slot: use the planned slot of that day for this
+        // recipe, preferring the one not counted yet (two snacks, same recipe).
+        const candidates = Object.keys(plannedDay).filter((s) => plannedDay[s] === id);
+        slot = candidates.find((s) => !skippedSeen.has(`${entry.date}|${s}|${id}`))
+          || candidates[0]
+          || null;
+      }
+      const key = `${entry.date}|${slot || ''}|${id}`;
       if (skippedSeen.has(key)) continue;
       skippedSeen.add(key);
       skippedOccurrences.push(id);
