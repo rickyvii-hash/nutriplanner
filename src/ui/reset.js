@@ -55,6 +55,9 @@ function openPanel({ title, confirmLabel, cancelLabel = 'Cancel', buildBody, onC
   return overlay;
 }
 
+// Generic confirmation dialog, reused where a screen must ask before losing input.
+export { openPanel as openConfirmPanel };
+
 /** "Start over": list what will be erased, then erase on confirm. */
 export function openStartOverPanel(ctx) {
   const copy = startOverConfirmCopy();

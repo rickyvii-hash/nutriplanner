@@ -285,12 +285,17 @@ function isSkippedEntry(entry) {
 /**
  * The headline of a saved log entry. A planned meal is named by its slot
  * ("Eaten · breakfast"), so food eaten outside the plan never hides which meal
- * it was; that food keeps its own "Outside the menu" entry. `recipe` is the
- * planned recipe already matched for the entry, if any.
+ * it was; that food keeps its own "Outside the menu" entry. A meal swapped for
+ * another one reads "Replaced · breakfast": it is not the planned meal that was
+ * eaten. `recipe` is the planned recipe already matched for the entry, if any.
  */
 export function logEntryKind(entry, recipe = null) {
   if (isSkippedEntry(entry)) return 'Skipped';
-  if (Array.isArray(entry?.replaced) && entry.replaced.length > 0) return 'Eaten · replaced';
+  if (Array.isArray(entry?.replaced) && entry.replaced.length > 0) {
+    // A replaced meal stands in for a planned slot; it is not an eaten planned meal.
+    const slot = entry.replaced.find((info) => info?.slot)?.slot || null;
+    return slot ? `Replaced · ${slotLabel(slot)}` : 'Replaced';
+  }
   const hasEaten = Array.isArray(entry?.eaten) && entry.eaten.length > 0;
   // An extra with no planned meal is food eaten outside the menu, not a slot.
   if (entry?.extra && !hasEaten) return 'Outside the menu';

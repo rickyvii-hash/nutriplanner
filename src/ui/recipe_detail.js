@@ -80,6 +80,10 @@ export function recipeDetailModel(recipe, { targets = [], foodsById } = {}) {
   };
 }
 
+// Cleanup of the detail panel currently on screen. Opening another one runs it
+// first, so a replaced panel never leaves its Escape listener behind.
+let activeDetailCleanup = null;
+
 /**
  * Open the detail panel inside `mount` (the current screen) for one recipe.
  * Returns the panel element, or null when there is no browser or no recipe.
@@ -92,7 +96,8 @@ export function openRecipeDetail(ctx, recipe, mount) {
   });
   if (!model) return null;
 
-  // One panel at a time.
+  // One panel at a time: drop the old one and its listener before opening this.
+  if (activeDetailCleanup) activeDetailCleanup();
   mount.querySelectorAll('[data-recipe-detail]').forEach((node) => node.remove());
 
   const overlay = el(`<div class="recipe-overlay" data-recipe-detail>
@@ -154,13 +159,16 @@ export function openRecipeDetail(ctx, recipe, mount) {
   }
   body.appendChild(links);
 
-  const close = () => {
-    document.removeEventListener('keydown', onKey);
-    overlay.remove();
-  };
   const onKey = (event) => {
     if (event.key === 'Escape') close();
   };
+  const cleanup = () => {
+    document.removeEventListener('keydown', onKey);
+    overlay.remove();
+    if (activeDetailCleanup === cleanup) activeDetailCleanup = null;
+  };
+  const close = () => cleanup();
+  activeDetailCleanup = cleanup;
   overlay.querySelector('[data-close-detail]').addEventListener('click', close);
   overlay.addEventListener('click', (event) => {
     if (event.target === overlay) close();

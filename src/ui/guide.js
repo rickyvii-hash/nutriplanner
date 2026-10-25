@@ -6,6 +6,10 @@ import { el, escapeHtml } from './dom.js';
 
 export const GUIDE_TITLE = 'How it works';
 
+// Cleanup of the guide currently on screen. Opening another one runs it first,
+// so a replaced overlay never leaves its Escape listener behind.
+let activeGuideCleanup = null;
+
 /**
  * Open the guide over the current screen. `firstRun` marks the automatic opening:
  * closing it then saves the dismissal, so it does not come back on the next visit.
@@ -14,6 +18,8 @@ export function openGuide(ctx, { firstRun = false } = {}) {
   if (typeof document === 'undefined') return null;
   const mount = document.getElementById('app');
   if (!mount) return null;
+  // Remove an open guide and its listener before the new one takes over.
+  if (activeGuideCleanup) activeGuideCleanup();
   mount.querySelectorAll('[data-guide-panel]').forEach((node) => node.remove());
 
   const overlay = el(`<div class="guide-overlay" data-guide-panel>
@@ -35,15 +41,21 @@ export function openGuide(ctx, { firstRun = false } = {}) {
     </section>
   </div>`);
 
-  const close = () => {
-    document.removeEventListener('keydown', onKey);
-    overlay.remove();
-    // Only the automatic first-run opening records the dismissal.
-    if (firstRun) ctx.dismissGuide?.();
-  };
   const onKey = (event) => {
     if (event.key === 'Escape') close();
   };
+  // Close without side effects: used both by the buttons and by a replacement.
+  const cleanup = () => {
+    document.removeEventListener('keydown', onKey);
+    overlay.remove();
+    if (activeGuideCleanup === cleanup) activeGuideCleanup = null;
+  };
+  const close = () => {
+    cleanup();
+    // Only the automatic first-run opening records the dismissal.
+    if (firstRun) ctx.dismissGuide?.();
+  };
+  activeGuideCleanup = cleanup;
 
   overlay.querySelector('[data-action="close-guide"]').addEventListener('click', close);
   overlay.addEventListener('click', (event) => {

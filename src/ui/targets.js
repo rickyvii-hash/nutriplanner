@@ -39,6 +39,46 @@ export function nextCustomTarget(targets) {
   return { nutrient: nutrient.key, kind: 'min', daily: defaultTargetDaily(nutrient.key) };
 }
 
+/**
+ * The nutrient keys the target row at `index` may choose: every nutrient except
+ * the ones another row already uses, so two rows can never share a nutrient.
+ */
+export function availableTargetNutrients(targets, index) {
+  const used = new Set();
+  (targets || []).forEach((target, i) => {
+    if (i !== index && target?.nutrient) used.add(target.nutrient);
+  });
+  return NUTRIENTS.map((n) => n.key).filter((key) => !used.has(key));
+}
+
+/**
+ * State after the "My meals" choices change. A built plan is refilled from today
+ * on; past days keep what was stored. Accept/reject decisions from earlier updates
+ * were replayed against the old base plan, so they are cleared together with the
+ * pending proposal and the base plan. The saved log and shopping ticks stay.
+ */
+export function applyMealPrefsState(state, {
+  prefs = {}, recipes = null, foodsById = new Map(), today = todayIso(),
+} = {}) {
+  const clean = normalizeMealPrefs(prefs);
+  const next = { ...state, mealPrefs: clean };
+  if (state.plan && Array.isArray(recipes) && recipes.length > 0) {
+    next.plan = rebuildPlanMeals(
+      state.plan,
+      state.targets,
+      recipes,
+      foodsById || new Map(),
+      clean,
+      today,
+    );
+    next.planBase = null;
+    next.keptForBought = [];
+    next.pendingProposal = null;
+    next.updateDecisions = [];
+  }
+  return next;
+}
+
 /** A target value must be a number greater than 0. Returns the number, or null when invalid. */
 export function parseTargetDaily(raw) {
   if (raw === null || raw === undefined || String(raw).trim() === '') return null;
@@ -137,11 +177,15 @@ export function renderTargets(ctx) {
       <p class="field-error" data-error hidden>Enter a number greater than 0</p>
     </div>`);
     const nutSel = row.querySelector('[data-field="nutrient"]');
+    const available = new Set(availableTargetNutrients(state.targets, index));
     for (const n of NUTRIENTS) {
       const opt = document.createElement('option');
       opt.value = n.key;
       opt.textContent = n.label;
       if (n.key === t.nutrient) opt.selected = true;
+      // A nutrient another row already targets cannot be chosen again. The
+      // row's own value stays selectable even in older data with a duplicate.
+      opt.disabled = !available.has(n.key) && n.key !== t.nutrient;
       nutSel.appendChild(opt);
     }
     row.querySelector('[data-field="kind"]').value = t.kind;
@@ -168,23 +212,12 @@ export function renderTargets(ctx) {
   </section>`);
 
   const applyMealPrefs = (nextPrefs) => {
-    const clean = normalizeMealPrefs(nextPrefs);
-    const next = { ...state, mealPrefs: clean };
-    // A plan already built is refilled from today on; past days keep what was stored.
-    if (state.plan && Array.isArray(ctx.recipes) && ctx.recipes.length > 0) {
-      next.plan = rebuildPlanMeals(
-        state.plan,
-        state.targets,
-        ctx.recipes,
-        ctx.foodsById || new Map(),
-        clean,
-        todayIso(),
-      );
-      next.planBase = null;
-      next.keptForBought = [];
-      next.pendingProposal = null;
-    }
-    onChange(next);
+    onChange(applyMealPrefsState(state, {
+      prefs: nextPrefs,
+      recipes: ctx.recipes,
+      foodsById: ctx.foodsById,
+      today: todayIso(),
+    }));
   };
 
   mealsCard.querySelectorAll('[data-meal]').forEach((input) => {
@@ -263,6 +296,7 @@ export function renderTargets(ctx) {
   const actions = el(`<div class="stack-actions">
     <button type="button" class="btn-secondary" data-action="add-target">Add custom target</button>
     <button type="button" class="btn-primary" data-action="build">Build my month plan</button>
+    <p class="muted tiny" data-build-hint hidden>Add at least one target first</p>
   </div>`);
   root.appendChild(actions);
   root.appendChild(guideFooter(ctx));
@@ -326,9 +360,18 @@ export function renderTargets(ctx) {
     });
   }
 
-  root.querySelector('[data-action="build"]')?.addEventListener('click', () => {
-    ctx.buildPlan();
-  });
+  const buildBtn = root.querySelector('[data-action="build"]');
+  if (buildBtn) {
+    // Without a target the plan has nothing to aim for: say so instead of
+    // opening an empty month plan.
+    if (state.targets.length === 0) {
+      buildBtn.disabled = true;
+      root.querySelector('[data-build-hint]').hidden = false;
+    }
+    buildBtn.addEventListener('click', () => {
+      ctx.buildPlan();
+    });
+  }
 
   return root;
 }

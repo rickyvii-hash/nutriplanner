@@ -45,7 +45,7 @@ test('round trip: export then restore restores plan, logs, targets and meals', (
   assert.equal(payload.app, 'NutriPlanner');
   // The file carries NutriPlanner fields only: nothing from another app can leak in.
   const allowedFields = new Set([
-    'version', 'app', 'exportedAt', 'profileId', 'targets', 'mealPrefs', 'plan',
+    'version', 'app', 'exportedAt', 'profileId', 'guideDismissed', 'targets', 'mealPrefs', 'plan',
     'planBase', 'log', 'bought', 'keptForBought', 'shopEvery', 'shopStart',
     'updateDecisions', 'labNotes',
   ]);

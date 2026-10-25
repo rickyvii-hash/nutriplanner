@@ -43,6 +43,8 @@ export function buildExportPayload(state) {
     app: EXPORT_APP_NAME,
     exportedAt: new Date().toISOString(),
     profileId: s.profileId ?? null,
+    // The first-run guide stays dismissed on the device the file is restored to.
+    guideDismissed: s.guideDismissed === true,
     targets: Array.isArray(s.targets) ? s.targets : [],
     mealPrefs: normalizeMealPrefs(s.mealPrefs),
     plan: s.plan ?? null,
@@ -114,6 +116,10 @@ export function validateImportPayload(data) {
   if (data.profileId !== undefined && data.profileId !== null && typeof data.profileId !== 'string') {
     return reject('This backup has an unexpected format for the profile.');
   }
+  // An older backup has no guide flag: it still restores, with the guide shown again.
+  if (data.guideDismissed !== undefined && data.guideDismissed !== null && typeof data.guideDismissed !== 'boolean') {
+    return reject('This backup has an unexpected format for the guide setting.');
+  }
   if (data.shopEvery !== undefined && data.shopEvery !== null && typeof data.shopEvery !== 'number') {
     return reject('This backup has an unexpected format for shopping frequency.');
   }
@@ -166,6 +172,8 @@ export function applyImportPayload(currentState, data) {
 
   const restored = {
     profileId: typeof data.profileId === 'string' ? data.profileId : null,
+    // An older backup never dismissed the guide, so it stays visible.
+    guideDismissed: data.guideDismissed === true,
     targets: (data.targets ?? []).map((t) => ({ ...t })),
     mealPrefs: normalizeMealPrefs(data.mealPrefs),
     plan: data.plan ?? null,

@@ -9,6 +9,7 @@ import {
   searchResultRow, setAmountMode,
 } from './custom_food.js';
 import { el, escapeHtml } from './dom.js';
+import { openConfirmPanel } from './reset.js';
 import { findPlannedRecipeForEntry } from '../log_corrections.js';
 
 // Saved meals can be corrected later from the Plan screen.
@@ -22,6 +23,30 @@ export {
 } from '../log_corrections.js';
 
 export const MAX_PORTION_GRAMS = 5000;
+
+/** Confirmation shown when leaving Outside the menu with foods still in "To add". */
+export const DISCARD_DRAFT_COPY = {
+  title: 'Discard what you entered?',
+  body: 'The foods in To add will not be saved.',
+  discardLabel: 'Discard',
+  keepLabel: 'Keep editing',
+};
+
+/** True when leaving Outside the menu would throw away foods added to "To add". */
+export function draftHasFoods(draft) {
+  return Array.isArray(draft?.items) && draft.items.length > 0;
+}
+
+/**
+ * What the back link does with the current draft: ask before discarding the
+ * foods in "To add", or go straight back when there is nothing to lose.
+ */
+export function backDecision(draft) {
+  if (draftHasFoods(draft)) {
+    return { confirm: true, ...DISCARD_DRAFT_COPY };
+  }
+  return { confirm: false, target: 'plan' };
+}
 
 /**
  * One logged food line. A food the person added keeps its name with the line,
@@ -623,6 +648,9 @@ export function flatDraftItems(draft) {
 
 export function renderLog(ctx) {
   const { state, foods } = ctx;
+  // The scroll guard belongs to a day-screen redraw only: it must never survive
+  // onto this screen.
+  ctx.suppressStripScroll = false;
   const root = el(`<div class="screen screen-log"></div>`);
 
   root.appendChild(el(`<header class="brand brand-compact">
@@ -861,7 +889,24 @@ export function renderLog(ctx) {
     // Free-search foods are saved as extras: they never replace or skip a planned meal.
     ctx.saveLogAndReplan(draftSavePayload(draft));
   });
-  root.querySelector('[data-back]').addEventListener('click', () => ctx.navigate('plan'));
+  root.querySelector('[data-back]').addEventListener('click', () => {
+    const decision = backDecision(draft);
+    if (!decision.confirm) {
+      ctx.navigate('plan');
+      return;
+    }
+    // Leave only after the person confirms: the foods in "To add" are not saved.
+    openConfirmPanel({
+      title: decision.title,
+      confirmLabel: decision.discardLabel,
+      cancelLabel: decision.keepLabel,
+      buildBody: (body) => {
+        body.appendChild(el(`<p>${escapeHtml(decision.body)}</p>`));
+        return () => undefined;
+      },
+      onConfirm: () => ctx.navigate('plan'),
+    });
+  });
 
   paintItems();
   return root;

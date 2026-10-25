@@ -153,7 +153,7 @@ test('D16: saved eaten, skipped, replaced and extra entries still render', () =>
 
   assert.equal(logEntryKind(eaten, lunch), 'Eaten · ' + lunch.slot);
   assert.equal(logEntryKind(skipped, lunch), 'Skipped');
-  assert.equal(logEntryKind(replaced, lunch), 'Eaten · replaced');
+  assert.equal(logEntryKind(replaced, lunch), 'Replaced · ' + lunch.slot);
   assert.equal(logEntryKind(extra, null), 'Outside the menu');
 
   // The day-screen Logged meals card reads the same saved outcomes and edits them.

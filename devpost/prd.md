@@ -13,7 +13,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 2. They review the **targets** (each a nutrient with a Min or Max and a daily value) and optionally add a custom target for any nutrient. They tap **Build my month plan**.
 3. They land on the **Month plan**: a day strip, today's meals, and daily progress against each target. A **Shopping list** is generated from the plan.
 4. They tick what they have already bought. Items already at home leave the "to buy" list.
-5. During the month they **log a meal**: from the plan, or by searching a food and entering a portion as an **Extra / outside meal**. From the plan they can **Add as eaten** (one grouped block per recipe), **Replace** with another recipe for the same slot or with **I ate something else** (a searched food logged as replaced), or mark a meal **Skipped**.
+5. During the month they handle each planned meal on the day screen: **Ate it**, **Skipped**, or **Replace** with another recipe for the same slot or with **I ate something else** (a searched food, or their own food, logged as replaced). Any choice can be undone or changed on the same screen. Food that was not a planned meal is added with **Add food outside the menu**.
 6. After saving (or after Replace), they see **Plan updated**: which upcoming meals changed (before and after), one sentence explaining why, and the effect on each target. They choose **Use updated plan** or **Keep my original plan**.
 7. The plan for the rest of the month is updated, favouring recipes that use food already bought or prepared. The shopping list updates to match.
 8. They can open a **recipe detail** from a planned meal or an eaten block to see ingredients, nutrients for their targets, and three outside web-search links.
@@ -22,14 +22,14 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 Success: the user logs an off-plan meal (for example pizza and ice cream) and sees a clear, calm, explained update to the rest of the month.
 
 ## Screens and Layout
-Mobile-first, organised around a bottom bar with three items: **Plan**, **Shopping**, **Targets**. Log a meal, Plan updated, the doctor summary and the confirmations are reached from the Plan or Targets screens, not from the bar.
+Mobile-first, organised around a bottom bar with three items: **Plan**, **Shopping**, **Targets**. Outside the menu, Plan updated, the doctor summary and the confirmations are reached from the Plan or Targets screens, not from the bar.
 
 1. **Targets** (choose profile, edit targets): four profile cards, a list of targets, "Add custom target", and the button "Build my month plan". "Change profile" and "Start over" ask for confirmation before changing anything.
-2. **Month plan**: a strip of days (today highlighted), today's meals, daily target progress bars, and a short "Upcoming days" preview. A "Log a meal" button, a "Summary for your doctor" button, and a "Start over" action. Saved log entries can be corrected here: remove, change a portion, or switch a meal between Eaten and Skipped.
-3. **Log a meal**: two modes, "From plan" (today's planned meals with "Add as eaten", "Replace" and "Skipped") and free search, which serves both **Extra / outside meals** (search a food, set the portion in g or ml, not tied to a planned slot) and "I ate something else" inside Replace. "This meal" shows grouped eaten blocks (`Eaten · [slot] · [recipe name]` with indented ingredients) plus any free-search foods; then "Save and update plan".
+2. **Month plan**: a strip of days (today highlighted), today's meals, daily target progress bars, and a short "Upcoming days" preview. Each planned meal shows its status (Planned, Eaten, Skipped, Replaced) with the buttons **Ate it**, **Skipped** and **Replace**, or **Undo** and **Change** once chosen, plus an "N of M meals logged" line. An "Add food outside the menu" button, a "Summary for your doctor" button, and a "Start over" action. Saved log entries can also be corrected in the Logged meals list: remove, change a portion, or switch a meal between Eaten and Skipped.
+3. **Outside the menu**: the food search for anything that was not a planned meal (a snack, a drink, a restaurant meal): search a food, set the portion in g, or in ml for drinks, or use **Add my own food** (name and calories, other nutrients optional, shown as "your entry") when the food is not in the list. The "To add" list then goes through "Save and update plan". The same search and own-food form are used by "I ate something else" inside Replace on the day screen.
 4. **Plan updated**: success banner, "What changed" (before and after per meal), "Reason" in one sentence, "Effect on targets", and the buttons "Keep my original plan" and "Use updated plan".
 5. **Shopping list**: items grouped by category with tickable checkboxes, a section "Already at home", and a note explaining when a recipe was kept because its ingredients are already bought.
-6. **Recipe detail** (overlay from Plan or Log): dish name, ingredients with grams, nutrient totals for the current targets, and three links that open a new browser tab — Full recipe, Find nearby, Order delivery — each a Google search or Maps search built from the dish name, with the note "Opens a web search. NutriPlanner does not take orders."
+6. **Recipe detail** (overlay from the day screen): dish name, ingredients with grams, nutrient totals for the current targets, and three links that open a new browser tab — Full recipe, Find nearby, Order delivery — each a Google search or Maps search built from the dish name, with the note "Opens a web search. NutriPlanner does not take orders."
 7. **Summary for your doctor**: profile and period, targets against the average per logged day, the logged meals with dates and grams, and a "Print or save as PDF" button.
 8. **Start over / Change profile confirmations**: small panels that list what will be erased and ask before acting.
 
@@ -57,11 +57,11 @@ Established from the mockups the learner chose:
 - Daily progress shows consumed versus target for each nutrient.
 
 ### Logging a meal
-- The user can mark a planned meal as eaten, replace it with another recipe for the same slot, skip it, or search a food and enter a portion in grams or millilitres.
-- "Add as eaten" keeps one grouped block per recipe (name and indented ingredients with editable portions). Removing the block clears that meal from the draft.
+- The user can mark a planned meal as eaten, replace it with another recipe for the same slot or with a food they ate instead, skip it, undo any of these on the same screen, or add food outside the menu with a portion in grams or millilitres.
+- "Ate it" saves the meal without leaving the day screen; "Undo" and "Change" appear on the row afterwards. Skipped and Replace open the Plan updated screen only when the plan would change.
 - "Replace" opens a picker of other recipes for that slot, or "I ate something else", which searches a food and logs the chosen portions as replaced for that slot (not skipped and not an extra).
-- Free search also serves **Extra / outside meals**: foods not tied to a planned slot, saved with `extra: true`. Extras count in the day totals and in the adaptive replan.
-- Several items can be logged together as one meal.
+- Adding food outside the menu serves **Extra / outside meals**: foods not tied to a planned slot, saved with `extra: true`. Extras count in the day totals and in the adaptive replan.
+- Several items can be added together in one "To add" list.
 - A saved log entry can be corrected: remove it, change a portion, or switch a planned meal between Eaten and Skipped. The plan is recalculated from the corrected log.
 
 ### Starting over and changing profile
@@ -114,7 +114,7 @@ Established from the mockups the learner chose:
 - Profile selection and editable monthly targets, including a custom target
 - A curated set of about 480 USDA SR Legacy foods and about 40 recipes built from them
 - Month plan with daily meals and progress against targets
-- Logging a meal, from plan or by searching a food with a portion; grouped eaten blocks; skip; replace with preview
+- Marking planned meals eaten, skipped or replaced on the day screen with undo; adding food outside the menu with a portion, including the user's own food
 - Plan recalculation after a log, skip or replace, with the Plan updated screen (before and after, reason, effect, keep or use)
 - Recipe detail with ingredients, target nutrients and three honest outside-search links (full recipe, find nearby, order delivery)
 - Tickable shopping list with "Already at home", feeding the recalculation

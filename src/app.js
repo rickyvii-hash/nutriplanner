@@ -22,6 +22,7 @@ import { shouldShowNav } from './ui/nav.js';
 import { openStartOverPanel, openChangeProfilePanel, openRestorePanel } from './ui/reset.js';
 import { shouldShowGuide, dismissGuideState } from './engine/guide.js';
 import { openGuide } from './ui/guide.js';
+import { resetTransientScreenState } from './screen_state.js';
 
 const app = document.getElementById('app');
 
@@ -220,6 +221,7 @@ const ctx = {
     // Remove the saved data and forget everything held in memory.
     clearState();
     ctx.state = startOverState();
+    resetTransientScreenState(ctx);
     ctx.proposal = null;
     ctx.logDraft = null;
     ctx.selectedDate = null;
@@ -251,6 +253,7 @@ const ctx = {
     const restored = restoredStateAndScreen(imported);
     ctx.state = restored.state;
     saveState(ctx.state);
+    resetTransientScreenState(ctx);
     ctx.proposal = null;
     ctx.logDraft = null;
     ctx.selectedDate = null;
@@ -262,6 +265,7 @@ const ctx = {
     // The plan goes; the meal log and shopping ticks stay unless the person clears them.
     ctx.state = changeProfileState(ctx.state, { keepLog });
     saveState(ctx.state);
+    resetTransientScreenState(ctx);
     ctx.proposal = null;
     ctx.logDraft = null;
     ctx.selectedDate = null;
