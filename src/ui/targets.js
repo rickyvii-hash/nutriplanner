@@ -161,8 +161,9 @@ export function renderTargets(ctx) {
     </div>
     <p class="field-label">Snacks per day</p>
     <div class="freq-options" role="group" aria-label="Snacks per day">
-      ${[0, 1, 2].map((n) => `<button type="button" class="freq-option${prefs.snacks === n ? ' is-active' : ''}" data-snacks="${n}" aria-pressed="${prefs.snacks === n ? 'true' : 'false'}">${n}</button>`).join('')}
+      ${[0, 1].map((n) => `<button type="button" class="freq-option${prefs.snacks === n ? ' is-active' : ''}" data-snacks="${n}" aria-pressed="${prefs.snacks === n ? 'true' : 'false'}">${n}</button>`).join('')}
     </div>
+    <p class="muted tiny">One snack maximum in this version.</p>
   </section>`);
 
   const applyMealPrefs = (nextPrefs) => {

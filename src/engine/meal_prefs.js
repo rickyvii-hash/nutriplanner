@@ -1,8 +1,8 @@
-// F2 — My meals: which daily meal slots are on, and 0–2 snacks.
+// F2 — My meals: which daily meal slots are on, and 0–1 snack.
 // Fewer meals still use the same daily targets, so each meal carries more.
 
 export const MEAL_SLOTS = ['breakfast', 'lunch', 'dinner'];
-export const MAX_SNACKS = 2;
+export const MAX_SNACKS = 1;
 
 /** The starting choice: breakfast, lunch, dinner and one snack. */
 export function defaultMealPrefs() {
@@ -10,7 +10,8 @@ export function defaultMealPrefs() {
 }
 
 /**
- * A safe copy of saved preferences: snacks clamped to 0–2, and at least one meal
+ * A safe copy of saved preferences: snacks clamped to 0–1 (an older saved 2
+ * comes down to 1), and at least one meal
  * stays on (dinner) so a plan can never be empty.
  */
 export function normalizeMealPrefs(prefs) {
@@ -28,8 +29,9 @@ export function normalizeMealPrefs(prefs) {
 }
 
 /**
- * The slots that are on, in meal order. Snacks 0 → none, 1 → snack,
- * 2 → snack and snack2 (both use recipes whose slot is "snack").
+ * The slots that are on, in meal order. Snacks 0 → none, 1 → snack.
+ * New plans never hold a second snack; `snack2` is only still understood when
+ * reading an older saved plan or log.
  */
 export function activeSlots(prefs) {
   const p = normalizeMealPrefs(prefs);
@@ -38,7 +40,6 @@ export function activeSlots(prefs) {
   if (p.lunch) slots.push('lunch');
   if (p.dinner) slots.push('dinner');
   if (p.snacks >= 1) slots.push('snack');
-  if (p.snacks >= 2) slots.push('snack2');
   return slots;
 }
 

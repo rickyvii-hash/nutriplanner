@@ -123,122 +123,34 @@ test('P1-B: converting one skipped slot to eaten leaves a sibling skip intact', 
   assert.ok(stillSkipLunch, 'lunch skip must remain');
 });
 
-// --- P1: a skip is keyed by its planned slot, not just by recipe id ---------
-
-const SNACK_DAY = '2026-10-24';
-const twoSnackPrefs = { breakfast: true, lunch: true, dinner: true, snacks: 2 };
-
-/** A two-snack plan whose logged day holds the same snack recipe in both snack slots. */
-function planWithTwoSameSnacks() {
-  const twoSnackPlan = buildPlan(
-    targets,
-    recipes,
-    { year: 2026, month: 10 },
-    foodsById,
-    [],
-    { mealPrefs: twoSnackPrefs },
-  );
+// A repeated skip of the same day and slot still counts once.
+test('P1: a duplicate skip of the same day and slot still counts once', () => {
   const snack = recipes.find((r) => r.slot === 'snack');
-  twoSnackPlan.days[SNACK_DAY] = {
-    ...twoSnackPlan.days[SNACK_DAY],
-    snack: snack.id,
-    snack2: snack.id,
-  };
-  return { plan: twoSnackPlan, snack };
-}
-
-function replanSkips(currentPlan, log) {
-  return replan({
+  const planDay = { ...dayMeals, snack: snack.id };
+  const snackDay = { ...plan, days: { ...plan.days, [day]: planDay } };
+  const entries = logEntriesForSave({
+    items: [],
+    groups: [],
+    extras: [],
+    skipped: [snack.id],
+    skippedSlots: [
+      { recipeId: snack.id, slot: 'snack' },
+      { recipeId: snack.id, slot: 'snack' },
+    ],
+    eaten: [],
+    extra: false,
+  }, { date: day, time: '16:00' });
+  const result = replan({
     targets,
     recipes,
-    plan: currentPlan,
-    log,
+    plan: snackDay,
+    log: entries,
     bought: [],
     foodsById,
-    fromDate: SNACK_DAY,
-    logFromDate: SNACK_DAY,
-    mealPrefs: twoSnackPrefs,
+    fromDate: day,
+    logFromDate: day,
+    mealPrefs: { breakfast: true, lunch: true, dinner: true, snacks: 1 },
   });
-}
-
-test('P1: skipping the same snack recipe on snack and snack2 counts two meals', () => {
-  const { plan: currentPlan, snack } = planWithTwoSameSnacks();
-  const entries = logEntriesForSave({
-    items: [],
-    groups: [],
-    extras: [],
-    skipped: [snack.id],
-    skippedSlots: [
-      { recipeId: snack.id, slot: 'snack' },
-      { recipeId: snack.id, slot: 'snack2' },
-    ],
-    eaten: [],
-    extra: false,
-  }, { date: SNACK_DAY, time: '16:00' });
-  assert.equal(entries.length, 2, 'each skipped planned slot is its own entry');
-  assert.deepEqual(entries.map((e) => e.skippedSlots[0].slot), ['snack', 'snack2']);
-
-  const both = replanSkips(currentPlan, entries);
-  const one = replanSkips(currentPlan, [entries[0]]);
-
-  const perSkip = recipeNutrients(snack, foodsById);
-  const minNutrients = targets
-    .filter((t) => t.kind === 'min' && !perSkip.unknown[t.nutrient] && perSkip.totals[t.nutrient] > 0)
-    .map((t) => t.nutrient);
-  assert.ok(minNutrients.length > 0, 'the snack recipe must have a known minimum nutrient');
-
-  assert.deepEqual(both.skippedNames, [snack.name], 'the recipe name is listed once');
-  for (const nutrient of minNutrients) {
-    assert.ok(
-      Math.abs(both.shortfall[nutrient] - perSkip.totals[nutrient] * 2) < 1e-9,
-      nutrient + ': two skipped planned slots leave twice the shortfall of one',
-    );
-    assert.ok(
-      Math.abs(one.shortfall[nutrient] - perSkip.totals[nutrient]) < 1e-9,
-      nutrient + ': one skipped planned slot leaves one meal of shortfall',
-    );
-    assert.ok(both.shortfall[nutrient] > one.shortfall[nutrient]);
-  }
-  assert.match(both.reason, /You skipped/i);
-});
-
-test('P1: older skip entries without a saved slot still use the planned slot of that day', () => {
-  const { plan: currentPlan, snack } = planWithTwoSameSnacks();
-  // The same two meals, saved without skippedSlots: the plan day still tells
-  // snack from snack2, so the second skipped meal counts too.
-  const legacy = [
-    { date: SNACK_DAY, time: '16:00', skipped: [snack.id], items: [] },
-    { date: SNACK_DAY, time: '16:00', skipped: [snack.id], items: [] },
-  ];
-  const both = replanSkips(currentPlan, legacy);
-  const perSkip = recipeNutrients(snack, foodsById);
-  const minNutrients = targets
-    .filter((t) => t.kind === 'min' && !perSkip.unknown[t.nutrient] && perSkip.totals[t.nutrient] > 0)
-    .map((t) => t.nutrient);
-  assert.ok(minNutrients.length > 0);
-  for (const nutrient of minNutrients) {
-    assert.ok(
-      Math.abs(both.shortfall[nutrient] - perSkip.totals[nutrient] * 2) < 1e-9,
-      nutrient + ': the two planned snack slots still count separately',
-    );
-  }
-});
-
-test('P1: a duplicate skip of the same day and slot still counts once', () => {
-  const { plan: currentPlan, snack } = planWithTwoSameSnacks();
-  const entries = logEntriesForSave({
-    items: [],
-    groups: [],
-    extras: [],
-    skipped: [snack.id],
-    skippedSlots: [
-      { recipeId: snack.id, slot: 'snack' },
-      { recipeId: snack.id, slot: 'snack' },
-    ],
-    eaten: [],
-    extra: false,
-  }, { date: SNACK_DAY, time: '16:00' });
-  const result = replanSkips(currentPlan, entries);
   const perSkip = recipeNutrients(snack, foodsById);
   const minNutrients = targets
     .filter((t) => t.kind === 'min' && !perSkip.unknown[t.nutrient] && perSkip.totals[t.nutrient] > 0)

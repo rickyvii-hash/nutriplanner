@@ -1,5 +1,5 @@
 /**
- * F2 — My meals: which daily slots are on, and 0–2 snacks.
+ * F2 — My meals: which daily slots are on, and 0–1 snack.
  * Contract tests; fail until the feature ships.
  */
 import test from 'node:test';
@@ -28,7 +28,7 @@ test('default meal prefs: all four slots on, one snack', () => {
   assert.deepEqual(activeSlots(prefs), ['breakfast', 'lunch', 'dinner', 'snack']);
 });
 
-test('activeSlots: no breakfast; no breakfast and no snack; two snacks; one meal only', () => {
+test('activeSlots: no breakfast; no breakfast and no snack; one meal only', () => {
   assert.deepEqual(
     activeSlots({ breakfast: false, lunch: true, dinner: true, snacks: 1 }),
     ['lunch', 'dinner', 'snack'],
@@ -38,17 +38,23 @@ test('activeSlots: no breakfast; no breakfast and no snack; two snacks; one meal
     ['lunch', 'dinner'],
   );
   assert.deepEqual(
-    activeSlots({ breakfast: true, lunch: true, dinner: true, snacks: 2 }),
-    ['breakfast', 'lunch', 'dinner', 'snack', 'snack2'],
-  );
-  assert.deepEqual(
     activeSlots({ breakfast: false, lunch: false, dinner: true, snacks: 0 }),
     ['dinner'],
   );
 });
 
-test('normalizeMealPrefs: snacks clamped to 0–2; at least one meal required', () => {
-  assert.equal(normalizeMealPrefs({ breakfast: true, lunch: true, dinner: true, snacks: 9 }).snacks, 2);
+test('activeSlots never includes snack2, even with a saved snacks: 2', () => {
+  assert.deepEqual(
+    activeSlots({ breakfast: true, lunch: true, dinner: true, snacks: 2 }),
+    ['breakfast', 'lunch', 'dinner', 'snack'],
+  );
+  assert.equal(activeSlots({ breakfast: true, lunch: true, dinner: true, snacks: 2 }).includes('snack2'), false);
+  assert.equal(activeSlots(defaultMealPrefs()).includes('snack2'), false);
+});
+
+test('normalizeMealPrefs: snacks clamped to 0–1; at least one meal required', () => {
+  assert.equal(normalizeMealPrefs({ breakfast: true, lunch: true, dinner: true, snacks: 9 }).snacks, 1);
+  assert.equal(normalizeMealPrefs({ breakfast: true, lunch: true, dinner: true, snacks: 2 }).snacks, 1);
   assert.equal(normalizeMealPrefs({ breakfast: true, lunch: true, dinner: true, snacks: -1 }).snacks, 0);
   const none = normalizeMealPrefs({
     breakfast: false, lunch: false, dinner: false, snacks: 0,
@@ -76,14 +82,23 @@ test('buildPlan uses only chosen slots for all four profiles', () => {
   }
 });
 
-test('two snacks fill snack and snack2 from snack recipes', () => {
+test('one snack fills only the snack slot from snack recipes', () => {
+  const targets = profileById('cholesterol').targets;
+  const prefs = { breakfast: true, lunch: true, dinner: true, snacks: 1 };
+  const plan = buildPlan(targets, recipes, { year: 2026, month: 10 }, foodsById, [], { mealPrefs: prefs });
+  const day = plan.days['2026-10-15'];
+  assert.ok(day.snack);
+  assert.equal(day.snack2, undefined, 'a new plan never holds a second snack');
+  assert.equal(recipes.find((r) => r.id === day.snack).slot, 'snack');
+});
+
+test('a saved snacks: 2 builds a plan with one snack and no snack2', () => {
   const targets = profileById('cholesterol').targets;
   const prefs = { breakfast: true, lunch: true, dinner: true, snacks: 2 };
   const plan = buildPlan(targets, recipes, { year: 2026, month: 10 }, foodsById, [], { mealPrefs: prefs });
   const day = plan.days['2026-10-15'];
-  assert.ok(day.snack && day.snack2);
-  assert.equal(recipes.find((r) => r.id === day.snack).slot, 'snack');
-  assert.equal(recipes.find((r) => r.id === day.snack2).slot, 'snack');
+  assert.ok(day.snack);
+  assert.equal(day.snack2, undefined);
 });
 
 test('one meal only: no crash; honest closest/unreachable when athlete minima cannot be met', () => {

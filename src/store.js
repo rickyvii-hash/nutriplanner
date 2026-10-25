@@ -11,7 +11,7 @@ export function emptyAppState() {
     // The first-run guide closes for good once dismissed; "How it works" still opens it.
     guideDismissed: false,
     targets: [],
-    // Which daily meals are on (breakfast, lunch, dinner and 0–2 snacks).
+    // Which daily meals are on (breakfast, lunch, dinner and 0–1 snack).
     mealPrefs: defaultMealPrefs(),
     plan: null,
     // The month plan as it was before an accepted update: a correction replans

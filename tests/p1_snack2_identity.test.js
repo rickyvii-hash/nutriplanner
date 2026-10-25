@@ -1,13 +1,11 @@
 /**
- * P1-1: with two snacks, the planned slot `snack2` stays `snack2` in eaten and
- * skipped outcomes. A second snack may use the same snack recipe as the first,
- * so the recipe id alone must never merge the two meals.
+ * Legacy `snack2` data. New plans offer one snack only, but a plan or log saved
+ * before that cut may still name `snack2`: reading it keeps it apart from the
+ * first snack, so a shared recipe id never merges the two meals.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { buildPlan } from '../src/engine/planner.js';
-import { profileById } from '../src/engine/profiles.js';
 import {
   newLogDraft,
   addRecipeGroup,
@@ -24,25 +22,17 @@ import {
   entrySlots,
 } from '../src/ui/log.js';
 
-const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
 const recipes = JSON.parse(fs.readFileSync(new URL('../data/recipes.json', import.meta.url), 'utf8'));
-const foodsById = new Map(foods.map((f) => [f.id, f]));
 const recipesById = new Map(recipes.map((r) => [r.id, r]));
 
 const DAY = '2026-10-24';
 const SNACK = 'snack';
 const SNACK2 = 'snack2';
-const twoSnacks = buildPlan(
-  profileById('cholesterol').targets,
-  recipes,
-  { year: 2026, month: 10 },
-  foodsById,
-  [],
-  { mealPrefs: { breakfast: true, lunch: true, dinner: true, snacks: 2 } },
-);
 const snackRecipe = recipes.find((r) => r.slot === SNACK);
-// Worst case: both snack slots hold the same snack recipe.
-const planDay = { ...twoSnacks.days[DAY], snack: snackRecipe.id, snack2: snackRecipe.id };
+// Worst case from an older save: both snack slots hold the same recipe.
+const planDay = {
+  breakfast: null, lunch: null, dinner: null, snack: snackRecipe.id, snack2: snackRecipe.id,
+};
 const when = { date: DAY, time: '16:00' };
 
 function saveEntries(payload) {
