@@ -35,7 +35,7 @@ npm test
 4. Tick shopping-list items you already have at home.
 5. Log a meal from the plan, search a food with a portion, or add **Extra / outside meals**. Use the **Drinks** shortcut with ml presets (glass, cup, can, bottle). Extras and drinks count in the day totals and in the plan update.
 6. **Replace** a planned meal with another recipe for the same slot, or with **I ate something else**.
-7. Undo or edit a saved log entry: remove it, change a portion, or switch a meal between Eaten and Skipped.
+7. Undo or edit a saved log entry: remove it, change a portion, or switch a meal between Eaten and Skipped. The month plan is always recomputed from your original plan plus the meals you still have logged (and whether you accepted each update), so an old correction cannot leave a stale make-up behind.
 8. **Download my data** / **Restore from file** to back up or move your plan, logs and targets on this device.
 9. **Start over** (with confirmation) erases the month plan, meal logs and shopping ticks. **Change profile** keeps the log unless you choose Start over.
 10. See **Plan updated**: an off-plan meal that goes over a daily maximum is made up over the next 4 days, with before/after meals, a one-sentence reason from the real numbers, and a choice to keep the original plan or use the new one.
