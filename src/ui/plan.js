@@ -3,6 +3,9 @@ import { activeSlots, slotLabel } from '../engine/meal_prefs.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { displayFoodName } from '../engine/food_display.js';
 import {
+  planReachGaps, PLAN_REACH_TITLE, PLAN_REACH_HINT,
+} from '../engine/plan_check.js';
+import {
   gramsForPortions, parsePortions, portionsFromGrams, shownFoodName,
 } from '../engine/custom_foods.js';
 import { pendingProposalForPlan } from '../store.js';
@@ -75,6 +78,26 @@ export function dayStatusText(action, slot = null) {
   if (action === 'skip') return `${label} skipped. Plan unchanged.`;
   if (action === 'replace') return `${label} replaced. Plan unchanged.`;
   return `${label} logged. Plan unchanged.`;
+}
+
+/**
+ * Calm note card: the month plan does not reach every target on average.
+ * It names each target with the real planned number behind it, never a single
+ * day, and offers one way forward. Compact on the Targets screen, where the
+ * "My meals" control that caused it sits right above.
+ */
+export function planReachCard(check, { compact = false, onOpenTargets = null } = {}) {
+  if (!check || check.reached || !check.gaps?.length) return null;
+  const card = el(`<section class="card note-card plan-reach${compact ? ' plan-reach-compact' : ''}" data-plan-reach>
+    <h3>${escapeHtml(PLAN_REACH_TITLE)}</h3>
+    <ul class="plan-reach-list">${check.gaps.map((gap) => `<li>${escapeHtml(gap.text)}</li>`).join('')}</ul>
+    <p class="muted tiny plan-reach-hint">${escapeHtml(PLAN_REACH_HINT)}</p>
+    ${compact ? '' : '<button type="button" class="btn-secondary btn-small" data-action="open-targets">Open Targets</button>'}
+  </section>`);
+  card.querySelector('[data-action="open-targets"]')?.addEventListener('click', () => {
+    onOpenTargets?.();
+  });
+  return card;
 }
 
 /** Actions whose save has a status line of its own when the plan does not change. */
@@ -407,6 +430,20 @@ export function renderPlan(ctx) {
     header.appendChild(reset);
   }
   root.appendChild(header);
+
+  // A plan that misses its own targets says so, calmly, before the day strip.
+  // It describes the planned average from today on, never one day.
+  if (state.plan && Array.isArray(state.targets) && state.targets.length > 0) {
+    const reach = planReachGaps({
+      plan: state.plan,
+      targets: state.targets,
+      recipesById,
+      foodsById,
+      today: todayIso(),
+    });
+    const reachCard = planReachCard(reach, { onOpenTargets: () => ctx.navigate('targets') });
+    if (reachCard) root.appendChild(reachCard);
+  }
 
   // A one-line note after a log correction that needed no plan change.
   if (ctx.logNotice) {

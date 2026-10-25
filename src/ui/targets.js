@@ -4,6 +4,8 @@ import { todayIso, rebuildPlanMeals } from '../engine/planner.js';
 import { normalizeMealPrefs } from '../engine/meal_prefs.js';
 import { validateImportPayload } from '../engine/export_import.js';
 import { withTargetsEdited } from '../store.js';
+import { planReachGaps } from '../engine/plan_check.js';
+import { planReachCard } from './plan.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit, formatKind } from './dom.js';
 
 const MEAL_LABELS = [
@@ -232,6 +234,20 @@ export function renderTargets(ctx) {
     });
   });
   root.appendChild(mealsCard);
+
+  // The plan those "My meals" choices just built: if it misses a target, the
+  // note sits right under the control that caused it.
+  if (state.plan && state.targets.length > 0) {
+    const reach = planReachGaps({
+      plan: state.plan,
+      targets: state.targets,
+      recipesById: ctx.recipesById || new Map(),
+      foodsById: ctx.foodsById || new Map(),
+      today: todayIso(),
+    });
+    const reachNote = planReachCard(reach, { compact: true });
+    if (reachNote) root.appendChild(reachNote);
+  }
 
   root.appendChild(list);
 

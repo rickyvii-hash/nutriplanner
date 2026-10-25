@@ -282,6 +282,12 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 }
 .effect-item { padding: 8px 0; border-bottom: 1px solid var(--line); }
 .note-card { background: #fffdf8; border-color: var(--tan); }
+.plan-reach h3 { margin: 0 0 6px; font-size: 1rem; }
+.plan-reach-list { margin: 0 0 8px; padding-left: 18px; font-size: 0.9rem; }
+.plan-reach-list li { margin: 2px 0; }
+.plan-reach-hint { margin: 0 0 10px; }
+.plan-reach-compact { padding: 12px 14px; }
+.plan-reach-compact .plan-reach-hint { margin-bottom: 0; }
 
 .shop-window .shop-dates { font-weight: 700; margin: 4px 0 12px; }
 .field-label { color: var(--muted); font-size: 0.85rem; margin: 0 0 6px; }
