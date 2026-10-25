@@ -263,27 +263,56 @@ export function rebuildPlanMeals(plan, targets, recipes, foodsById, prefs, fromD
   const normalized = normalizeMealPrefs(prefs || defaultMealPrefs());
   const slots = activeSlots(normalized);
   const dates = Object.keys(plan.days).sort();
-  const days = Object.fromEntries(dates.map((date) => [date, { ...plan.days[date] }]));
-  // Variety carries over from the days that stay as they are.
-  const recent = {};
-  for (const slot of slots) recent[slot] = [];
-  for (const date of dates) {
-    if (date >= fromDate) break;
-    for (const slot of slots) {
-      const id = plan.days[date]?.[slot];
-      if (id) recent[slot].push(id);
+  const rebuild = (carryVariety) => {
+    const days = Object.fromEntries(dates.map((date) => [date, { ...plan.days[date] }]));
+    // Variety carries over from the days that stay as they are.
+    const recent = {};
+    for (const slot of slots) recent[slot] = [];
+    if (carryVariety) {
+      for (const date of dates) {
+        if (date >= fromDate) break;
+        for (const slot of slots) {
+          const id = plan.days[date]?.[slot];
+          if (id) recent[slot].push(id);
+        }
+      }
     }
-  }
-  for (const date of dates) {
-    if (date < fromDate) continue;
-    const avoid = {};
-    for (const slot of slots) {
-      avoid[slot] = new Set(recent[slot].slice(-cooldownDays(recipes, slot)));
+    for (const date of dates) {
+      if (date < fromDate) continue;
+      const avoid = {};
+      for (const slot of slots) {
+        avoid[slot] = new Set(recent[slot].slice(-cooldownDays(recipes, slot)));
+      }
+      days[date] = fillDay(recipes, targets, foodsById, new Set(), avoid, {}, {}, null, null, slots);
+      for (const slot of slots) recent[slot].push(days[date][slot]);
     }
-    days[date] = fillDay(recipes, targets, foodsById, new Set(), avoid, {}, {}, null, null, slots);
-    for (const slot of slots) recent[slot].push(days[date][slot]);
+    return { month: plan.month, days };
+  };
+  const carried = rebuild(true);
+  // A rebuild should reach the same targets a fresh plan does. The variety carried
+  // over from the untouched past days is only a preference: when it would leave a
+  // minimum short on average, rebuild without it instead of showing a plan that
+  // "does not reach every target" right after the user turned a meal back on.
+  if (reachesMinTargets(carried.days, dates.filter((d) => d >= fromDate), targets, recipes, foodsById)) {
+    return carried;
   }
-  return { month: plan.month, days };
+  return rebuild(false);
+}
+
+/** True when the planned average over `datesToCount` meets every minimum target. */
+function reachesMinTargets(days, datesToCount, targets, recipes, foodsById) {
+  if (datesToCount.length === 0) return true;
+  const recipesById = new Map(recipes.map((r) => [r.id, r]));
+  const sums = emptyTotals();
+  for (const date of datesToCount) {
+    const totals = dayTotals(days[date], recipesById, foodsById).totals;
+    for (const k of NUTRIENT_KEYS) sums[k] += totals[k] || 0;
+  }
+  for (const t of targets || []) {
+    if (t?.kind !== 'min' || !(t.daily > 0)) continue;
+    if (sums[t.nutrient] / datesToCount.length < t.daily) return false;
+  }
+  return true;
 }
 
 /** True when a log entry only records skipped planned meals (never counted as eaten). */

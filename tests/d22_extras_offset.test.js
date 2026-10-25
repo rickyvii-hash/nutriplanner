@@ -333,13 +333,16 @@ test('D22 property: a replacement plus an extra that covers its shortfall leaves
   for (const profile of PROFILES) {
     const plan = build(profile.id);
     const plannedId = plan.days[FROM].lunch;
-    // A light replacement of the planned lunch ("I ate something else"), so every
-    // profile really has a minimum to make up.
+    // A replacement of the planned lunch that brings no nutrients ("I ate something
+    // else"), so every profile really has a minimum to make up. Water is used instead
+    // of the earlier apple because an apple adds fibre: for the Cholesterol profile
+    // (fibre is its only minimum) it raised the day instead of lowering it, so no
+    // make-up was due and the property had nothing to check.
     const entry = {
       date: FROM,
       time: '13:00',
-      items: [{ foodId: 'apple-raw', grams: 100 }],
-      replaced: [{ slot: 'lunch', recipeId: 'custom', name: 'an apple', fromRecipeId: plannedId }],
+      items: [{ foodId: 'water', grams: 100 }],
+      replaced: [{ slot: 'lunch', recipeId: 'custom', name: 'water', fromRecipeId: plannedId }],
     };
 
     const base = run(profile.id, plan, [entry]);

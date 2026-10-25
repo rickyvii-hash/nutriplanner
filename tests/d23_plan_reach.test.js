@@ -161,7 +161,6 @@ test('turning breakfast back on and rebuilding clears the note', () => {
   const check = planReachGaps({
     plan: rebuilt, targets: recovery.targets, recipesById, foodsById, today: TODAY,
   });
-  console.log('REBUILD', JSON.stringify(check.gaps));
   assert.equal(check.reached, true);
 });
 
