@@ -1,4 +1,5 @@
 import { buildSummary } from '../engine/summary.js';
+import { LAB_DISCLAIMER } from '../engine/lab_notes.js';
 import { PROFILES } from '../engine/profiles.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit, formatKind } from './dom.js';
 
@@ -93,6 +94,39 @@ export function renderSummary(ctx) {
     mealsEl.appendChild(list);
   }
   root.appendChild(mealsCard);
+
+  // Same fixed note as the Lab notes screen: two separate records, no cause and effect.
+  const labNotes = Array.isArray(state.labNotes) ? state.labNotes : [];
+  const labCard = el(`<section class="card">
+    <h2>Lab notes</h2>
+    <p class="muted tiny" data-lab-note>${escapeHtml(LAB_DISCLAIMER)}</p>
+    <div data-labs></div>
+  </section>`);
+  const labsEl = labCard.querySelector('[data-labs]');
+  if (labNotes.length === 0) {
+    labsEl.appendChild(el(`<p class="muted">No lab values entered.</p>`));
+  } else {
+    const sortedLabs = labNotes.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    const labTable = el(`<table class="summary-table">
+      <thead><tr><th>Name</th><th>Value</th><th>Date</th><th>Note</th></tr></thead>
+      <tbody></tbody>
+    </table>`);
+    const labBody = labTable.querySelector('tbody');
+    for (const note of sortedLabs) {
+      const numeric = Number(note.value);
+      const valueText = Number.isFinite(numeric)
+        ? `${numeric}${note.unit ? ` ${note.unit}` : ''}`
+        : 'n/a';
+      labBody.appendChild(el(`<tr>
+        <td>${escapeHtml(note.name || '')}</td>
+        <td>${escapeHtml(valueText)}</td>
+        <td>${escapeHtml(note.date || '')}</td>
+        <td>${escapeHtml(note.note || '')}</td>
+      </tr>`));
+    }
+    labsEl.appendChild(labTable);
+  }
+  root.appendChild(labCard);
 
   root.appendChild(el(`<section class="card note-card">
     <p class="muted">This summary lists only what you entered and is not medical advice.</p>

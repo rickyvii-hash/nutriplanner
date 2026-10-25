@@ -429,3 +429,29 @@ input[type="checkbox"], input[type="radio"] { min-width: 28px; min-height: 28px;
   .confirm-actions .btn-primary, .confirm-actions .btn-secondary { width: auto; }
 }
 
+/* Lab notes: entry form, saved values and the two separate charts. */
+.lab-disclaimer { border-color: #cfe0d3; background: #f3f8f4; }
+.lab-disclaimer p { margin: 0; font-weight: 600; }
+.lab-controls { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 8px 0 14px; }
+.lab-controls .field { margin: 0; }
+.lab-charts { display: flex; flex-direction: column; gap: 18px; }
+.lab-chart { border: 1px solid var(--line); border-radius: 14px; padding: 10px 8px 8px; }
+.lab-chart-title { margin: 0 0 6px; font-weight: 700; font-size: 0.95rem; }
+.lab-chart svg { display: block; width: 100%; height: auto; }
+.lab-chart .muted { margin: 6px 2px 0; }
+.lab-note-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--line);
+}
+.lab-note-row:last-child { border-bottom: none; }
+.lab-note-main { min-width: 0; }
+.lab-note-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.lab-note-value { font-weight: 700; color: var(--green); }
+.lab-note-text { margin: 4px 0 0; font-size: 0.92rem; }
+.lab-note-actions { display: flex; flex-direction: column; gap: 2px; flex: 0 0 auto; }
+
+@media (min-width: 800px) {
+  .lab-controls { grid-template-columns: 1fr 1fr; }
+  .lab-note-actions { flex-direction: row; gap: 6px; }
+}
+
