@@ -21,6 +21,8 @@ export function emptyAppState() {
     planBase: null,
     log: [],
     bought: [],
+    // Ingredients that were not in the shop, so they are never counted as bought.
+    notFound: [],
     keptForBought: [],
     // One entry per trigger day whose Plan updated was accepted or rejected:
     // { triggerDate, accepted }. The shown plan is recomputed from these.
@@ -49,6 +51,7 @@ export const START_OVER_ITEMS = [
   'Your month plan',
   'Your meal logs',
   'Shopping ticks (items you marked bought)',
+  'Shopping items marked not found',
   'A pending plan update proposal',
   'Notes about meals kept because you bought the ingredients',
   'Lab notes you recorded',
@@ -100,9 +103,10 @@ export function changeProfileState(state, { keepLog = true } = {}) {
       ...next,
       log: Array.isArray(current.log) ? [...current.log] : [],
       bought: Array.isArray(current.bought) ? [...current.bought] : [],
+      notFound: Array.isArray(current.notFound) ? [...current.notFound] : [],
     };
   }
-  return { ...next, log: [], bought: [] };
+  return { ...next, log: [], bought: [], notFound: [] };
 }
 
 /**
@@ -349,6 +353,10 @@ export function loadState() {
       planBase: data.planBase && typeof data.planBase === 'object' ? data.planBase : null,
       log: Array.isArray(data.log) ? data.log : [],
       bought: Array.isArray(data.bought) ? data.bought : [],
+      // Older saved data has no not-found list: it starts empty.
+      notFound: Array.isArray(data.notFound)
+        ? data.notFound.filter((id) => typeof id === 'string')
+        : [],
       keptForBought: Array.isArray(data.keptForBought) ? data.keptForBought : [],
       updateDecisions: (Array.isArray(data.updateDecisions) ? data.updateDecisions : [])
         .filter((decision) => decision && typeof decision.triggerDate === 'string')
@@ -390,6 +398,7 @@ export function saveState(state) {
         planBase: state.planBase || null,
         log: state.log,
         bought: state.bought,
+        notFound: Array.isArray(state.notFound) ? state.notFound : [],
         keptForBought: state.keptForBought || [],
         updateDecisions: Array.isArray(state.updateDecisions) ? state.updateDecisions : [],
         shopEvery: state.shopEvery || 7,

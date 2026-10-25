@@ -613,6 +613,21 @@ export function flatDraftItems(draft) {
   ];
 }
 
+/**
+ * Which day the "From plan" list shows: an explicit hand-off from another screen
+ * (openReplace.date), then the day selected on Plan, then today, then the first
+ * planned day. A date that is not in the plan is ignored.
+ */
+export function logPlanDate({
+  state, today = todayIso(), selectedDate = null, openReplace = null,
+} = {}) {
+  const days = state?.plan?.days || {};
+  const wanted = openReplace?.date || selectedDate;
+  if (wanted && days[wanted]) return wanted;
+  if (days[today]) return today;
+  return Object.keys(days).sort()[0] || null;
+}
+
 export function renderLog(ctx) {
   const { state, recipesById, foods } = ctx;
   const root = el(`<div class="screen screen-log"></div>`);
@@ -647,13 +662,20 @@ export function renderLog(ctx) {
   </section>`);
 
   const planBody = mode.querySelector('[data-body="plan"]');
-  // This mode always lists today, not the day selected on the Plan screen: say which date it is.
-  const planDate = state.plan.days[today] ? today : Object.keys(state.plan.days).sort()[0];
+  // A hand-off from another screen (the shopping list's Swap meal) is used once.
+  const openReplace = ctx.openReplace && typeof ctx.openReplace === 'object' ? ctx.openReplace : null;
+  ctx.openReplace = null;
+  const planDate = logPlanDate({
+    state, today, selectedDate: ctx.selectedDate, openReplace,
+  });
   const todayMeals = state.plan.days[planDate];
   // A slot already saved keeps that one outcome: opening Log again shows it instead
   // of offering to log the same meal a second time.
   const savedOutcomes = savedSlotOutcomes(state.log, planDate, todayMeals, recipesById);
-  planBody.appendChild(el(`<p class="field-label" data-plan-date>Today's planned meals (${planDate})</p>`));
+  const planDateLabel = planDate === today
+    ? `Today's planned meals (${planDate})`
+    : `Planned meals (${planDate})`;
+  planBody.appendChild(el(`<p class="field-label" data-plan-date>${planDateLabel}</p>`));
   // Only the meals that are on are offered; a slot that is switched off has no row.
   for (const slot of activeSlots(state.mealPrefs)) {
     const recipe = recipesById.get(todayMeals?.[slot]);
@@ -1135,6 +1157,17 @@ export function renderLog(ctx) {
       openReplacePicker(row, slot, btn.dataset.replaceRecipe);
     });
   });
+
+  // The shopping list's "Swap meal" opens this screen with that meal's Replace
+  // picker already open. A row that is already logged or chosen stays locked.
+  if (openReplace?.slot) {
+    const forwardRow = [...planBody.querySelectorAll('.plan-meal-row')]
+      .find((row) => row.dataset.slot === openReplace.slot);
+    const forwardBtn = forwardRow?.querySelector('[data-replace-recipe]');
+    if (forwardRow && forwardBtn && !forwardBtn.disabled) {
+      openReplacePicker(forwardRow, openReplace.slot, forwardBtn.dataset.replaceRecipe);
+    }
+  }
 
   const resultsEl = root.querySelector('[data-results]');
   const searchInput = root.querySelector('[data-search]');

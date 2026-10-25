@@ -29,12 +29,17 @@ const ctx = {
   recipesById: new Map(),
   screen: 'targets',
   selectedDate: null,
+  // One-shot hand-off from the shopping list: { date, slot } to open on Log.
+  openReplace: null,
   proposal: null,
   logDraft: null,
   monthBanner: null,
   navigate: (name) => {
     ctx.screen = name;
-    if (name !== 'log') ctx.logDraft = null;
+    if (name !== 'log') {
+      ctx.logDraft = null;
+      ctx.openReplace = null;
+    }
     render();
   },
   refresh: () => {

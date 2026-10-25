@@ -1,10 +1,15 @@
-// Shopping list from the remaining plan. Ticked items move to "Already at home"
-// and leave the to-buy list (no duplicates across sections).
+// Shopping list from the remaining plan. Every ingredient is in one of three
+// states: To buy, In cart or Not found. A ticked item stays visible in the cart
+// list with an Undo, and a missing item leaves the cart so the planner never
+// counts it as bought.
 
 import { todayIso } from './planner.js';
 import { displayFoodName } from './food_display.js';
 
 const CATEGORY_ORDER = ['Produce', 'Protein', 'Dairy', 'Pantry', 'Frozen', 'Other'];
+
+// The order meal slots appear inside a day, for the "meals that use it" list.
+const SLOT_ORDER = ['breakfast', 'lunch', 'dinner', 'snack', 'snack2'];
 
 export const SHOP_EVERY_OPTIONS = [2, 3, 5, 7];
 
@@ -74,15 +79,109 @@ export function savedShopStart(shopStart, today) {
 }
 
 /**
+ * The state of one ingredient on the shopping list. Not found wins over a
+ * tick, so an item can never be both missing and bought for the planner.
+ */
+export function shoppingItemState(foodId, { bought = [], notFound = [] } = {}) {
+  if ((notFound || []).includes(foodId)) return 'notFound';
+  if ((bought || []).includes(foodId)) return 'inCart';
+  return 'toBuy';
+}
+
+/** "3 of 12 in cart": cart items over every item the list holds. */
+export function cartProgress({ toBuy = [], inCart = [], notFound = [] } = {}) {
+  const total = toBuy.length + inCart.length + notFound.length;
+  return {
+    inCart: inCart.length,
+    total,
+    text: `${inCart.length} of ${total} in cart`,
+  };
+}
+
+/**
+ * The planned meals inside the shopping window that use one ingredient, as
+ * { date, slot, recipeId, recipeName }, oldest day first and in slot order.
+ */
+export function mealsUsingFood({
+  plan, recipes = [], recipesById = null, foodId, fromDate, toDate = null,
+}) {
+  const byId = recipesById || new Map(recipes.map((r) => [r.id, r]));
+  const out = [];
+  if (!foodId) return out;
+  for (const [date, meals] of Object.entries(plan?.days || {})) {
+    if (date < fromDate) continue;
+    if (toDate && date > toDate) continue;
+    for (const slot of Object.keys(meals || {})) {
+      const recipe = byId.get(meals[slot]);
+      if (!recipe) continue;
+      if (!(recipe.ingredients || []).some((ing) => ing.foodId === foodId)) continue;
+      out.push({ date, slot, recipeId: recipe.id, recipeName: recipe.name });
+    }
+  }
+  const slotRank = (slot) => {
+    const index = SLOT_ORDER.indexOf(slot);
+    return index === -1 ? SLOT_ORDER.length : index;
+  };
+  out.sort((a, b) => (a.date === b.date ? slotRank(a.slot) - slotRank(b.slot) : a.date.localeCompare(b.date)));
+  return out;
+}
+
+/** Move an item into the cart: state.bought keeps its old meaning for the planner. */
+export function markItemInCart(state, foodId) {
+  if (!state || !foodId) return state;
+  const bought = new Set(state.bought || []);
+  bought.add(foodId);
+  return {
+    ...state,
+    bought: [...bought],
+    notFound: (state.notFound || []).filter((id) => id !== foodId),
+  };
+}
+
+/** Mark an item as not found: it leaves the cart, so it never counts as bought. */
+export function markItemNotFound(state, foodId) {
+  if (!state || !foodId) return state;
+  const notFound = new Set(state.notFound || []);
+  notFound.add(foodId);
+  return {
+    ...state,
+    notFound: [...notFound],
+    bought: (state.bought || []).filter((id) => id !== foodId),
+  };
+}
+
+/** Send an item back to To buy from either the cart or the not-found list. */
+export function undoItemState(state, foodId) {
+  if (!state || !foodId) return state;
+  return {
+    ...state,
+    bought: (state.bought || []).filter((id) => id !== foodId),
+    notFound: (state.notFound || []).filter((id) => id !== foodId),
+  };
+}
+
+/**
+ * "I'm shopping now": start a new window today and clear the not-found list.
+ * Items already in the cart keep their existing meaning and stay as they are.
+ */
+export function shoppingNowState(state, today) {
+  if (!state) return state;
+  return { ...state, shopStart: today, notFound: [] };
+}
+
+/**
  * Build a shopping list for meals inside [fromDate, toDate] (both inclusive).
- * Returns { toBuy: [{ foodId, name, category, grams }], atHome: same }.
+ * Returns { toBuy, inCart, notFound }, each a list of
+ * { foodId, name, category, grams }, plus the same lists grouped by category.
+ * `atHome` is kept as an alias of `inCart` for the existing screens and tests.
  * Each foodId appears in at most one section.
  */
 export function buildShoppingList({
-  plan, recipes, foodsById, bought = [], fromDate = todayIso(), toDate = null,
+  plan, recipes, foodsById, bought = [], notFound = [], fromDate = todayIso(), toDate = null,
 }) {
   const recipesById = new Map(recipes.map((r) => [r.id, r]));
   const boughtSet = new Set(bought);
+  const notFoundSet = new Set(notFound);
   const gramsByFood = new Map();
 
   for (const [date, meals] of Object.entries(plan?.days || {})) {
@@ -99,7 +198,8 @@ export function buildShoppingList({
   }
 
   const toBuy = [];
-  const atHome = [];
+  const inCart = [];
+  const missing = [];
 
   for (const [foodId, grams] of gramsByFood) {
     const food = foodsById.get(foodId);
@@ -109,7 +209,8 @@ export function buildShoppingList({
       category: food?.category || 'Other',
       grams: Math.round(grams),
     };
-    if (boughtSet.has(foodId)) atHome.push(item);
+    if (notFoundSet.has(foodId)) missing.push(item);
+    else if (boughtSet.has(foodId)) inCart.push(item);
     else toBuy.push(item);
   }
 
@@ -134,9 +235,13 @@ export function buildShoppingList({
 
   return {
     toBuy,
-    atHome,
+    inCart,
+    notFound: missing,
+    atHome: inCart,
     toBuyGrouped: byCategory(toBuy),
-    atHomeGrouped: byCategory(atHome),
+    inCartGrouped: byCategory(inCart),
+    notFoundGrouped: byCategory(missing),
+    atHomeGrouped: byCategory(inCart),
   };
 }
 

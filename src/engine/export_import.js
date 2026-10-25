@@ -34,7 +34,10 @@ function reject(message) {
  */
 export function buildExportPayload(state) {
   const s = state || {};
-  return {
+  const notFound = Array.isArray(s.notFound)
+    ? s.notFound.filter((id) => typeof id === 'string')
+    : [];
+  const payload = {
     version: EXPORT_VERSION,
     app: EXPORT_APP_NAME,
     exportedAt: new Date().toISOString(),
@@ -57,6 +60,10 @@ export function buildExportPayload(state) {
     // Kept as an empty list in the schema for forward compatibility.
     labNotes: [],
   };
+  // Only written when there is something to restore, so a backup of an older
+  // state stays exactly as it was and older files stay readable.
+  if (notFound.length > 0) payload.notFound = notFound;
+  return payload;
 }
 
 /**
@@ -81,6 +88,7 @@ export function validateImportPayload(data) {
   const targets = data.targets ?? [];
   const log = data.log ?? [];
   const bought = data.bought ?? [];
+  const notFound = data.notFound ?? [];
   const keptForBought = data.keptForBought ?? [];
   const labNotes = data.labNotes ?? [];
   const plan = data.plan ?? null;
@@ -90,6 +98,9 @@ export function validateImportPayload(data) {
   if (!isEntryList(targets)) return reject('This backup has an unexpected format for targets.');
   if (!isEntryList(log)) return reject('This backup has an unexpected format for meal logs.');
   if (!Array.isArray(bought)) return reject('This backup has an unexpected format for shopping ticks.');
+  if (!Array.isArray(notFound) || !notFound.every((id) => typeof id === 'string')) {
+    return reject('This backup has an unexpected format for shopping items marked not found.');
+  }
   if (!isEntryList(keptForBought)) return reject('This backup has an unexpected format for kept meals.');
   if (!isEntryList(labNotes)) return reject('This backup has an unexpected format for lab notes.');
   if (!isPlan(plan)) return reject('This backup has an unexpected format for the month plan.');
@@ -148,6 +159,8 @@ export function applyImportPayload(currentState, data) {
     planBase: data.planBase ?? null,
     log: (data.log ?? []).map((entry) => ({ ...entry })),
     bought: [...(data.bought ?? [])],
+    // An older backup without this list restores it as empty.
+    notFound: [...(data.notFound ?? [])],
     keptForBought: (data.keptForBought ?? []).map((entry) => ({ ...entry })),
     shopEvery: [2, 3, 5, 7].includes(data.shopEvery) ? data.shopEvery : 7,
     shopStart: typeof data.shopStart === 'string' ? data.shopStart : null,

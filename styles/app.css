@@ -303,13 +303,34 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .shop-group { margin-bottom: 14px; }
 .shop-group h3 { font-size: 0.95rem; color: var(--muted); margin-bottom: 6px; }
 .shop-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 8px 0; border-bottom: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 6px 10px; padding: 8px 0; border-bottom: 1px solid var(--line);
 }
-.shop-item label { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-.shop-item.is-bought span { text-decoration: line-through; color: var(--muted); }
-.shop-item input { width: 26px; height: 26px; accent-color: var(--green); }
-.shop-item label { min-height: 44px; }
+.shop-item label {
+  display: flex; flex: 1 1 auto; align-items: center; gap: 10px; cursor: pointer;
+  min-height: 44px; min-width: 44px;
+}
+.shop-item label span, .shop-item-main > span, .shop-swap-row > span { overflow-wrap: anywhere; }
+.shop-swap-row > span { flex: 1 1 160px; }
+.shop-item.is-bought label span { text-decoration: line-through; color: var(--muted); }
+.shop-item input[type="checkbox"] { width: 44px; height: 44px; accent-color: var(--green); }
+.shop-item-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.shop-item .btn-small, .shop-item-actions .btn-small, .shop-swap-row .btn-small { min-height: 44px; }
+.shop-progress { font-weight: 700; margin: 4px 0 10px; }
+.badge-in-cart, .badge-not-found {
+  display: inline-block; font-size: 0.7rem; font-weight: 600;
+  padding: 2px 8px; border-radius: 99px;
+}
+.badge-in-cart { background: var(--green); color: #fff; }
+.badge-not-found { background: var(--tan); color: #3a2f18; }
+.shop-item.is-not-found { display: block; }
+.shop-item-main { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.shop-swap-hint { margin: 4px 0; }
+.shop-swaps { list-style: none; margin: 0; padding: 0; }
+.shop-swap-row {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 6px 10px; padding: 4px 0;
+}
 
 .footer-note { text-align: center; color: var(--muted); font-size: 0.82rem; margin: 16px 0 8px; }
 .error { background: #fbf1e3; border: 1px solid var(--tan); border-radius: var(--radius); padding: 16px; }
@@ -346,10 +367,16 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .upcoming-day { padding: 6px 0; border-bottom: 1px solid var(--line); }
 .upcoming-day ul { list-style: none; margin: 4px 0 0; padding: 0; font-size: 0.92rem; }
 
-/* Touch targets: at least 40-44 px. */
-.btn-icon { min-width: 40px; min-height: 40px; }
+/* Touch targets: at least 44 by 44 px, including every tick and x control. */
+.btn-icon { min-width: 44px; min-height: 44px; }
 .target-row select, .target-row input, .logged-item input { min-height: 44px; }
 input[type="checkbox"], input[type="radio"] { min-width: 28px; min-height: 28px; }
+/* The shopping list and My meals ticks are full 44 px targets. */
+.shop-item input[type="checkbox"], .my-meals input[type="checkbox"] { width: 44px; height: 44px; }
+.my-meals .meal-pref {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 44px; min-width: 44px; cursor: pointer;
+}
 
 /* Print: a clean sheet with no navigation or buttons. */
 @media print {

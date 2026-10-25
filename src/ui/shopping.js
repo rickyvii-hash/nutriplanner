@@ -1,12 +1,19 @@
 import {
   buildShoppingList,
+  cartProgress,
+  mealsUsingFood,
+  markItemInCart,
+  markItemNotFound,
+  shoppingNowState,
   shoppingWindow,
   currentShopStart,
+  undoItemState,
   windowCoverage,
   savedShopStart,
   SHOP_EVERY_OPTIONS,
 } from '../engine/shopping.js';
 import { todayIso } from '../engine/planner.js';
+import { slotLabel } from '../engine/meal_prefs.js';
 import { displayFoodName } from '../engine/food_display.js';
 import { el, escapeHtml } from './dom.js';
 
@@ -16,7 +23,7 @@ export function renderShopping(ctx) {
 
   root.appendChild(el(`<header class="brand brand-compact">
     <span class="logo" aria-hidden="true">🌿</span>
-    <div><h1>Shopping list</h1><p>Tick what you already have at home.</p></div>
+    <div><h1>Shopping list</h1><p>Tick items as they go in your cart.</p></div>
   </header>`));
 
   if (!state.plan) {
@@ -59,7 +66,8 @@ export function renderShopping(ctx) {
     btn.addEventListener('click', () => pickFrequency(Number(btn.dataset.shopEvery)));
   });
   windowCard.querySelector('[data-action="shop-now"]').addEventListener('click', () => {
-    ctx.onChange({ ...state, shopEvery, shopStart: todayIso() });
+    // A new window; the not-found list belongs to the old trip and is cleared.
+    ctx.onChange(shoppingNowState({ ...state, shopEvery }, todayIso()));
   });
 
   const list = buildShoppingList({
@@ -67,14 +75,19 @@ export function renderShopping(ctx) {
     recipes,
     foodsById,
     bought: state.bought || [],
+    notFound: state.notFound || [],
     fromDate: window.from,
     toDate: window.to,
   });
+  const progress = cartProgress(list);
 
-  const buyCard = el(`<section class="card"><h2>To buy</h2><div class="shop-groups" data-buy></div></section>`);
+  const buyCard = el(`<section class="card"><h2>To buy</h2>
+    <p class="shop-progress" data-cart-progress>${progress.text}</p>
+    <div class="shop-groups" data-buy></div>
+  </section>`);
   const buyEl = buyCard.querySelector('[data-buy]');
   if (list.toBuyGrouped.length === 0) {
-    buyEl.appendChild(el(`<p class="muted">Everything in this shopping window is already at home.</p>`));
+    buyEl.appendChild(el(`<p class="muted">Everything in this shopping window is in the cart or at home.</p>`));
   } else {
     for (const group of list.toBuyGrouped) {
       const block = el(`<div class="shop-group"><h3>${escapeHtml(group.category)}</h3><ul></ul></div>`);
@@ -82,10 +95,13 @@ export function renderShopping(ctx) {
       for (const item of group.items) {
         const li = el(`<li class="shop-item">
           <label>
-            <input type="checkbox" data-food="${escapeHtml(item.foodId)}">
+            <input type="checkbox" data-food="${escapeHtml(item.foodId)}" aria-label="In cart: ${escapeHtml(displayFoodName(item.name) || item.foodId)}">
             <span>${escapeHtml(displayFoodName(item.name) || item.foodId)}</span>
           </label>
-          <span class="muted tiny">${item.grams} g</span>
+          <span class="shop-item-actions">
+            <span class="muted tiny">${item.grams} g</span>
+            <button type="button" class="btn-secondary btn-small" data-not-found="${escapeHtml(item.foodId)}">Not found</button>
+          </span>
         </li>`);
         ul.appendChild(li);
       }
@@ -94,28 +110,76 @@ export function renderShopping(ctx) {
   }
   root.appendChild(buyCard);
 
-  const homeCard = el(`<section class="card"><h2>Already at home</h2><div class="shop-groups" data-home></div></section>`);
-  const homeEl = homeCard.querySelector('[data-home]');
-  if (list.atHome.length === 0) {
-    homeEl.appendChild(el(`<p class="muted">Tick items above when you buy them. They will move here and leave the to-buy list.</p>`));
+  // Directly under To buy: a ticked item stays visible, struck through, with Undo.
+  const cartCard = el(`<section class="card"><h2>In cart / at home</h2>
+    <div class="shop-groups" data-cart></div>
+  </section>`);
+  const cartEl = cartCard.querySelector('[data-cart]');
+  if (list.inCart.length === 0) {
+    cartEl.appendChild(el(`<p class="muted">Tick items above when you put them in the cart. They stay here with an Undo button.</p>`));
   } else {
-    for (const group of list.atHomeGrouped) {
+    for (const group of list.inCartGrouped) {
       const block = el(`<div class="shop-group"><h3>${escapeHtml(group.category)}</h3><ul></ul></div>`);
       const ul = block.querySelector('ul');
       for (const item of group.items) {
         const li = el(`<li class="shop-item is-bought">
           <label>
-            <input type="checkbox" checked data-food="${escapeHtml(item.foodId)}">
+            <input type="checkbox" checked data-food="${escapeHtml(item.foodId)}" aria-label="In cart: ${escapeHtml(displayFoodName(item.name) || item.foodId)}">
             <span>${escapeHtml(displayFoodName(item.name) || item.foodId)}</span>
           </label>
-          <span class="muted tiny">${item.grams} g</span>
+          <span class="shop-item-actions">
+            <span class="badge-in-cart">In cart</span>
+            <span class="muted tiny">${item.grams} g</span>
+            <button type="button" class="btn-secondary btn-small" data-undo-food="${escapeHtml(item.foodId)}">Undo</button>
+          </span>
         </li>`);
         ul.appendChild(li);
       }
-      homeEl.appendChild(block);
+      cartEl.appendChild(block);
     }
   }
-  root.appendChild(homeCard);
+  root.appendChild(cartCard);
+
+  // Items that were not in the shop: each row says which planned meals use it.
+  if (list.notFound.length > 0) {
+    const missCard = el(`<section class="card"><h2>Not found</h2>
+      <div class="shop-groups" data-notfound></div>
+    </section>`);
+    const missEl = missCard.querySelector('[data-notfound]');
+    for (const group of list.notFoundGrouped) {
+      const block = el(`<div class="shop-group"><h3>${escapeHtml(group.category)}</h3><ul></ul></div>`);
+      const ul = block.querySelector('ul');
+      for (const item of group.items) {
+        const meals = mealsUsingFood({
+          plan: state.plan,
+          recipes,
+          recipesById: ctx.recipesById,
+          foodId: item.foodId,
+          fromDate: window.from,
+          toDate: window.to,
+        });
+        const swapRows = meals.length === 0
+          ? '<li class="muted tiny">No planned meal in this window uses it.</li>'
+          : meals.map((meal) => `<li class="shop-swap-row">
+              <span>${escapeHtml(meal.date)} · ${escapeHtml(slotLabel(meal.slot))} · ${escapeHtml(meal.recipeName)}</span>
+              <button type="button" class="btn-secondary btn-small" data-swap-meal="${escapeHtml(item.foodId)}" data-date="${escapeHtml(meal.date)}" data-slot="${escapeHtml(meal.slot)}">Swap meal</button>
+            </li>`).join('');
+        const li = el(`<li class="shop-item is-not-found">
+          <div class="shop-item-main">
+            <span>${escapeHtml(displayFoodName(item.name) || item.foodId)}</span>
+            <span class="badge-not-found">Not found</span>
+            <span class="muted tiny">${item.grams} g</span>
+            <button type="button" class="btn-secondary btn-small" data-undo-food="${escapeHtml(item.foodId)}">Undo</button>
+          </div>
+          <p class="muted tiny shop-swap-hint">Not in the shop? Swap one of the meals that use it.</p>
+          <ul class="shop-swaps">${swapRows}</ul>
+        </li>`);
+        ul.appendChild(li);
+      }
+      missEl.appendChild(block);
+    }
+    root.appendChild(missCard);
+  }
 
   if (state.keptForBought?.length) {
     root.appendChild(el(`<section class="card note-card">
@@ -126,13 +190,37 @@ export function renderShopping(ctx) {
 
   root.appendChild(el(`<p class="footer-note">Support tool, not medical advice.</p>`));
 
+  // A tick means "in the cart"; unticking or Undo puts the item back in To buy.
   root.querySelectorAll('input[data-food]').forEach((input) => {
     input.addEventListener('change', () => {
       const id = input.dataset.food;
-      const bought = new Set(state.bought || []);
-      if (input.checked) bought.add(id);
-      else bought.delete(id);
-      ctx.onChange({ ...state, bought: [...bought] });
+      ctx.onChange(input.checked ? markItemInCart(state, id) : undoItemState(state, id));
+    });
+  });
+
+  // Not found keeps the item on screen and takes it out of the cart.
+  root.querySelectorAll('[data-not-found]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      ctx.onChange(markItemNotFound(state, btn.dataset.notFound));
+    });
+  });
+
+  root.querySelectorAll('[data-undo-food]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      ctx.onChange(undoItemState(state, btn.dataset.undoFood));
+    });
+  });
+
+  // Swap a planned meal that uses the missing ingredient: the Log screen opens
+  // for that date with the meal's Replace picker already open.
+  root.querySelectorAll('[data-swap-meal]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const date = btn.dataset.date;
+      const slot = btn.dataset.slot;
+      if (!date || !slot) return;
+      ctx.selectedDate = date;
+      ctx.openReplace = { date, slot };
+      ctx.navigate('log');
     });
   });
 
