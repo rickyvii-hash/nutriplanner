@@ -126,6 +126,18 @@ export function renderPlan(ctx) {
   summaryCard.querySelector('[data-action="summary"]').addEventListener('click', () => ctx.navigate('summary'));
   root.appendChild(summaryCard);
 
+  const labCard = el(`<section class="card summary-cta">
+    <div class="row">
+      <div>
+        <h3>Lab notes</h3>
+        <p class="muted tiny">Record values from blood tests you choose to keep on this device.</p>
+      </div>
+      <button type="button" class="btn-secondary btn-small" data-action="lab-notes">Lab notes</button>
+    </div>
+  </section>`);
+  labCard.querySelector('[data-action="lab-notes"]').addEventListener('click', () => ctx.navigate('lab-notes'));
+  root.appendChild(labCard);
+
   const dates = Object.keys(state.plan.days).sort();
   const today = todayIso();
   let selected = ctx.selectedDate && state.plan.days[ctx.selectedDate] ? ctx.selectedDate : today;

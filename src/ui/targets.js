@@ -247,6 +247,7 @@ export function renderTargets(ctx) {
 
   const actions = el(`<div class="stack-actions">
     <button type="button" class="btn-secondary" data-action="add-target">Add custom target</button>
+    <button type="button" class="btn-secondary" data-action="lab-notes">Lab notes</button>
     <button type="button" class="btn-primary" data-action="build">Build my month plan</button>
   </div>`);
   root.appendChild(actions);
@@ -312,6 +313,10 @@ export function renderTargets(ctx) {
 
   root.querySelector('[data-action="build"]')?.addEventListener('click', () => {
     ctx.buildPlan();
+  });
+
+  root.querySelector('[data-action="lab-notes"]')?.addEventListener('click', () => {
+    ctx.navigate('lab-notes');
   });
 
   return root;
