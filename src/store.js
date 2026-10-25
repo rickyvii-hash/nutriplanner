@@ -22,6 +22,9 @@ export function emptyAppState() {
     log: [],
     bought: [],
     keptForBought: [],
+    // One entry per trigger day whose Plan updated was accepted or rejected:
+    // { triggerDate, accepted }. The shown plan is recomputed from these.
+    updateDecisions: [],
     shopEvery: 7,
     shopStart: null,
     pendingProposal: null,
@@ -90,6 +93,7 @@ export function changeProfileState(state, { keepLog = true } = {}) {
     planBase: null,
     pendingProposal: null,
     keptForBought: [],
+    updateDecisions: [],
   };
   if (keepLog) {
     return {
@@ -210,19 +214,55 @@ export function withoutSecondSnack(state) {
 }
 
 /**
+ * Record what the person decided about the update for one log day. A later
+ * decision for the same day replaces the earlier one. The recompute drops a
+ * decision whose log entry is gone, so it never outlives its meal.
+ */
+export function recordUpdateDecision(state, triggerDate, accepted) {
+  if (!state) return state;
+  if (typeof triggerDate !== 'string' || !triggerDate) return state;
+  const kept = (Array.isArray(state.updateDecisions) ? state.updateDecisions : [])
+    .filter((decision) => decision?.triggerDate !== triggerDate);
+  return {
+    ...state,
+    updateDecisions: [...kept, { triggerDate, accepted: accepted === true }],
+  };
+}
+
+/**
+ * The trigger day a proposal belongs to: the day whose log drove the update.
+ * `replan` returns it as `triggerDate`; a proposal without one records nothing.
+ */
+function proposalTriggerDate(proposal) {
+  if (typeof proposal?.triggerDate === 'string') return proposal.triggerDate;
+  return null;
+}
+
+/**
  * Apply an accepted update proposal. The plan before the update is remembered in
  * `planBase` (the first time only), so a later log correction can replan from the
  * plan that existed before any make-up was accepted instead of from the already
- * compensated days.
+ * compensated days. The decision for the trigger day is saved with the plan.
  */
 export function acceptUpdatedPlan(state, proposal) {
   if (!state || !proposal) return state;
+  const withDecision = recordUpdateDecision(state, proposalTriggerDate(proposal), true);
   return withoutPendingProposal({
-    ...state,
+    ...withDecision,
     plan: proposal.plan,
     keptForBought: proposal.keptForBought || [],
     planBase: state.planBase || state.plan || null,
   });
+}
+
+/**
+ * Keep the original plan after an update proposal. The decision is remembered
+ * (accepted: false) so a later correction never re-applies the refused update.
+ */
+export function rejectUpdatedPlan(state, proposal) {
+  if (!state) return state;
+  const withDecision = proposal ? recordUpdateDecision(state, proposalTriggerDate(proposal), false) : state;
+  return withoutPendingProposal(withDecision);
 }
 
 /** Calendar month as YYYY-MM in local time. */
@@ -266,6 +306,8 @@ export function applyStaleMonthOnStart(state, now = new Date()) {
       plan: null,
       planBase: null,
       keptForBought: [],
+      // The plan those updates belonged to is gone with the old month.
+      updateDecisions: [],
     }),
     banner,
     screenHint: 'targets',
@@ -308,6 +350,9 @@ export function loadState() {
       log: Array.isArray(data.log) ? data.log : [],
       bought: Array.isArray(data.bought) ? data.bought : [],
       keptForBought: Array.isArray(data.keptForBought) ? data.keptForBought : [],
+      updateDecisions: (Array.isArray(data.updateDecisions) ? data.updateDecisions : [])
+        .filter((decision) => decision && typeof decision.triggerDate === 'string')
+        .map((decision) => ({ triggerDate: decision.triggerDate, accepted: decision.accepted === true })),
       shopEvery: [2, 3, 5, 7].includes(data.shopEvery) ? data.shopEvery : 7,
       shopStart: typeof data.shopStart === 'string' ? data.shopStart : null,
       pendingProposal: data.pendingProposal && typeof data.pendingProposal === 'object'
@@ -346,6 +391,7 @@ export function saveState(state) {
         log: state.log,
         bought: state.bought,
         keptForBought: state.keptForBought || [],
+        updateDecisions: Array.isArray(state.updateDecisions) ? state.updateDecisions : [],
         shopEvery: state.shopEvery || 7,
         shopStart: state.shopStart || null,
         pendingProposal: state.pendingProposal || null,

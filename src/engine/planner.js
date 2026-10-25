@@ -777,6 +777,7 @@ export function replan(state) {
       recentTotals,
       windowDates: [],
       skipNoMin: true,
+      triggerDate: fromDate,
     };
   }
 
@@ -1071,6 +1072,8 @@ export function replan(state) {
     replacementOver,
     replacementUnder,
     replacementPrimary,
+    // The day whose log drove this update; an accepted update is remembered by it.
+    triggerDate: fromDate,
   };
 }
 

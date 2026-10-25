@@ -1,7 +1,7 @@
 import {
   loadState, saveState, getStorageNotice, clearState,
   proposalToStore, pendingProposalForPlan, withoutPendingProposal,
-  acceptUpdatedPlan, applyStaleMonthOnStart, startOverState, changeProfileState,
+  acceptUpdatedPlan, rejectUpdatedPlan, applyStaleMonthOnStart, startOverState, changeProfileState,
   restoredStateAndScreen,
 } from './store.js';
 import { buildExportPayload, applyImportPayload, EXPORT_FILE_NAME } from './engine/export_import.js';
@@ -136,7 +136,8 @@ const ctx = {
     ctx.navigate('plan');
   },
   keepOriginalPlan: () => {
-    ctx.state = withoutPendingProposal(ctx.state);
+    // Remember the refusal, so a later correction never re-applies this update.
+    ctx.state = rejectUpdatedPlan(ctx.state, ctx.proposal);
     saveState(ctx.state);
     ctx.proposal = null;
     ctx.navigate('plan');

@@ -48,6 +48,12 @@ export function buildExportPayload(state) {
     keptForBought: Array.isArray(s.keptForBought) ? s.keptForBought : [],
     shopEvery: s.shopEvery ?? 7,
     shopStart: s.shopStart ?? null,
+    // Accept/reject decisions per log day; the shown plan is recomputed from these.
+    updateDecisions: Array.isArray(s.updateDecisions)
+      ? s.updateDecisions
+        .filter((d) => d && typeof d.triggerDate === 'string')
+        .map((d) => ({ triggerDate: d.triggerDate, accepted: d.accepted === true }))
+      : [],
     // Kept as an empty list in the schema for forward compatibility.
     labNotes: [],
   };
@@ -100,6 +106,16 @@ export function validateImportPayload(data) {
   if (data.shopStart !== undefined && data.shopStart !== null && typeof data.shopStart !== 'string') {
     return reject('This backup has an unexpected format for the shopping start date.');
   }
+  if (data.updateDecisions !== undefined && data.updateDecisions !== null) {
+    if (!Array.isArray(data.updateDecisions)) {
+      return reject('This backup has an unexpected format for plan update decisions.');
+    }
+    for (const d of data.updateDecisions) {
+      if (!isPlainObject(d) || typeof d.triggerDate !== 'string' || typeof d.accepted !== 'boolean') {
+        return reject('This backup has an unexpected format for plan update decisions.');
+      }
+    }
+  }
 
   return {
     ok: true,
@@ -136,6 +152,11 @@ export function applyImportPayload(currentState, data) {
     shopEvery: [2, 3, 5, 7].includes(data.shopEvery) ? data.shopEvery : 7,
     shopStart: typeof data.shopStart === 'string' ? data.shopStart : null,
     pendingProposal: null,
+    updateDecisions: Array.isArray(data.updateDecisions)
+      ? data.updateDecisions
+        .filter((d) => d && typeof d.triggerDate === 'string')
+        .map((d) => ({ triggerDate: d.triggerDate, accepted: d.accepted === true }))
+      : [],
     // The field is accepted for older files but the restored state keeps it empty.
     labNotes: [],
   };
