@@ -15,7 +15,8 @@ import {
 import { renderTargets } from './ui/targets.js';
 import { renderPlan, daySaveDecision } from './ui/plan.js';
 import { renderLog, logEntriesForSave, mergeLogEntries } from './ui/log.js';
-import { recomputePlanAfterSave } from './engine/plan_from_log.js';
+import { recomputePlanAfterSave, recomputeShownPlan } from './engine/plan_from_log.js';
+import { makePlannedExtra, plannedExtraToLogEntry } from './engine/planned_extras.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
@@ -26,6 +27,41 @@ import { openGuide } from './ui/guide.js';
 import { resetTransientScreenState } from './screen_state.js';
 
 const app = document.getElementById('app');
+
+/**
+ * Save a change to the planned outside-the-menu meals and recompute the shown
+ * plan with the same pure function the log uses: the base plan, the log, the
+ * decisions and the planned meals are the only inputs. Returns the recompute
+ * result, whose proposal is null when the plan does not need to change.
+ */
+function afterPlannedChange(context, { plannedExtras, log, fromDate }) {
+  const recomputed = recomputeShownPlan({
+    planBase: context.state.planBase || context.state.plan,
+    plan: context.state.plan,
+    log,
+    decisions: context.state.updateDecisions || [],
+    plannedExtras,
+    today: todayIso(),
+    targets: context.state.targets,
+    recipes: context.recipes,
+    foodsById: context.foodsById,
+    bought: context.state.bought || [],
+    mealPrefs: context.state.mealPrefs,
+    fromDate,
+  });
+  context.state = {
+    ...context.state,
+    log,
+    plannedExtras,
+    updateDecisions: recomputed.decisions,
+    pendingProposal: proposalToStore(recomputed.result),
+  };
+  saveState(context.state);
+  context.proposal = recomputed.result;
+  context.logDraft = null;
+  context.selectedDate = fromDate;
+  return recomputed;
+}
 
 const ctx = {
   state: loadState(),
@@ -152,6 +188,7 @@ const ctx = {
         foodsById: ctx.foodsById,
         bought: ctx.state.bought || [],
         mealPrefs: ctx.state.mealPrefs,
+        plannedExtras: ctx.state.plannedExtras || [],
         fromDate: when.date,
       });
       const result = recomputed.result;
@@ -195,6 +232,7 @@ const ctx = {
       foodsById: ctx.foodsById,
       fromDate: when.date,
       mealPrefs: ctx.state.mealPrefs,
+      plannedExtras: ctx.state.plannedExtras || [],
     });
     // Days that are already over keep the meals of the plan in force right now:
     // make-up accepted for an earlier log must not be wiped by a replan that starts
@@ -227,6 +265,76 @@ const ctx = {
     }
     ctx.navigate('updated');
     return result;
+  },
+  // D26: a meal the person already knows they will eat outside the menu. It is
+  // not eaten food: it goes to its own list, the plan leaves room for it on its
+  // date, and the usual Plan updated screen asks whether to keep or use it.
+  savePlannedExtra: (value) => {
+    if (!ctx.state?.plan) return null;
+    const planned = Array.isArray(ctx.state.plannedExtras) ? ctx.state.plannedExtras : [];
+    let extra = makePlannedExtra(value);
+    if (extra.items.length === 0) return null;
+    // Keep every planned meal addressable even when two share a date and time.
+    if (planned.some((item) => item.id === extra.id)) {
+      let n = 2;
+      while (planned.some((item) => item.id === `${extra.id}-${n}`)) n += 1;
+      extra = { ...extra, id: `${extra.id}-${n}` };
+    }
+    const recomputed = afterPlannedChange(ctx, {
+      plannedExtras: [...planned, extra],
+      log: ctx.state.log || [],
+      fromDate: extra.date,
+    });
+    if (recomputed.proposal) {
+      ctx.navigate('updated');
+      return recomputed.result;
+    }
+    ctx.dayStatus = `Planned for ${extra.date}. Plan unchanged.`;
+    ctx.navigate('plan');
+    return recomputed.result;
+  },
+  // "Ate it" moves the planned meal into the log with its own date and time, then
+  // the plan is recomputed from the base through the normal path.
+  atePlannedExtra: (id) => {
+    const planned = Array.isArray(ctx.state.plannedExtras) ? ctx.state.plannedExtras : [];
+    const extra = planned.find((item) => item.id === id);
+    if (!extra || !ctx.state.plan) return null;
+    const entry = plannedExtraToLogEntry(extra);
+    const log = mergeLogEntries(ctx.state.log, [entry], {
+      date: extra.date,
+      planDay: ctx.state.plan.days?.[extra.date],
+      recipesById: ctx.recipesById,
+    });
+    const recomputed = afterPlannedChange(ctx, {
+      plannedExtras: planned.filter((item) => item.id !== id),
+      log,
+      fromDate: extra.date,
+    });
+    if (recomputed.proposal) {
+      ctx.navigate('updated');
+      return recomputed.result;
+    }
+    ctx.dayStatus = `Added for ${extra.date}. Plan unchanged.`;
+    ctx.navigate('plan');
+    return recomputed.result;
+  },
+  // "Remove" deletes the planned meal and recomputes everything from the base.
+  removePlannedExtra: (id) => {
+    const planned = Array.isArray(ctx.state.plannedExtras) ? ctx.state.plannedExtras : [];
+    const extra = planned.find((item) => item.id === id);
+    if (!extra || !ctx.state.plan) return null;
+    const recomputed = afterPlannedChange(ctx, {
+      plannedExtras: planned.filter((item) => item.id !== id),
+      log: ctx.state.log || [],
+      fromDate: extra.date,
+    });
+    if (recomputed.proposal) {
+      ctx.navigate('updated');
+      return recomputed.result;
+    }
+    ctx.dayStatus = 'Planned meal removed. Plan unchanged.';
+    ctx.navigate('plan');
+    return recomputed.result;
   },
   useUpdatedPlan: () => {
     if (!ctx.proposal) return;

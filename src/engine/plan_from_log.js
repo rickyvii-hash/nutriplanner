@@ -5,6 +5,7 @@
 // base plan in date order, so an expired make-up window cannot be re-applied.
 
 import { replan, todayIso } from './planner.js';
+import { normalizePlannedExtras } from './planned_extras.js';
 
 /** Shown when a correction invalidated one or more earlier decisions. */
 export const STALE_DECISIONS_NOTICE = 'Some earlier updates were recomputed after your change';
@@ -13,17 +14,20 @@ export const STALE_DECISIONS_NOTICE = 'Some earlier updates were recomputed afte
  * Keep only the decisions whose trigger day still has a log entry (and belongs
  * to this plan month). The last decision for a day wins. Sorted by trigger date.
  */
-export function normalizeUpdateDecisions(decisions, log, plan) {
+export function normalizeUpdateDecisions(decisions, log, plan, plannedExtras = []) {
   const loggedDates = new Set(
     (Array.isArray(log) ? log : []).map((entry) => entry?.date).filter(Boolean),
   );
+  // A planned meal is a trigger like a log entry: its accepted update stays valid
+  // while that planned meal is still on its date.
+  const plannedDates = new Set(normalizePlannedExtras(plannedExtras).map((extra) => extra.date));
   const byDate = new Map();
   let dropped = false;
   for (const decision of Array.isArray(decisions) ? decisions : []) {
     const triggerDate = decision?.triggerDate;
     if (typeof triggerDate !== 'string' || !triggerDate) continue;
     const inPlan = !plan?.days || Boolean(plan.days[triggerDate]);
-    if (!loggedDates.has(triggerDate) || !inPlan) {
+    if ((!loggedDates.has(triggerDate) && !plannedDates.has(triggerDate)) || !inPlan) {
       dropped = true;
       continue;
     }
@@ -90,14 +94,17 @@ export function recomputeShownPlan({
   foodsById = new Map(),
   bought = [],
   mealPrefs,
+  plannedExtras = [],
   fromDate = null,
 } = {}) {
   const base = planBase || plan;
   if (!base || !base.days) return { plan: base, decisions: [], notice: null, proposal: null, result: null };
 
   const logList = Array.isArray(log) ? log : [];
+  const plannedList = normalizePlannedExtras(plannedExtras);
+  const plannedDates = new Set(plannedList.map((extra) => extra.date));
   const hadDecisions = Array.isArray(decisions) && decisions.length > 0;
-  const { decisions: kept, dropped } = normalizeUpdateDecisions(decisions, logList, base);
+  const { decisions: kept, dropped } = normalizeUpdateDecisions(decisions, logList, base, plannedList);
   const days = copyDays(base);
 
   let source = null;
@@ -115,9 +122,14 @@ export function recomputeShownPlan({
       fromDate: triggerDate,
       logFromDate: triggerDate,
       mealPrefs,
+      plannedExtras: plannedList,
     });
     for (const [date, meals] of Object.entries(result.plan?.days || {})) {
-      if (date > triggerDate) days[date] = { ...meals };
+      // A planned meal changes its own day, so that day is copied as well; a log
+      // trigger leaves its day as planned and only the days after it may change.
+      if (date > triggerDate || (date === triggerDate && plannedDates.has(date))) {
+        days[date] = { ...meals };
+      }
     }
     source = result;
   }
@@ -143,6 +155,7 @@ export function recomputeShownPlan({
       fromDate: replanFrom,
       logFromDate,
       mealPrefs,
+      plannedExtras: plannedList,
     });
     if (!hadDecisions) {
       for (const [date, meals] of Object.entries(source.plan?.days || {})) {

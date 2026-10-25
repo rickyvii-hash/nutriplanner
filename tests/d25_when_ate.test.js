@@ -135,7 +135,7 @@ test('D25: the day screen lists that date with the time and sorts by date and ti
   assert.match(planSrc, /entry\.date, entry\.time/);
 });
 
-test('D25: screens carry the chips and the validation message, not a third chip', () => {
+test('D25: screens carry the past moment chips and the validation message', () => {
   assert.match(logSrc, /When did you eat it\?/);
   assert.match(logSrc, />Just now</);
   assert.match(logSrc, />Earlier</);
@@ -145,8 +145,9 @@ test('D25: screens carry the chips and the validation message, not a third chip'
   assert.match(logSrc, /type="time"/);
   assert.match(logSrc, /validateEatenWhen/);
   assert.match(logSrc, /data-when-error/);
-  assert.doesNotMatch(logSrc, />Planned</);
-  assert.doesNotMatch(logSrc, /data-when-planned/);
+  // D26 adds the third chip for a meal that will be eaten later; it is not eaten food.
+  assert.match(logSrc, />Planned<\/button>/);
+  assert.match(logSrc, /data-when-planned/);
   assert.match(stylesSrc, /\.when-chips/);
 });
 

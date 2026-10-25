@@ -3,6 +3,9 @@ import { activeSlots, slotLabel } from '../engine/meal_prefs.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { displayFoodName } from '../engine/food_display.js';
 import {
+  plannedExtrasForDate, plannedExtraLabel, plannedExtraFoodNames,
+} from '../engine/planned_extras.js';
+import {
   planReachGaps, PLAN_REACH_TITLE, PLAN_REACH_HINT,
 } from '../engine/plan_check.js';
 import {
@@ -667,6 +670,27 @@ export function renderPlan(ctx) {
     if (actions.childElementCount === 0) actions.remove();
     rowsBySlot.set(slot, { item, recipe });
     list.appendChild(item);
+  }
+  // Meals the person already planned outside the menu for this day are expected
+  // intake, not logged food: they show under the meals with Ate it and Remove.
+  // A day that has passed without "Ate it" says "not logged" and keeps both
+  // buttons, so a planned meal never turns into eaten food by itself.
+  for (const extra of plannedExtrasForDate(state.plannedExtras, selected)) {
+    const extraId = String(extra.id || '');
+    const names = plannedExtraFoodNames(extra, foodsById).join(', ');
+    const li = el(`<li class="planned-extra" data-planned-extra="${escapeHtml(extraId)}">
+      <div class="planned-extra-head">
+        <span class="planned-extra-kind">${escapeHtml(plannedExtraLabel(extra, { today }))}</span>
+        <span class="planned-extra-foods">${escapeHtml(names)}</span>
+      </div>
+      <div class="meal-row-actions">
+        <button type="button" class="btn-secondary btn-small" data-planned-ate="${escapeHtml(extraId)}">Ate it</button>
+        <button type="button" class="btn-secondary btn-small" data-planned-remove="${escapeHtml(extraId)}">Remove</button>
+      </div>
+    </li>`);
+    li.querySelector('[data-planned-ate]').addEventListener('click', () => ctx.atePlannedExtra?.(extraId));
+    li.querySelector('[data-planned-remove]').addEventListener('click', () => ctx.removePlannedExtra?.(extraId));
+    list.appendChild(li);
   }
   // The shopping list's Swap meal: open this meal's Replace picker, but only
   // while the meal is still planned and not yet logged. Otherwise the day screen

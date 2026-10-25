@@ -5,6 +5,7 @@ import { recipeNutrients, loggedNutrients, NUTRIENT_KEYS } from './nutrients.js'
 import {
   defaultMealPrefs, normalizeMealPrefs, activeSlots, perSlotCapFactor, slotRecipeKind,
 } from './meal_prefs.js';
+import { normalizePlannedExtras, plannedExtraFoodNames } from './planned_extras.js';
 
 const SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
@@ -445,14 +446,48 @@ function worstOtherTarget(effects, targets, exceptNutrient) {
   return worst;
 }
 
+/** "Pizza and cola": the food names a planned meal is named by. */
+function plannedFoodList(names) {
+  const list = (Array.isArray(names) ? names : []).filter(Boolean);
+  if (list.length === 0) return 'food';
+  if (list.length === 1) return list[0];
+  return `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`;
+}
+
+/**
+ * The reason shown when a planned meal lowered the other meals of its own day.
+ * The per-day number is the same rounded change the Effect rows print.
+ */
+function plannedExtraReason({ notes, effects, changed, nothingToChange }) {
+  const note = notes[0];
+  const names = plannedFoodList(note.names);
+  const date = note.date;
+  const dayChanged = !nothingToChange && changed.some((c) => c.date === date);
+  if (!dayChanged || !note.primary) {
+    return `You planned ${names} on ${date}. That day's other meals do not need to change.`;
+  }
+  const key = note.primary.nutrient;
+  const effect = effects.find((e) => e.nutrient === key);
+  const change = effectChange(key, effect);
+  if (change === 0) {
+    return `You planned ${names} on ${date}, so that day's other meals are about the same in ${nutrientWords(key)}.`;
+  }
+  const direction = change < 0 ? 'lower' : 'higher';
+  return `You planned ${names} on ${date}, so that day's other meals are about ${formatAmount(key, Math.abs(change))} ${direction} in ${nutrientWords(key)}.`;
+}
+
 function buildReasonCore({
   effects, changed, keptForBought, unreachable, nothingToChange, targets, recentTotals,
   skippedNames = [], shortfall = {}, skipNoMin = false, windowDayCount = 0,
   replacements = [], replacementOver = {}, replacementUnder = {}, replacementPrimary = null,
   overshoot = {}, logDayCount = 1, logIsPast = false,
   extrasOffset = {}, grossShortfall = {}, extrasCoveredAll = false,
+  plannedNotes = [],
 }) {
   if (skipNoMin) return SKIP_NO_MIN_REASON;
+  if (plannedNotes.length > 0) {
+    return plannedExtraReason({ notes: plannedNotes, effects, changed, nothingToChange });
+  }
   if (nothingToChange) {
     // The extras covered every minimum the day was short of: nothing to make up.
     if (extrasCoveredAll) {
@@ -646,6 +681,7 @@ export function replan(state) {
     fromDate = todayIso(),
     logFromDate = fromDate,
     mealPrefs,
+    plannedExtras = [],
   } = state;
 
   const prefs = normalizeMealPrefs(mealPrefs || defaultMealPrefs());
@@ -806,6 +842,19 @@ export function replan(state) {
     if (!outsideMenu) continue;
     const r = loggedNutrients(items, foodsById);
     extrasByDate.set(date, addTotals(extrasByDate.get(date) || emptyTotals(), r.totals));
+  }
+
+  // Planned outside-the-menu meals (D26) are expected intake, not eaten food.
+  // They count like an extra on their own date only: their nutrients reduce that
+  // day's minimum shortfall, and the other meals of the day leave room under every
+  // maximum. A planned meal whose day is already over no longer steers the plan.
+  const plannedByDate = new Map();
+  const plannedForPlan = normalizePlannedExtras(plannedExtras)
+    .filter((extra) => extra.date >= fromDate && Boolean(plan.days?.[extra.date]));
+  for (const extra of plannedForPlan) {
+    const r = loggedNutrients(extra.items, foodsById);
+    plannedByDate.set(extra.date, addTotals(plannedByDate.get(extra.date) || emptyTotals(), r.totals));
+    extrasByDate.set(extra.date, addTotals(extrasByDate.get(extra.date) || emptyTotals(), r.totals));
   }
 
   // The make-up a nutrient still needs: the day's shortfall (skips and lighter
@@ -1094,6 +1143,30 @@ export function replan(state) {
     }
   }
 
+  // A planned meal must leave room on its own day: the day's other meals are
+  // refilled with every maximum the planned food already uses lowered by that
+  // amount. The days after it are not changed for it.
+  const plannedChangedDates = new Set();
+  for (const date of [...plannedByDate.keys()].sort()) {
+    const extraTotals = plannedByDate.get(date);
+    let leavesRoom = false;
+    const roomTargets = targets.map((t) => {
+      if (t.kind !== 'max' || !(t.daily > 0)) return t;
+      const used = extraTotals[t.nutrient] || 0;
+      if (!(used > 0)) return t;
+      leavesRoom = true;
+      return { ...t, daily: Math.max(t.daily * 0.05, t.daily - used), originalDaily: t.daily };
+    });
+    if (!leavesRoom) continue;
+    const day = fillDay(recipes, roomTargets, foodsById, boughtSet, {}, {}, {}, null, null, slots, false);
+    if (!day) continue;
+    const prev = plan.days[date] || {};
+    const differs = slots.some((slot) => (prev[slot] || null) !== (day[slot] || null));
+    if (!differs) continue;
+    newPlan.days[date] = day;
+    plannedChangedDates.add(date);
+  }
+
   // Every slot a changed day holds on either side: the active slots plus anything a
   // day stored earlier, so a slot that is switched off is still reported honestly.
   const dayKeys = (date) => {
@@ -1105,7 +1178,8 @@ export function replan(state) {
   };
 
   const changed = [];
-  for (const date of windowDates) {
+  const scannedDates = [...new Set([...windowDates, ...plannedChangedDates])].sort();
+  for (const date of scannedDates) {
     for (const slot of dayKeys(date)) {
       const before = plan.days[date]?.[slot];
       const after = newPlan.days[date]?.[slot];
@@ -1146,6 +1220,27 @@ export function replan(state) {
   const sample = dayTotals(sampleDay, recipesById, foodsById);
   if (scoreAgainstTargets(sample.totals, targets).unmet >= targets.length) unreachable = true;
 
+  // The planned meals that really lowered their day, named for the reason.
+  const plannedNotes = [];
+  for (const date of [...plannedChangedDates].sort()) {
+    const extras = plannedForPlan.filter((extra) => extra.date === date);
+    const names = [...new Set(extras.flatMap((extra) => plannedExtraFoodNames(extra, foodsById)))];
+    const extraTotals = plannedByDate.get(date) || {};
+    let primary = null;
+    let primaryScore = -Infinity;
+    for (const t of targets) {
+      if (t.kind !== 'max' || !(t.daily > 0)) continue;
+      const used = extraTotals[t.nutrient] || 0;
+      if (!(used > 0)) continue;
+      const score = used / t.daily;
+      if (score > primaryScore) {
+        primaryScore = score;
+        primary = t;
+      }
+    }
+    plannedNotes.push({ date, names, primary });
+  }
+
   const nothingToChange = changed.length === 0;
 
   const reason = lastDayOverMax
@@ -1172,6 +1267,7 @@ export function replan(state) {
       extrasOffset,
       grossShortfall,
       extrasCoveredAll,
+      plannedNotes,
     });
 
   return {

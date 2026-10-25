@@ -4,6 +4,7 @@ import {
   defaultMealPrefs, normalizeMealPrefs, activeSlots, MAX_SNACKS,
 } from './engine/meal_prefs.js';
 import { normalizeCustomFoods } from './engine/custom_foods.js';
+import { normalizePlannedExtras } from './engine/planned_extras.js';
 
 const KEY = 'nutriplanner-v1';
 
@@ -21,6 +22,9 @@ export function emptyAppState() {
     // from here, so a make-up for a meal that is later removed cannot survive.
     planBase: null,
     log: [],
+    // Meals the person already knows they will eat outside the menu: expected
+    // intake for their own date, never eaten food and never a log entry.
+    plannedExtras: [],
     // Foods the person added themselves ("Add my own food"), saved on this device.
     customFoods: [],
     bought: [],
@@ -53,6 +57,7 @@ export function startOverState() {
 export const START_OVER_ITEMS = [
   'Your month plan',
   'Your meal logs',
+  'Meals you planned outside the menu',
   'Foods you added yourself',
   'Shopping ticks (items you marked bought)',
   'Shopping items marked not found',
@@ -101,6 +106,8 @@ export function changeProfileState(state, { keepLog = true } = {}) {
     pendingProposal: null,
     keptForBought: [],
     updateDecisions: [],
+    // Planned meals belong to the plan that is being cleared.
+    plannedExtras: [],
   };
   if (keepLog) {
     return {
@@ -316,6 +323,7 @@ export function applyStaleMonthOnStart(state, now = new Date()) {
       keptForBought: [],
       // The plan those updates belonged to is gone with the old month.
       updateDecisions: [],
+      plannedExtras: [],
     }),
     banner,
     screenHint: 'targets',
@@ -356,6 +364,8 @@ export function loadState() {
       plan: data.plan ?? null,
       planBase: data.planBase && typeof data.planBase === 'object' ? data.planBase : null,
       log: Array.isArray(data.log) ? data.log : [],
+      // Older saved data has no planned meals: the list starts empty.
+      plannedExtras: normalizePlannedExtras(data.plannedExtras),
       // Older saved data has no foods the person added: the list starts empty.
       customFoods: normalizeCustomFoods(data.customFoods),
       bought: Array.isArray(data.bought) ? data.bought : [],
@@ -403,6 +413,7 @@ export function saveState(state) {
         plan: state.plan,
         planBase: state.planBase || null,
         log: state.log,
+        plannedExtras: normalizePlannedExtras(state.plannedExtras),
         customFoods: normalizeCustomFoods(state.customFoods),
         bought: state.bought,
         notFound: Array.isArray(state.notFound) ? state.notFound : [],

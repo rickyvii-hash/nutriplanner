@@ -215,6 +215,7 @@ export function applyLogCorrection(ctx, correctedState, { fromDate, stay = false
     foodsById: ctx.foodsById || new Map(),
     bought: state.bought || [],
     mealPrefs: state.mealPrefs,
+    plannedExtras: state.plannedExtras || [],
     fromDate: logDate,
   });
   const proposal = recomputed.proposal;

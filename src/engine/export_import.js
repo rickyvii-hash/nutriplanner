@@ -5,6 +5,7 @@
 
 import { normalizeMealPrefs, activeSlots } from './meal_prefs.js';
 import { normalizeCustomFoods } from './custom_foods.js';
+import { normalizePlannedExtras } from './planned_extras.js';
 import { withoutSecondSnack } from '../store.js';
 
 export const EXPORT_VERSION = 1;
@@ -68,6 +69,10 @@ export function buildExportPayload(state) {
   if (notFound.length > 0) payload.notFound = notFound;
   const customFoods = normalizeCustomFoods(s.customFoods);
   if (customFoods.length > 0) payload.customFoods = customFoods;
+  // Planned meals are expected intake, not logged food: they travel in their own
+  // list, and a backup without them simply restores none.
+  const plannedExtras = normalizePlannedExtras(s.plannedExtras);
+  if (plannedExtras.length > 0) payload.plannedExtras = plannedExtras;
   return payload;
 }
 
@@ -136,6 +141,17 @@ export function validateImportPayload(data) {
     }
   }
 
+  if (data.plannedExtras !== undefined && data.plannedExtras !== null) {
+    if (!Array.isArray(data.plannedExtras)) {
+      return reject('This backup has an unexpected format for planned meals.');
+    }
+    for (const extra of data.plannedExtras) {
+      if (!isPlainObject(extra) || typeof extra.date !== 'string' || (extra.items !== undefined && !Array.isArray(extra.items))) {
+        return reject('This backup has an unexpected format for planned meals.');
+      }
+    }
+  }
+
   if (data.customFoods !== undefined && data.customFoods !== null) {
     if (!Array.isArray(data.customFoods)) {
       return reject('This backup has an unexpected format for the foods you added.');
@@ -179,6 +195,8 @@ export function applyImportPayload(currentState, data) {
     plan: data.plan ?? null,
     planBase: data.planBase ?? null,
     log: (data.log ?? []).map((entry) => ({ ...entry })),
+    // An older backup without this list restores no planned meals.
+    plannedExtras: normalizePlannedExtras(data.plannedExtras),
     // An older backup without this list restores no foods the person added.
     customFoods: normalizeCustomFoods(data.customFoods),
     bought: [...(data.bought ?? [])],
