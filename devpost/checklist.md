@@ -102,3 +102,5 @@ Activity mode: not started
 
 - 2026-10-25: Last feature round on v2: My meals (0?1 snack); Drinks shortcut; Download/Restore; first-run guide; closed multi-accept and multi-slot P1s. Two snacks and Lab notes cut after review stayed red. Open: day-progress without log; same-day second log replan.
 - 2026-10-25: History scrub + correctness round on v2: day progress comes only from what was logged (empty log ? zeros); same-day second log replans from the original plan plus the full day log; later-day logs keep accepted make-up; past days preserved when using the original plan for a same-day replan; log corrections replan from every remaining log date. Cuts unchanged (two snacks, Lab notes). Remaining known limits: expired 4-day window can re-apply on multi-accept undo; today's meals may be kept when the removed log was what changed today.
+
+- 2026-10-25: Pure plan recompute: shown plan = f(base, log, updateDecisions); expired windows and today-recalc covered by tests; 203 pass.
