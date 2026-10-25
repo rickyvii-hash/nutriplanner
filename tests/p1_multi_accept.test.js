@@ -110,6 +110,22 @@ test('P1-A: correcting a later accepted log keeps earlier make-up on days alread
       `${d}: correcting B must not wipe A's accepted past make-up`,
     );
   }
+  // Future make-up still owed by A (days >= today that A changed) must survive
+  // in the refreshed proposal — not snap back to the original month plan.
+  const futureMakeUpFromA = [...new Set(resultA.changed.map((c) => c.date))]
+    .filter((d) => d >= DAY_B);
+  assert.ok(
+    futureMakeUpFromA.length > 0,
+    'need at least one still-future make-up day from A',
+  );
+  assert.ok(applied.planChanged && ctx.proposal, 'removing B must offer a refreshed proposal');
+  for (const d of futureMakeUpFromA) {
+    assert.notDeepEqual(
+      ctx.proposal.plan.days[d],
+      plan.days[d],
+      `${d}: proposal must keep A's still-future make-up after removing B`,
+    );
+  }
   // DAY_A log is still present.
   assert.equal(ctx.state.log.length, 1);
   assert.equal(ctx.state.log[0].date, DAY_A);

@@ -183,8 +183,8 @@ export function correctionFromDate(state, entry) {
  * foodsById, navigate and the in-memory state.
  *
  * A correction on a past day never rewrites days that are already over: the
- * replan starts today. The corrected day is still passed as the first logged
- * day, so every later entry counts in the totals the replan uses.
+ * replan starts today. The earliest remaining entry is still passed as the first
+ * logged day, so every entry that is left counts in the totals the replan uses.
  */
 export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   const state = correctedState || ctx?.state;
@@ -196,6 +196,14 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   const logDate = fromDate || correctionFromDate(state);
   const today = todayIso();
   const replanFrom = logDate > today ? logDate : today;
+  // Every log entry that is still in the corrected log keeps feeding the replan,
+  // not only the corrected one: when a later log is removed after an earlier one
+  // was accepted, the earlier log's overshoot still owes make-up on future days.
+  const logFromDate = (state.log || []).reduce((earliest, entry) => {
+    const date = entry?.date;
+    if (!date) return earliest;
+    return earliest && earliest < date ? earliest : date;
+  }, logDate);
   // When an earlier update was accepted, the current plan already contains its
   // make-up days. Replan from the plan before that acceptance with the corrected
   // log, so removing or reducing the meal that drove the update also removes (or
@@ -209,7 +217,7 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
     bought: state.bought || [],
     foodsById: ctx.foodsById || new Map(),
     fromDate: replanFrom,
-    logFromDate: logDate,
+    logFromDate,
     mealPrefs: state.mealPrefs,
   });
   // Days that are already over keep the meals of the plan in force now: make-up
@@ -219,13 +227,46 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   for (const [date, meals] of Object.entries(state.plan?.days || {})) {
     if (date < today) keptPastDays[date] = { ...meals };
   }
+  // Today is not over, but a replan never recalculates it: the make-up an earlier
+  // remaining log already earned for today stays as it is in the plan in force, so
+  // removing a later log cannot wipe it.
+  const keptToday = logFromDate < today ? state.plan?.days?.[today] : null;
+  if (keptToday) keptPastDays[today] = { ...keptToday };
+  // A kept day that the baseline does not hold is still a change the proposal owes:
+  // report it slot by slot, so the refreshed proposal shows it instead of hiding it.
+  const keptTodayChanges = [];
+  if (keptToday) {
+    const beforeDay = basePlan.days?.[today] || {};
+    const recipeOf = ctx.recipesById
+      ? (id) => ctx.recipesById.get(id)
+      : (id) => recipes.find((r) => r.id === id);
+    for (const slot of Object.keys({ ...beforeDay, ...keptToday })) {
+      const before = beforeDay[slot];
+      const after = keptToday[slot];
+      if (before === after) continue;
+      const beforeRecipe = recipeOf(before);
+      const afterRecipe = recipeOf(after);
+      keptTodayChanges.push({
+        date: today,
+        slot,
+        before,
+        after,
+        beforeName: beforeRecipe?.name || before,
+        afterName: afterRecipe?.name || after,
+        beforeIcon: beforeRecipe?.icon || '',
+        afterIcon: afterRecipe?.icon || '',
+      });
+    }
+  }
+  const changed = [...keptTodayChanges, ...result.changed];
   const proposal = {
     ...result,
+    changed,
     plan: { ...result.plan, days: { ...result.plan.days, ...keptPastDays } },
   };
   // Until the refreshed proposal is accepted the plan goes back to the baseline
-  // from today on, so no stale compensation survives; days already over keep
-  // what was accepted for them.
+  // from today on, so no stale compensation survives; days already over and a
+  // make-up still owed for today keep what was accepted for them.
   const nextDays = {};
   for (const [date, meals] of Object.entries(basePlan.days || {})) {
     nextDays[date] = keptPastDays[date] || { ...meals };
@@ -233,7 +274,7 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
   for (const [date, meals] of Object.entries(keptPastDays)) {
     if (!nextDays[date]) nextDays[date] = meals;
   }
-  const planChanged = result.changed.length > 0;
+  const planChanged = changed.length > 0;
   const next = {
     ...state,
     plan: { ...basePlan, days: nextDays },
