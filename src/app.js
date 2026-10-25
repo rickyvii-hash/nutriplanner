@@ -109,6 +109,17 @@ const ctx = {
       fromDate: when.date,
       mealPrefs: ctx.state.mealPrefs,
     });
+    // Days that are already over keep the meals of the plan in force right now:
+    // make-up accepted for an earlier log must not be wiped by a replan that starts
+    // from the base plan. Only `when.date` and the days after it are recalculated.
+    const keptPastDays = {};
+    for (const [date, meals] of Object.entries(ctx.state.plan?.days || {})) {
+      if (date < when.date) keptPastDays[date] = { ...meals };
+    }
+    result.plan = {
+      ...result.plan,
+      days: { ...result.plan.days, ...keptPastDays },
+    };
     ctx.state = { ...ctx.state, log, pendingProposal: proposalToStore(result) };
     saveState(ctx.state);
     ctx.proposal = result;
