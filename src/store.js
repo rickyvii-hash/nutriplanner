@@ -21,6 +21,9 @@ export function emptyAppState() {
     shopEvery: 7,
     shopStart: null,
     pendingProposal: null,
+    // Notes from blood tests the person chooses to record. Kept in a backup
+    // even before the lab notes screen exists.
+    labNotes: [],
   };
 }
 
@@ -230,6 +233,7 @@ export function loadState() {
       pendingProposal: data.pendingProposal && typeof data.pendingProposal === 'object'
         ? data.pendingProposal
         : null,
+      labNotes: Array.isArray(data.labNotes) ? data.labNotes : [],
     };
   } catch {
     storageNotice = 'Saved data could not be read; starting fresh for this session.';
@@ -258,6 +262,7 @@ export function saveState(state) {
         shopEvery: state.shopEvery || 7,
         shopStart: state.shopStart || null,
         pendingProposal: state.pendingProposal || null,
+        labNotes: Array.isArray(state.labNotes) ? state.labNotes : [],
       }),
     );
     return true;

@@ -2,6 +2,7 @@ import { PROFILES } from '../engine/profiles.js';
 import { NUTRIENTS } from '../engine/nutrients.js';
 import { todayIso, rebuildPlanMeals } from '../engine/planner.js';
 import { normalizeMealPrefs } from '../engine/meal_prefs.js';
+import { validateImportPayload } from '../engine/export_import.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit, formatKind } from './dom.js';
 
 const MEAL_LABELS = [
@@ -194,6 +195,55 @@ export function renderTargets(ctx) {
       <button type="button" class="btn-secondary" data-action="start-over">Start over</button>
     </section>`));
   }
+
+  // Download my data / Restore from file: the backup stays on this device.
+  const dataCard = el(`<section class="card data-transfer">
+    <h3>My data</h3>
+    <p class="muted tiny">Download a copy of everything saved on this device, or restore it from a file.</p>
+    <div class="stack-actions">
+      <button type="button" class="btn-secondary" data-action="download-data">Download my data</button>
+      <button type="button" class="btn-secondary" data-action="restore-data">Restore from file</button>
+    </div>
+    <input type="file" accept="application/json,.json" data-import-file hidden>
+    <p class="field-error" data-import-error hidden></p>
+  </section>`);
+  root.appendChild(dataCard);
+
+  const fileInput = dataCard.querySelector('[data-import-file]');
+  const importError = dataCard.querySelector('[data-import-error]');
+  const showImportError = (message) => {
+    importError.textContent = message;
+    importError.hidden = false;
+  };
+
+  dataCard.querySelector('[data-action="download-data"]')?.addEventListener('click', () => {
+    ctx.downloadData?.();
+  });
+  dataCard.querySelector('[data-action="restore-data"]')?.addEventListener('click', () => {
+    importError.hidden = true;
+    fileInput?.click();
+  });
+  fileInput?.addEventListener('change', async () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    importError.hidden = true;
+    let parsed = null;
+    try {
+      parsed = JSON.parse(await file.text());
+    } catch {
+      showImportError('This file could not be read as a backup. Choose a JSON file downloaded from NutriPlanner.');
+      fileInput.value = '';
+      return;
+    }
+    const check = validateImportPayload(parsed);
+    fileInput.value = '';
+    if (!check.ok) {
+      // A bad file changes nothing: saved data stays exactly as it is.
+      showImportError(check.message);
+      return;
+    }
+    ctx.openRestore?.(parsed, check.summary);
+  });
 
   const actions = el(`<div class="stack-actions">
     <button type="button" class="btn-secondary" data-action="add-target">Add custom target</button>

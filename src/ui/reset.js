@@ -75,8 +75,7 @@ export function openStartOverPanel(ctx) {
 }
 
 /** "Change profile": clear the plan, keep the log unless the person clears it too. */
-export function openChangeProfilePanel(ctx) {
-  const copy = changeProfileCopy();
+export function openChangeProfilePanel(ctx) {  const copy = changeProfileCopy();
   return openPanel({
     title: copy.title,
     confirmLabel: copy.confirmLabel,
@@ -95,5 +94,39 @@ export function openChangeProfilePanel(ctx) {
       return () => ({ keepLog: !checkbox.checked });
     },
     onConfirm: (choice) => ctx.confirmChangeProfile?.({ keepLog: choice?.keepLog !== false }),
+  });
+}
+
+/** One line per part of the saved data a restore replaces. */
+function restoreLines(summary) {
+  const s = summary || {};
+  const count = (n) => (Number.isFinite(Number(n)) ? Number(n) : 0);
+  const planLine = count(s.planDays) > 0
+    ? `Your month plan (${count(s.planDays)} days)`
+    : 'Your month plan (none in this file)';
+  return [
+    `Your targets (${count(s.targets)})`,
+    `Your meal choices (${count(s.meals)} meals a day)`,
+    planLine,
+    `Your meal logs (${count(s.logs)} entries)`,
+    `Your lab notes (${count(s.labNotes)} notes)`,
+  ];
+}
+
+/** "Restore from file": show what the file will replace, then apply it on confirm. */
+export function openRestorePanel(ctx, data, summary) {
+  return openPanel({
+    title: 'Restore from file?',
+    confirmLabel: 'Restore my data',
+    cancelLabel: 'Cancel',
+    buildBody: (body) => {
+      body.appendChild(el(`<div>
+        <p>This replaces what is saved on this device:</p>
+        <ul class="confirm-list">${restoreLines(summary).map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>
+        <p class="muted tiny">Nothing changes until you confirm.</p>
+      </div>`));
+      return () => undefined;
+    },
+    onConfirm: () => ctx.confirmRestore?.(data),
   });
 }
