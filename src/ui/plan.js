@@ -2,6 +2,7 @@ import { todayIso } from '../engine/planner.js';
 import { activeSlots, slotLabel } from '../engine/meal_prefs.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { displayFoodName } from '../engine/food_display.js';
+import { pendingProposalForPlan } from '../store.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
 import { createReplacePicker } from './replace_picker.js';
@@ -43,6 +44,107 @@ export function dayMealSavePayload(recipe, slot, action) {
   else if (action === 'skip') skipRecipeGroup(draft, recipe.id, slot || null);
   else return null;
   return draftSavePayload(draft);
+}
+
+/** The banner a day-screen save shows when it would change the next days. */
+export const DAY_CHANGE_BANNER = 'Your next days can change because of this meal.';
+export const DAY_BANNER_REVIEW = 'Review the update';
+export const DAY_BANNER_NOT_NOW = 'Not now';
+
+/** "breakfast" → "Breakfast", so a status line reads as a sentence. */
+function mealLabel(slot) {
+  if (!slot) return 'Meal';
+  const label = slotLabel(slot);
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+/**
+ * The short status line under the meal list after a save that changed nothing.
+ * "Breakfast logged. Plan unchanged." / "Dinner is planned again. Plan unchanged."
+ */
+export function dayStatusText(action, slot = null) {
+  const label = mealLabel(slot);
+  if (action === 'undo') return `${label} is planned again. Plan unchanged.`;
+  return `${label} logged. Plan unchanged.`;
+}
+
+/**
+ * What the day screen does right after one meal action.
+ *
+ * Ate it and Undo stay on the day screen. With no real change (`proposal` is
+ * null or nothingToChange) the decision carries the short status line; when the
+ * plan would change it carries the inline banner and its two buttons. Skipped
+ * and Replace keep today's behaviour and open the Plan updated screen, because
+ * they need a decision.
+ */
+export function daySaveDecision({ action = 'eat', slot = null, proposal = null } = {}) {
+  if (action === 'skip' || action === 'replace') {
+    return {
+      mode: 'navigate',
+      stays: false,
+      action,
+      statusText: null,
+      bannerText: null,
+      reviewLabel: null,
+      notNowLabel: null,
+      proposal: null,
+    };
+  }
+  const changesPlan = Boolean(proposal && proposal.nothingToChange !== true);
+  if (changesPlan) {
+    return {
+      mode: 'banner',
+      stays: true,
+      action,
+      statusText: null,
+      bannerText: DAY_CHANGE_BANNER,
+      reviewLabel: DAY_BANNER_REVIEW,
+      notNowLabel: DAY_BANNER_NOT_NOW,
+      proposal,
+    };
+  }
+  return {
+    mode: 'inline',
+    stays: true,
+    action,
+    // A Change (eaten ↔ skipped) has no line of its own: the row chip and the
+    // counter already say what happened.
+    statusText: action === 'eat' || action === 'undo' ? dayStatusText(action, slot) : null,
+    bannerText: null,
+    reviewLabel: null,
+    notNowLabel: null,
+    proposal: null,
+  };
+}
+
+/**
+ * Put a save decision on screen. Stay decisions redraw the day screen in place
+ * (the status line or the pending banner comes from the state); a decision that
+ * needs one opens the Plan updated screen. Returns the decision.
+ */
+export function applyDaySaveDecision(ctx, decision) {
+  if (!ctx || !decision) return decision;
+  if (decision.mode === 'navigate') {
+    if (typeof ctx.navigate === 'function') ctx.navigate('updated');
+    return decision;
+  }
+  ctx.dayStatus = decision.statusText || null;
+  ctx.dayBannerMinimized = false;
+  if (typeof ctx.refresh === 'function') ctx.refresh();
+  return decision;
+}
+
+/**
+ * One meal action from the day screen. The save keeps the selected day and never
+ * navigates on its own (`stay`); the decision below decides what the day screen
+ * shows. Ate it therefore stays put with a status line or an inline banner.
+ */
+export function runDaySave(ctx, {
+  action = 'eat', slot = null, payload = null, date = null,
+} = {}) {
+  if (!ctx || !payload || typeof ctx.saveLogAndReplan !== 'function') return null;
+  const result = ctx.saveLogAndReplan(payload, { date, stay: true });
+  return applyDaySaveDecision(ctx, daySaveDecision({ action, slot, proposal: result }));
 }
 
 /**
@@ -240,6 +342,9 @@ function progressClass(kind, value, daily) {
 
 export function renderPlan(ctx) {
   const { state, recipesById, foodsById } = ctx;
+  // A redraw in place must not pull the page back up to the day strip.
+  const suppressStripScroll = Boolean(ctx.suppressStripScroll);
+  ctx.suppressStripScroll = false;
   const root = el(`<div class="screen screen-plan"></div>`);
   // A one-shot hand-off from the shopping list is read here, once, even when the
   // plan or that meal is gone: it then leaves no trace and shows no error.
@@ -315,9 +420,11 @@ export function renderPlan(ctx) {
   }
   root.appendChild(strip);
 
-  queueMicrotask(() => {
-    stripEl.querySelector('.is-selected')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
-  });
+  if (!suppressStripScroll) {
+    queueMicrotask(() => {
+      stripEl.querySelector('.is-selected')?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+    });
+  }
 
   const meals = state.plan.days[selected];
   const mealCard = el(`<section class="card">
@@ -341,6 +448,37 @@ export function renderPlan(ctx) {
   const progressEl = mealCard.querySelector('[data-day-progress]');
   progressEl.textContent = progress.text;
   progressEl.setAttribute('data-day-progress-total', String(progress.total));
+  // A save that would change the next days never navigates and is never applied
+  // on its own: the day card keeps a banner until the person decides. "Not now"
+  // only minimizes it; the proposal stays saved and comes back on the next visit.
+  const pending = pendingProposalForPlan(state);
+  const pendingChange = pending && pending.nothingToChange !== true ? pending : null;
+  const openPending = () => {
+    if (!ctx.proposal) ctx.proposal = pendingChange;
+    ctx.navigate('updated');
+  };
+  if (pendingChange && ctx.dayBannerMinimized) {
+    const line = el(`<p class="day-banner-pending" data-day-banner-pending>
+      Plan update pending.
+      <button type="button" class="btn-text" data-review-update>Review the update</button>
+    </p>`);
+    line.querySelector('[data-review-update]').addEventListener('click', openPending);
+    mealCard.prepend(line);
+  } else if (pendingChange) {
+    const banner = el(`<section class="day-banner" data-day-banner>
+      <p><strong>${DAY_CHANGE_BANNER}</strong></p>
+      <div class="day-banner-actions">
+        <button type="button" class="btn-secondary btn-small" data-not-now>Not now</button>
+        <button type="button" class="btn-primary btn-small" data-review-update>Review the update</button>
+      </div>
+    </section>`);
+    banner.querySelector('[data-not-now]').addEventListener('click', () => {
+      ctx.dayBannerMinimized = true;
+      ctx.refresh();
+    });
+    banner.querySelector('[data-review-update]').addEventListener('click', openPending);
+    mealCard.prepend(banner);
+  }
   let openPicker = null;
   const closePicker = () => {
     if (openPicker) openPicker.remove();
@@ -355,7 +493,7 @@ export function renderPlan(ctx) {
       recipes: ctx.recipes,
       foods: ctx.foods,
       foodsById,
-      onPick: (payload) => saveOneMeal(payload),
+      onPick: (payload) => saveOneMeal(payload, 'replace', slot),
     });
     item.appendChild(picker);
     openPicker = picker;
@@ -363,15 +501,21 @@ export function renderPlan(ctx) {
   // Meal rows on this day, so a hand-off can find the slot it asks for.
   const rowsBySlot = new Map();
   // A day-screen save takes the same path the Log screen uses; only the selected
-  // date changes, so a meal chosen on a day ahead is saved for that day.
-  const saveOneMeal = (payload) => {
-    if (!payload || typeof ctx.saveLogAndReplan !== 'function') return;
-    ctx.saveLogAndReplan(payload, { date: selected });
+  // date changes, so a meal chosen on a day ahead is saved for that day. Ate it
+  // stays on this screen; Skipped and Replace still need the Plan updated screen.
+  const saveOneMeal = (payload, action = 'eat', slot = null) => {
+    runDaySave(ctx, { action, slot, payload, date: selected });
   };
-  // Undo and Change use the same correction path as the Logged meals card below.
-  const correctMeal = (nextState) => {
+  // Undo and Change use the same correction path as the Logged meals card below,
+  // but they stay on the day screen too (D15). A correction that would change the
+  // plan shows the same inline banner instead of opening another screen.
+  const correctMeal = (nextState, action = 'change', slot = null) => {
     if (!nextState || nextState === ctx.state) return;
-    applyLogCorrection(ctx, nextState, { fromDate: selected });
+    const result = applyLogCorrection(ctx, nextState, { fromDate: selected, stay: true });
+    if (!result) return;
+    applyDaySaveDecision(ctx, daySaveDecision({
+      action, slot, proposal: result.proposal || null,
+    }));
   };
 
   for (const slot of daySlots) {
@@ -393,12 +537,12 @@ export function renderPlan(ctx) {
     const actions = item.querySelector('.meal-row-actions');
     if (row.canEat) {
       const btn = el(`<button type="button" class="btn-secondary btn-small" data-meal-eat="${escapeHtml(slot)}">Ate it</button>`);
-      btn.addEventListener('click', () => saveOneMeal(dayMealSavePayload(recipe, slot, 'eat')));
+      btn.addEventListener('click', () => saveOneMeal(dayMealSavePayload(recipe, slot, 'eat'), 'eat', slot));
       actions.appendChild(btn);
     }
     if (row.canSkip) {
       const btn = el(`<button type="button" class="btn-secondary btn-small" data-meal-skip="${escapeHtml(slot)}">Skipped</button>`);
-      btn.addEventListener('click', () => saveOneMeal(dayMealSavePayload(recipe, slot, 'skip')));
+      btn.addEventListener('click', () => saveOneMeal(dayMealSavePayload(recipe, slot, 'skip'), 'skip', slot));
       actions.appendChild(btn);
     }
     if (row.canReplace) {
@@ -417,7 +561,7 @@ export function renderPlan(ctx) {
       btn.addEventListener('click', () => {
         const entry = ctx.state.log?.[row.entryIndex];
         if (!entry) return;
-        correctMeal(removeLogEntry(ctx.state, row.entryIndex));
+        correctMeal(removeLogEntry(ctx.state, row.entryIndex), 'undo', slot);
       });
       actions.appendChild(btn);
     }
@@ -427,11 +571,11 @@ export function renderPlan(ctx) {
         const entry = ctx.state.log?.[row.entryIndex];
         if (!entry) return;
         if (row.changeTo === 'skipped') {
-          correctMeal(convertLogEntryToSkipped(ctx.state, row.entryIndex, row.recipeId, slot));
+          correctMeal(convertLogEntryToSkipped(ctx.state, row.entryIndex, row.recipeId, slot), 'change', slot);
         } else if (row.changeTo === 'eaten') {
           const planned = recipe || recipesById.get(row.recipeId);
           if (!planned) return;
-          correctMeal(convertSkippedEntryToEaten(ctx.state, row.entryIndex, planned, slot));
+          correctMeal(convertSkippedEntryToEaten(ctx.state, row.entryIndex, planned, slot), 'change', slot);
         }
       });
       actions.appendChild(btn);
@@ -450,6 +594,14 @@ export function renderPlan(ctx) {
   const forwardRow = forward ? rowsBySlot.get(forward.slot) : null;
   if (forwardRow && forwardRow.recipe) {
     openReplacement(forwardRow.item, forward.slot, forwardRow.recipe);
+  }
+  // A save that left the plan alone says so under the meal list, announced to
+  // screen readers and gone after a few seconds. It never moves the page.
+  if (ctx.dayStatus) {
+    const status = el(`<p class="meal-status-line" data-day-status role="status" aria-live="polite">${escapeHtml(ctx.dayStatus)}</p>`);
+    ctx.dayStatus = null;
+    list.after(status);
+    setTimeout(() => status.remove(), 4000);
   }
   mealCard.querySelector('[data-action="log"]').addEventListener('click', () => ctx.navigate('log'));
   root.appendChild(mealCard);

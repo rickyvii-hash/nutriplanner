@@ -233,6 +233,22 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .notice-card { border-left: 3px solid var(--green); }
 .notice-card p { margin: 0; font-size: 0.9rem; }
 
+/* Day screen: a save that changes nothing says so here; a pending update stays
+   in the day card with its two buttons instead of opening another screen. */
+.meal-status-line {
+  margin: 8px 0 0; padding: 8px 10px; border-radius: 10px;
+  background: var(--green-soft); color: var(--green); font-size: 0.9rem;
+}
+.day-banner {
+  border: 1px solid var(--tan); background: var(--tan-soft);
+  border-radius: 12px; padding: 10px 12px; margin: 0 0 12px;
+}
+.day-banner p { margin: 0 0 8px; }
+.day-banner-actions { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+.day-banner-actions .btn-small { min-height: 44px; }
+.day-banner-pending { margin: 0 0 10px; font-size: 0.9rem; color: var(--muted); }
+.day-banner-pending .btn-text { min-height: 44px; }
+
 /* The plan row of a meal already in "This meal". */
 .plan-meal-row.is-in-draft { background: var(--green-soft); border-radius: 12px; padding: 10px 8px; }
 .badge-in-draft {

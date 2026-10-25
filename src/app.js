@@ -41,8 +41,11 @@ const ctx = {
     if (name !== 'plan') ctx.openReplace = null;
     render();
   },
+  // A redraw in place (a day-screen save) keeps the page where it was, and the
+  // day strip must not pull the page back up to itself.
   refresh: () => {
-    render();
+    ctx.suppressStripScroll = true;
+    render({ keepScroll: true });
   },
   onChange: (next) => {
     ctx.state = next;
@@ -126,11 +129,17 @@ const ctx = {
       ...result.plan,
       days: { ...result.plan.days, ...keptPastDays },
     };
+    // A day-screen save asks to stay: the day screen decides what to show (a
+    // short status line, or the pending banner it can review later). The result
+    // is stored either way, so a Skipped / Replace save still opens the usual
+    // Plan updated screen; a save that changed nothing never shows a banner.
     ctx.state = { ...ctx.state, log, pendingProposal: proposalToStore(result) };
     saveState(ctx.state);
     ctx.proposal = result;
     ctx.logDraft = null;
+    if (options.stay) return result;
     ctx.navigate('updated');
+    return result;
   },
   useUpdatedPlan: () => {
     if (!ctx.proposal) return;
@@ -244,7 +253,10 @@ function navBar() {
   return nav;
 }
 
-function render() {
+function render({ keepScroll = false } = {}) {
+  const scroll = keepScroll && typeof window !== 'undefined'
+    ? { x: window.scrollX, y: window.scrollY }
+    : null;
   app.innerHTML = '';
   const notice = getStorageNotice();
   if (notice) {
@@ -265,6 +277,8 @@ function render() {
 
   app.appendChild(screen);
   if (shouldShowNav(ctx.state)) app.appendChild(navBar());
+  // Put the page back where it was after a redraw in place: no scroll jump.
+  if (scroll && typeof window.scrollTo === 'function') window.scrollTo(scroll.x, scroll.y);
 }
 
 async function loadJson(path) {
@@ -297,9 +311,11 @@ async function start() {
     saveState(ctx.state);
 
     const pending = pendingProposalForPlan(ctx.state);
-    if (pending && !stale.banner) {
+    if (pending && pending.nothingToChange !== true && !stale.banner) {
+      // A pending update is never applied on its own and never lost: the day
+      // screen shows it as a banner with Review the update / Not now.
       ctx.proposal = pending;
-      ctx.screen = 'updated';
+      ctx.screen = ctx.state.plan ? 'plan' : 'updated';
     } else if (ctx.state.plan) {
       ctx.state = withoutPendingProposal(ctx.state);
       saveState(ctx.state);

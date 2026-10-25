@@ -181,16 +181,19 @@ export function correctionFromDate(state, entry) {
  * Save a corrected state and recalculate the plan from the corrected log.
  * Opens Plan updated when the plan would change; otherwise keeps the corrected
  * log and goes back to the Plan with a calm note. `ctx` provides recipes,
- * foodsById, navigate and the in-memory state.
+ * foodsById, navigate and the in-memory state. With `stay` the caller keeps the
+ * current screen (the day screen does) and shows the outcome itself.
  *
  * A correction on a past day never rewrites days that are already over, and a
  * correction never reverses an earlier accepted update by hand: the shown plan
  * is recomputed from the base plan, the corrected log and the saved decisions.
  * Days before today stay frozen as they were; today is recalculated.
  */
-export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
+export function applyLogCorrection(ctx, correctedState, { fromDate, stay = false } = {}) {
   const state = correctedState || ctx?.state;
-  if (!ctx || !state || !state.plan) return { state, result: null, planChanged: false };
+  if (!ctx || !state || !state.plan) {
+    return { state, result: null, planChanged: false, proposal: null, notice: null };
+  }
 
   const recipes = Array.isArray(ctx.recipes) && ctx.recipes.length > 0
     ? ctx.recipes
@@ -233,13 +236,31 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
     updateDecisions: recomputed.decisions,
     pendingProposal: planChanged ? proposalToStore(proposal) : null,
   };
+  const notice = recomputed.notice || (planChanged
+    ? 'Log corrected. The plan was updated.'
+    : 'Log corrected. The rest of the month did not need to change.');
   ctx.state = next;
   saveState(next);
   ctx.proposal = planChanged ? proposal : null;
   ctx.logDraft = null;
-  ctx.logNotice = recomputed.notice || (planChanged
-    ? 'Log corrected. The plan was updated.'
-    : 'Log corrected. The rest of the month did not need to change.');
+  if (stay) {
+    // The caller keeps its screen and shows its own status line or banner.
+    ctx.logNotice = null;
+    return {
+      state: next,
+      result: recomputed.result,
+      planChanged,
+      proposal: planChanged ? proposal : null,
+      notice,
+    };
+  }
+  ctx.logNotice = notice;
   if (typeof ctx.navigate === 'function') ctx.navigate(planChanged ? 'updated' : 'plan');
-  return { state: next, result: recomputed.result, planChanged };
+  return {
+    state: next,
+    result: recomputed.result,
+    planChanged,
+    proposal: planChanged ? proposal : null,
+    notice,
+  };
 }
