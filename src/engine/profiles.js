@@ -5,7 +5,7 @@ export const PROFILES = [
     id: 'weight-loss',
     name: 'Weight loss',
     icon: '⚖️',
-    blurb: 'A moderate calorie ceiling with enough protein and fibre.',
+    blurb: 'Example targets: a moderate calorie maximum, with protein and fibre minima.',
     targets: [
       { nutrient: 'kcal', kind: 'max', daily: 1800 },
       { nutrient: 'protein', kind: 'min', daily: 90 },
@@ -17,7 +17,7 @@ export const PROFILES = [
     id: 'cholesterol',
     name: 'Cholesterol',
     icon: '💚',
-    blurb: 'Lower saturated fat, more fibre, steady energy.',
+    blurb: 'Example targets: a saturated-fat maximum and a fibre minimum.',
     targets: [
       { nutrient: 'satFat', kind: 'max', daily: 13 },
       { nutrient: 'fibre', kind: 'min', daily: 30 },
@@ -29,7 +29,7 @@ export const PROFILES = [
     id: 'recovery',
     name: 'Recovery',
     icon: '🌱',
-    blurb: 'A calorie and protein floor to support rebuilding.',
+    blurb: 'Example targets: calorie and protein minima you can edit.',
     targets: [
       { nutrient: 'kcal', kind: 'min', daily: 2200 },
       { nutrient: 'protein', kind: 'min', daily: 100 },
@@ -41,7 +41,7 @@ export const PROFILES = [
     id: 'athlete',
     name: 'Athlete',
     icon: '🏃',
-    blurb: 'Higher calorie and protein floors for training days.',
+    blurb: 'Example targets: higher calorie and protein minima.',
     targets: [
       { nutrient: 'kcal', kind: 'min', daily: 2800 },
       { nutrient: 'protein', kind: 'min', daily: 150 },
