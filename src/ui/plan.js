@@ -1,4 +1,4 @@
-import { dayTotals, todayIso } from '../engine/planner.js';
+import { todayIso } from '../engine/planner.js';
 import { activeSlots, slotLabel } from '../engine/meal_prefs.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
@@ -30,39 +30,34 @@ export function dayValueText(result, nutrient) {
 
 /**
  * What the day's progress bars show, and the line that explains it.
- * Meals actually logged win; when nothing was eaten, planned meals count except
- * the ones the user marked Skipped. A skipped meal is never counted as eaten.
- * Returns { result, note } where result is shaped like dayTotals.
+ * Progress is what was actually logged for the day: planned meals are a plan,
+ * not food already eaten, so they are never counted here. A skipped meal is not
+ * eaten either. With an empty (or skipped-only) log every total is 0.
+ * Returns { result, note } where result is shaped like sumNutrients.
  */
 export function dayProgressTotals(dayMeals, dayLog, recipesById, foodsById) {
   const parts = [];
-  const skippedIds = new Set();
+  let hasSkipped = false;
   for (const entry of dayLog || []) {
     for (const it of entry.items || []) {
       const food = foodsById.get(it.foodId);
       if (food) parts.push(foodNutrients(food, it.grams));
     }
-    for (const id of entry.skipped || []) skippedIds.add(id);
+    if ((entry.skipped || []).length > 0) hasSkipped = true;
   }
 
   if (parts.length > 0) {
-    return { result: sumNutrients(parts), note: 'Based on meals you logged for this day.' };
+    return { result: sumNutrients(parts), note: 'Based on the food you logged for this day.' };
   }
-  if (skippedIds.size > 0) {
-    // Keep the planned meals that were not skipped; the skipped one is gone.
-    const remaining = {};
-    for (const slot of Object.keys(dayMeals || {})) {
-      const id = dayMeals?.[slot];
-      if (id && !skippedIds.has(id)) remaining[slot] = id;
-    }
+  if (hasSkipped) {
     return {
-      result: dayTotals(remaining, recipesById, foodsById),
-      note: 'Based on planned meals (skipped meals are not counted as eaten).',
+      result: sumNutrients([]),
+      note: 'Progress is based on what was logged: skipped meals are not counted as eaten. Nothing eaten logged yet.',
     };
   }
   return {
-    result: dayTotals(dayMeals, recipesById, foodsById),
-    note: 'Based on planned meals (nothing logged yet).',
+    result: sumNutrients([]),
+    note: 'Progress is based on what was logged: nothing yet. Planned meals count only once you log them.',
   };
 }
 
@@ -183,7 +178,7 @@ export function renderPlan(ctx) {
   root.appendChild(mealCard);
 
   const dayLog = (state.log || []).filter((e) => e.date === selected);
-  // Skipped meals have no food items: they are dropped from the planned values.
+  // Only what the user logged counts as progress; the planned meals above are a plan.
   const { result: display, note: progressNote } =
     dayProgressTotals(meals, dayLog, recipesById, foodsById);
 
