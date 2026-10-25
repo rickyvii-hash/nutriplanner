@@ -150,36 +150,38 @@ test('D18: every display name from the food data starts with a letter and is cle
   assert.equal(loneLetter.length, 0, `names must not contain a lone letter:\n${loneLetter.join('\n')}`);
 });
 
-test('D18: two different foods never share a display name', () => {
+test('D18/D21: two different foods never share a visible display name', () => {
+  // A hidden restaurant twin keeps the same label for older log entries, so
+  // uniqueness is a promise about the foods that are actually offered.
   const byName = new Map();
   const collisions = [];
-  for (const food of foods) {
+  for (const food of foodsForDisplay(foods)) {
     const name = displayFoodName(food);
     if (!name) continue;
     const first = byName.get(name);
     if (first) collisions.push(`"${name}": ${first} / ${food.id}`);
     else byName.set(name, food.id);
   }
-  assert.equal(collisions.length, 0, `display names must be unique:\n${collisions.join('\n')}`);
+  assert.equal(collisions.length, 0, `visible display names must be unique:\n${collisions.join('\n')}`);
 });
 
 test('search still finds pizza, burger, fries, beer, cola, ice cream with several results', () => {
-  const list = foodsForDisplay(foods).length ? foods : foods;
   // Search uses original names so branded rows still match generic queries;
-  // the UI then shows displayFoodName on each hit.
+  // the UI then shows displayFoodName on each hit. The food list holds seven
+  // "french fries" rows, but six are the same restaurant dish at six chains:
+  // after D21 only two distinct fries foods remain to offer.
   for (const q of ['pizza', 'burger', 'fries', 'beer', 'cola', 'ice cream']) {
+    const minHits = q === 'fries' ? 2 : 3;
     const hits = searchFoods(foods, q, { limit: 12 });
-    assert.ok(hits.length >= 3, `"${q}" must return at least 3 hits, got ${hits.length}`);
+    assert.ok(hits.length >= minHits, `"${q}" must return at least ${minHits} hits, got ${hits.length}`);
     for (const hit of hits) {
       const shown = displayFoodName(hit);
-      // Hits that cannot be shown without a brand are allowed in the engine list
-      // only if displayFoodName can still produce a clean label for most of them.
       if (shown) assert.equal(displayNameHasBrand(shown), false, `${q} hit: ${shown}`);
     }
     const displayable = hits.filter((h) => displayFoodName(h));
     assert.ok(
-      displayable.length >= 3,
-      `"${q}" must leave at least 3 brand-free display hits, got ${displayable.length}`,
+      displayable.length >= minHits,
+      `"${q}" must leave at least ${minHits} brand-free display hits, got ${displayable.length}`,
     );
   }
 });

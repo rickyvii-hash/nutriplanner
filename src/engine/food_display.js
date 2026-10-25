@@ -134,22 +134,90 @@ function sourceName(food) {
 }
 
 /**
- * A real distinguishing detail for a food whose short name collides with
- * another: the last part of the full USDA name that the short name leaves out
- * ("with added ascorbic acid", "salted", "calcium, and potassium").
+ * Restaurant chains in this food list. Their rows are the same dish at several
+ * chains, so once the chain name is removed they describe one restaurant food.
+ */
+export const RESTAURANT_BRAND_TOKENS = [
+  "APPLEBEE'S",
+  "ARBY'S",
+  'BURGER KING',
+  "DENNY'S",
+  "DOMINO'S",
+  'LITTLE CAESARS',
+  "McDONALD'S",
+  "PAPA JOHN'S",
+  'PIZZA HUT',
+  "T.G.I. FRIDAY'S",
+  "TGI FRIDAY'S",
+  "WENDY'S",
+];
+
+/** The full stored name, before the display shortening. */
+function fullSourceName(food) {
+  if (!food || typeof food !== 'object') return String(food ?? '');
+  return food.usdaName || food.name || '';
+}
+
+/** True for a row that comes from a restaurant chain. */
+function isRestaurantFood(food) {
+  const name = String(fullSourceName(food)).toUpperCase();
+  return RESTAURANT_BRAND_TOKENS.some((brand) => name.startsWith(brand.toUpperCase()));
+}
+
+/** Words only, lower case, used to compare two names that a brand removal left. */
+function nameCore(food) {
+  return stripBrandFromName(fullSourceName(food))
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+/**
+ * True when the rows differ only by a brand or a branded product line.
+ * "BURGER KING, Cheeseburger" and "McDONALD'S, Cheeseburger" both keep only
+ * "cheeseburger"; the rows for salted and unsalted chips still differ.
+ */
+function isBrandOnlyGroup(group) {
+  const first = nameCore(group[0].food);
+  return first !== '' && group.every((entry) => nameCore(entry.food) === first);
+}
+
+/**
+ * A real distinguishing detail for a collision that is not only about a brand:
+ * the rest of the full USDA name that the short name leaves out
+ * ("with added ascorbic acid", "oil, salted", "calcium and potassium").
+ * Plain words in parentheses, never a record number.
  */
 function extraNameDetail(food, base) {
-  const full = stripBrandFromName(food?.usdaName || '');
-  if (!full || full === base) return '';
-  const lowerBase = String(base).toLowerCase();
-  const segments = full.split(',').map((part) => part.trim()).filter(Boolean);
-  for (let i = segments.length - 1; i >= 0; i -= 1) {
-    const segment = segments[i];
-    if (!lowerBase.includes(segment.toLowerCase()) && !displayNameHasBrand(segment)) {
-      return segment;
+  const full = stripBrandFromName(fullSourceName(food));
+  if (!full) return '';
+  let detail = '';
+  const at = full.toLowerCase().indexOf(String(base).toLowerCase());
+  if (at === 0) {
+    detail = full.slice(String(base).length);
+    // The short stored name can end inside a word ("...volume wa"); the rest of
+    // that word is not a distinguishing detail.
+    if (/[A-Za-z0-9]$/.test(base) && /^[A-Za-z0-9]/.test(detail)) {
+      detail = detail.replace(/^[A-Za-z0-9]+/, '');
+    }
+    detail = detail.replace(/^[\s,;:\-–—]+|[\s,;:\-–—]+$/g, '').trim();
+  }
+  if (!detail) {
+    // Fallback: the last comma part of the full name that the short name omits.
+    const lowerBase = String(base).toLowerCase();
+    const segments = full.split(',').map((part) => part.trim()).filter(Boolean);
+    for (let i = segments.length - 1; i >= 0; i -= 1) {
+      const segment = segments[i];
+      if (!lowerBase.includes(segment.toLowerCase()) && !displayNameHasBrand(segment)) {
+        detail = segment;
+        break;
+      }
     }
   }
-  return '';
+  // Plain words: drop an Oxford comma and refuse anything with a brand or id.
+  detail = detail.replace(/,\s*and\s+/gi, ' and ').trim();
+  if (!detail || displayNameHasBrand(detail) || /USDA|\d{5,}/i.test(detail)) return '';
+  return detail;
 }
 
 /** A stable key for a food inside the display-name index. */
@@ -157,31 +225,48 @@ function foodKey(food, index) {
   return food?.id || `#${index}`;
 }
 
-/** The real USDA record number, used only when two names would still collide. */
-function collisionDetail(food, index) {
-  if (food?.fdcId !== undefined && food?.fdcId !== null && food?.fdcId !== '') {
-    return `USDA ${food.fdcId}`;
-  }
-  // Without a record number the position in the list is the only stable detail.
-  return String(index + 1);
+/** Lowest USDA record number first, then position in the list. */
+function byUsdaId(a, b) {
+  const first = Number(a.food?.fdcId);
+  const second = Number(b.food?.fdcId);
+  const firstId = Number.isFinite(first) ? first : Number.POSITIVE_INFINITY;
+  const secondId = Number.isFinite(second) ? second : Number.POSITIVE_INFINITY;
+  return firstId - secondId || a.index - b.index;
 }
 
-const NAME_INDEX = new WeakMap();
+const DISPLAY_INDEX = new WeakMap();
 
 /**
- * The display name of every food in a list, kept unique.
- * Two foods can produce the same words after their brands are removed (six
- * restaurant "French fries", for example). The first keeps the plain name; a
- * later one adds a real distinguishing detail in parentheses, never a brand.
+ * Names and visibility for every food in a list.
+ * A brand-only collision (six chains' "French fries") becomes one visible row
+ * named after the dish, with the plain suffix ", restaurant" for restaurant
+ * rows. Every row of that group keeps the same label, so an older log entry
+ * still reads correctly. A collision with a real difference (salted/unsalted
+ * chips) keeps both rows, separated by that difference in parentheses.
  */
-export function displayNamesFor(foods) {
-  if (!Array.isArray(foods)) return new Map();
-  if (NAME_INDEX.has(foods)) return NAME_INDEX.get(foods);
+function buildDisplayIndex(foods) {
+  const names = new Map();
+  const labels = new WeakMap();
+  const visibleIds = new Set();
+  const visibleFoods = new WeakSet();
 
   const entries = [];
   foods.forEach((food, index) => {
+    if (!food || typeof food !== 'object') return;
+    const key = foodKey(food, index);
+    if (food.custom) {
+      const label = String(food.name ?? '').trim();
+      if (label) {
+        names.set(key, label);
+        labels.set(food, label);
+        visibleIds.add(key);
+        visibleFoods.add(food);
+      }
+      return;
+    }
     const base = stripBrandFromName(sourceName(food));
-    if (base) entries.push({ food, base, index });
+    if (!base || displayNameHasBrand(base)) return;
+    entries.push({ food, base, index, key });
   });
 
   const groups = new Map();
@@ -190,32 +275,87 @@ export function displayNamesFor(foods) {
     groups.get(entry.base).push(entry);
   }
 
-  const names = new Map();
+  const show = (entry, label) => {
+    names.set(entry.key, label);
+    labels.set(entry.food, label);
+    visibleIds.add(entry.key);
+    visibleFoods.add(entry.food);
+  };
+  const keepHidden = (entry, label) => {
+    names.set(entry.key, label);
+    labels.set(entry.food, label);
+  };
+
   for (const [base, group] of groups) {
     if (group.length === 1) {
-      const entry = group[0];
-      names.set(foodKey(entry.food, entry.index), base);
+      show(group[0], base);
       continue;
     }
+
+    if (isBrandOnlyGroup(group)) {
+      const sorted = group.slice().sort(byUsdaId);
+      const restaurant = group.every((entry) => isRestaurantFood(entry.food));
+      const label = restaurant ? `${base}, restaurant` : base;
+      // One row is offered; the others stay only for older log entries.
+      show(sorted[0], label);
+      for (const entry of sorted.slice(1)) keepHidden(entry, label);
+      continue;
+    }
+
+    // A real difference keeps both rows: the detail in parentheses is the
+    // difference itself, never a record number.
+    const sorted = group.slice().sort(byUsdaId);
     const usedDetails = new Set();
-    group.forEach((entry, position) => {
-      const realDetail = extraNameDetail(entry.food, base);
-      let detail = realDetail && !usedDetails.has(realDetail.toLowerCase())
-        ? realDetail
-        : collisionDetail(entry.food, position);
-      // Even a record number must not repeat: add the position in that case.
-      let suffix = 2;
-      while (usedDetails.has(detail.toLowerCase())) {
-        detail = `${collisionDetail(entry.food, position)} ${suffix}`;
-        suffix += 1;
+    let plainUsed = false;
+    for (const entry of sorted) {
+      const detail = extraNameDetail(entry.food, base);
+      const detailKey = detail.toLowerCase();
+      if (!detail || usedDetails.has(detailKey)) {
+        // No usable detail: one row keeps the plain name, the rest stay only
+        // for older log entries.
+        if (!plainUsed) {
+          plainUsed = true;
+          show(entry, base);
+        } else {
+          keepHidden(entry, base);
+        }
+        continue;
       }
-      usedDetails.add(detail.toLowerCase());
-      names.set(foodKey(entry.food, entry.index), `${base} (${detail})`);
-    });
+      usedDetails.add(detailKey);
+      show(entry, `${base} (${detail})`);
+    }
   }
 
-  NAME_INDEX.set(foods, names);
-  return names;
+  return { names, labels, visibleIds, visibleFoods };
+}
+
+/** Index for a food list, kept until that list changes. */
+export function displayIndexFor(foods) {
+  if (!Array.isArray(foods)) {
+    return {
+      names: new Map(), labels: new WeakMap(), visibleIds: new Set(), visibleFoods: new WeakSet(),
+    };
+  }
+  // The app adds a custom food by clearing and refilling the same list, so the
+  // cache also watches its length and its ends.
+  const last = foods.length - 1;
+  const cached = DISPLAY_INDEX.get(foods);
+  if (cached
+    && cached.length === foods.length
+    && cached.first === (foods[0] ?? null)
+    && cached.last === (foods[last] ?? null)) {
+    return cached.index;
+  }
+  const index = buildDisplayIndex(foods);
+  DISPLAY_INDEX.set(foods, {
+    index, length: foods.length, first: foods[0] ?? null, last: foods[last] ?? null,
+  });
+  return index;
+}
+
+/** The display name of every food in a list, keyed by food id. */
+export function displayNamesFor(foods) {
+  return displayIndexFor(foods).names;
 }
 
 /** Every food the app has loaded, used so on-screen names stay unique. */
@@ -232,8 +372,9 @@ export function registerDisplayFoods(foods) {
 
 /**
  * Name shown in the UI. Empty when the entry cannot be shown without a
- * trademark (search should skip it). When the food belongs to the registered
- * list, the name is also made unique against the rest of that list.
+ * trademark (search should skip it). A hidden twin (a second chain's "French
+ * fries") keeps the same label as the row that is offered, so older log lines
+ * still read correctly.
  */
 export function displayFoodName(foodOrName) {
   const food = foodOrName && typeof foodOrName === 'object' ? foodOrName : null;
@@ -242,13 +383,28 @@ export function displayFoodName(foodOrName) {
   if (!base) return '';
   if (displayNameHasBrand(base)) return '';
   if (food && registeredFoods) {
-    const unique = displayNamesFor(registeredFoods).get(food.id);
-    if (unique) return unique;
+    const index = displayIndexFor(registeredFoods);
+    const label = index.labels.get(food) ?? index.names.get(foodKey(food));
+    if (label) return label;
   }
   return base;
 }
 
-/** Foods safe to offer in free search (have a brand-free display name). */
+/** True when a food may appear in search results, pickers and the drinks list. */
+export function isFoodDisplayVisible(food) {
+  if (!food || typeof food !== 'object') return Boolean(displayFoodName(food));
+  if (food.custom) return Boolean(String(food.name ?? '').trim());
+  if (!registeredFoods) return Boolean(displayFoodName(food));
+  const index = displayIndexFor(registeredFoods);
+  if (index.labels.has(food)) return index.visibleFoods.has(food);
+  const key = foodKey(food);
+  if (index.names.has(key)) return index.visibleIds.has(key);
+  return Boolean(displayFoodName(food));
+}
+
+/** Foods safe to offer in free search: brand-free and not a hidden twin. */
 export function foodsForDisplay(foods) {
-  return (Array.isArray(foods) ? foods : []).filter((f) => displayFoodName(f));
+  if (!Array.isArray(foods)) return [];
+  const index = displayIndexFor(foods);
+  return foods.filter((food) => food && index.visibleFoods.has(food));
 }

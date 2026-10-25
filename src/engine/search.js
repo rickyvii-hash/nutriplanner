@@ -3,7 +3,7 @@
 // prefix of the food name or id, so "cola" never matches "chocolate chip cookies".
 // Foods that match all words directly rank above foods found through a synonym.
 
-import { foodSearchLabel } from './custom_foods.js';
+import { displayIndexFor } from './food_display.js';
 
 /** Small English synonym map for the off-plan foods people search for most. */
 export const SYNONYMS = {
@@ -91,13 +91,13 @@ function phraseMatches(foodWords, phrase) {
   return phraseWords.every((pw) => foodWords.some((fw) => wordMatches(fw, pw)));
 }
 
-function scoreFood(food, query, queryWords) {
+function scoreFood(food, query, queryWords, displayLabel) {
   const name = normalizeText(food.name);
   const id = normalizeText(food.id || '');
   const nameWords = words(food.name);
   const idWords = words(food.id || '');
   // The label the UI actually shows, so a query also matches the brand-free name.
-  const displayWords = words(foodSearchLabel(food));
+  const displayWords = words(displayLabel);
 
   if (name === query || (id && id === query.replace(/\s+/g, '-'))) return 100;
   if (name.startsWith(query)) return 80;
@@ -140,12 +140,16 @@ export function searchFoods(foods, query, { limit = 12 } = {}) {
   const queryWords = words(text);
   if (!Array.isArray(foods) || queryWords.length === 0) return [];
 
+  const index = displayIndexFor(foods);
   const scored = [];
   for (const food of foods) {
     if (!food || !food.name) continue;
-    // A food whose label cannot be made brand-free is not offered in search.
-    if (!foodSearchLabel(food)) continue;
-    const score = scoreFood(food, text, queryWords);
+    // A food whose label cannot be made brand-free, or that is a hidden twin of
+    // another restaurant row, is not offered in search.
+    if (!index.visibleFoods.has(food)) continue;
+    const label = index.labels.get(food) || '';
+    if (!label) continue;
+    const score = scoreFood(food, text, queryWords, label);
     if (score > 0) scored.push({ food, score });
   }
 

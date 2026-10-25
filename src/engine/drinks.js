@@ -2,6 +2,8 @@
 // millilitre presets people use for them. Nothing here judges a drink:
 // beer and wine are listed like water or coffee.
 
+import { foodsForDisplay } from './food_display.js';
+
 /** Common drink portions, in millilitres. */
 export const DRINK_PRESETS = {
   glass: 200,
@@ -57,7 +59,9 @@ export function isDrinkFood(food) {
 /** Every drink in the food list, sorted by name; the order is stable. */
 export function listDrinkFoods(foods) {
   if (!Array.isArray(foods)) return [];
-  return foods
+  // A drink name shown once: a second chain's branded twin stays in the data
+  // for older log entries but is not offered again.
+  return foodsForDisplay(foods)
     .filter(isDrinkFood)
     .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 }
