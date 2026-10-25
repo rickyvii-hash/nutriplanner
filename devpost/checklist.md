@@ -106,3 +106,4 @@ Activity mode: not started
 - 2026-10-25: Pure plan recompute: shown plan = f(base, log, updateDecisions); expired windows and today-recalc covered by tests; 203 pass.
 
 - 2026-10-25: Contest rules round — brand-free displayed food names (22 tokens; 87 USDA rows stripped on screen); Pages relative URLs + /nutriplanner/ load test; video ~76 s with first-20s pitch and adaptive moment before 1:00; DEVPOST_SUBMISSION.md written.
+- 2026-10-25: Owner hands-on revisions. Meals can be marked Ate it / Skipped / Replace and undone on the day screen (not only in Log); a chosen meal can be cleared from its row; shopping items show In cart and Not found states with Undo; the doctor summary never presents planned food as logged; a skipped-meal make-up no longer pushes a maximum target over its limit; tap targets are at least 44 px on phone. A shopping budget that shapes the plan is planned for a later version (README roadmap).

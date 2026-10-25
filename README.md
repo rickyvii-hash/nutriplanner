@@ -48,8 +48,8 @@ npm test
 1. Choose a profile (Weight loss, Cholesterol, Recovery, or Athlete) and edit daily nutrient targets. A short first-run guide explains the idea; open it again from **How it works**.
 2. Under **My meals**, switch breakfast, lunch and dinner on or off and choose 0 or 1 snack. The plan uses only those slots; daily targets stay the same.
 3. Build a month plan and review today’s meals. Daily progress starts at zero and only counts food you have logged (planned meals stay planned until you log them).
-4. Tick shopping-list items you already have at home.
-5. Log a meal from the plan, search a food with a portion, or add **Extra / outside meals**. Use the **Drinks** shortcut with ml presets (glass, cup, can, bottle). Extras and drinks count in the day totals and in the plan update.
+4. On the shopping list tick items as they go in your cart (they stay visible, with Undo and an "N of M in cart" count), or mark one **Not found** and swap a meal that uses it.
+5. On the day screen mark each meal **Ate it**, **Skipped** or **Replace**, and **Undo** or **Change** it right there. For anything else, log a meal from the plan, search a food with a portion, or add **Extra / outside meals**. Use the **Drinks** shortcut with ml presets (glass, cup, can, bottle). Extras and drinks count in the day totals and in the plan update.
 6. **Replace** a planned meal with another recipe for the same slot, or with **I ate something else**.
 7. Undo or edit a saved log entry: remove it, change a portion, or switch a meal between Eaten and Skipped. The month plan is always recomputed from your original plan plus the meals you still have logged (and whether you accepted each update), so an old correction cannot leave a stale make-up behind.
 8. **Download my data** / **Restore from file** to back up or move your plan, logs and targets on this device.
@@ -58,6 +58,14 @@ npm test
 11. Open a **Summary for your doctor**: targets against logged days, meals logged, and print or save-as-PDF.
 
 Everything is stored on this device only (browser localStorage). There are no accounts and no background network calls while the app is running. A recipe detail panel has links that open a Google or Maps search in a new tab, but only when you tap them.
+
+## Roadmap
+
+Planned for a later version, not in this proof of concept:
+
+- A weekly shopping **budget** that shapes the plan: choose a budget and the planner favours affordable recipes while keeping your targets.
+- Excluded foods (allergies, intolerances, dislikes) and a second snack.
+- A simple lab-notes view that puts your own lab values next to your intake, without interpreting them.
 
 ## Data
 
