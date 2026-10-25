@@ -5,6 +5,7 @@ import {
   restoredStateAndScreen,
 } from './store.js';
 import { buildExportPayload, applyImportPayload, EXPORT_FILE_NAME } from './engine/export_import.js';
+import { registerDisplayFoods } from './engine/food_display.js';
 import {
   buildPlan, replan, todayIso, localTime,
 } from './engine/planner.js';
@@ -294,6 +295,7 @@ async function start() {
       loadJson('data/recipes.json'),
     ]);
     ctx.foods = foods;
+    registerDisplayFoods(foods);
     ctx.recipes = recipes;
     ctx.foodsById = new Map(foods.map((f) => [f.id, f]));
     ctx.recipesById = new Map(recipes.map((r) => [r.id, r]));

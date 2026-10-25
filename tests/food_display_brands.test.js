@@ -9,10 +9,12 @@ import {
   displayFoodName,
   displayNameHasBrand,
   foodsForDisplay,
+  registerDisplayFoods,
 } from '../src/engine/food_display.js';
 import { searchFoods } from '../src/engine/search.js';
 
 const foods = JSON.parse(fs.readFileSync(new URL('../data/foods.json', import.meta.url), 'utf8'));
+registerDisplayFoods(foods);
 
 test('every brand token from the data list is recognised by the display helper', () => {
   for (const brand of FOOD_BRAND_TOKENS) {
@@ -86,6 +88,79 @@ test('branded USDA rows keep nutrients but lose the brand on screen', () => {
   assert.ok(shown.length >= 3, 'stripped name remains usable');
   assert.equal(displayNameHasBrand(shown), false);
   assert.ok(hut.nutrients || hut.kcal != null || hut.protein != null || true);
+});
+
+// --- D18: the displayed name must read like a name ------------------------
+
+/** A display name must start with a capital letter, not a size or punctuation. */
+const BAD_START = /^[^A-Z]/;
+const DOUBLE_SPACE = /\s{2,}/;
+const DOUBLE_COMMA = /,\s*,/;
+/** A name must not start with a standalone single letter. */
+const LONE_LETTER = /^[A-Za-z](?:$|[\s,;:.\-–—])/;
+
+test('D18: a leading size becomes a plain-words suffix', () => {
+  assert.equal(
+    displayFoodName('PIZZA HUT 12 Cheese Pizza, Hand-Tossed Crust'),
+    'Cheese pizza, hand-tossed crust (12 in)',
+  );
+  assert.equal(
+    displayFoodName("DOMINO'S 14 Pepperoni Pizza, Classic Hand-Tossed Crust"),
+    'Pepperoni pizza, classic hand-tossed crust (14 in)',
+  );
+  assert.equal(
+    displayFoodName('12 Cheese Pizza, Hand-Tossed Crust'),
+    'Cheese pizza, hand-tossed crust (12 in)',
+  );
+});
+
+test('D18: leftover punctuation, lone letters and doubled separators are dropped', () => {
+  assert.equal(displayFoodName(',, Cheese Pizza'), 'Cheese pizza');
+  assert.equal(displayFoodName('X,  Cheese Pizza'), 'Cheese pizza');
+  assert.equal(displayFoodName('- Pepperoni Pizza'), 'Pepperoni pizza');
+  assert.equal(
+    displayFoodName('Cheese  Pizza,,  Hand-Tossed'),
+    'Cheese pizza, hand-tossed',
+  );
+});
+
+test('D18: every display name from the food data starts with a letter and is clean', () => {
+  const shown = foods
+    .map((food) => ({ food, name: displayFoodName(food) }))
+    .filter((entry) => entry.name);
+
+  const badStart = shown
+    .filter(({ name }) => BAD_START.test(name))
+    .map(({ food, name }) => `${food.id}: "${name}"`);
+  assert.equal(badStart.length, 0, `names must not start with a digit or punctuation:\n${badStart.join('\n')}`);
+
+  const badSpace = shown
+    .filter(({ name }) => DOUBLE_SPACE.test(name))
+    .map(({ food, name }) => `${food.id}: "${name}"`);
+  assert.equal(badSpace.length, 0, `names must not contain doubled spaces:\n${badSpace.join('\n')}`);
+
+  const badComma = shown
+    .filter(({ name }) => DOUBLE_COMMA.test(name))
+    .map(({ food, name }) => `${food.id}: "${name}"`);
+  assert.equal(badComma.length, 0, `names must not contain doubled commas:\n${badComma.join('\n')}`);
+
+  const loneLetter = shown
+    .filter(({ name }) => LONE_LETTER.test(name))
+    .map(({ food, name }) => `${food.id}: "${name}"`);
+  assert.equal(loneLetter.length, 0, `names must not contain a lone letter:\n${loneLetter.join('\n')}`);
+});
+
+test('D18: two different foods never share a display name', () => {
+  const byName = new Map();
+  const collisions = [];
+  for (const food of foods) {
+    const name = displayFoodName(food);
+    if (!name) continue;
+    const first = byName.get(name);
+    if (first) collisions.push(`"${name}": ${first} / ${food.id}`);
+    else byName.set(name, food.id);
+  }
+  assert.equal(collisions.length, 0, `display names must be unique:\n${collisions.join('\n')}`);
 });
 
 test('search still finds pizza, burger, fries, beer, cola, ice cream with several results', () => {

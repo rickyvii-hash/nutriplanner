@@ -26,3 +26,9 @@ test('the drink shortcut picks and labels drinks by the same brand-free name', (
   assert.ok(body.includes('displayFoodName('), 'drinkPreview must pick on the display name');
   assert.doesNotMatch(body, /f\.name/, 'drinkPreview must not match the raw USDA name');
 });
+
+test('the app registers the loaded food list so display names stay unique', () => {
+  const src = fs.readFileSync(path.join(root, 'src', 'app.js'), 'utf8');
+  assert.match(src, /registerDisplayFoods/, 'app.js must import the display registration');
+  assert.match(src, /registerDisplayFoods\(foods\)/, 'the loaded foods must be registered before a screen shows a name');
+});
