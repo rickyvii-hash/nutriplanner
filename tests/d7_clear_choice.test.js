@@ -115,17 +115,9 @@ test('D7: the blocked notice names the new wording', () => {
   assert.doesNotMatch(REPLACE_BLOCKED_MESSAGE, /Clear This meal first/);
 });
 
-// No DOM harness exists for renderLog, so the row wiring is checked on the static markup.
-test('D7: every chosen row gets a real Clear button with an accessible label', () => {
-  assert.match(logSrc, /<button type="button"[^>]*data-clear-choice/);
-  assert.match(logSrc, /aria-label="Clear my choice for /);
-  assert.match(logSrc, /data-clear-choice/);
-  assert.match(logSrc, />Clear<\/button>/);
-});
-
-test('D7: the This meal card has a Clear all control and the handlers use the helpers', () => {
+// The planned-meal rows were removed from the Log screen (D16); the helpers stay.
+test('D7: the To add card has a Clear all control that uses the helper', () => {
   assert.match(logSrc, /data-clear-all/);
   assert.match(logSrc, />Clear all<\/button>/);
-  assert.match(logSrc, /clearDraftChoice\(draft, recipeId, slot\)/);
   assert.match(logSrc, /clearDraft\(draft\)/);
 });

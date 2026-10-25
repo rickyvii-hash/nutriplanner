@@ -313,8 +313,8 @@ test('D6: the day actions reuse the Log and correction helpers, not a second pla
   assert.doesNotMatch(planSrc, /\blogEntriesForSave\(/, 'the save stays in the one app path');
 });
 
-test('D6: the day screen explains the Log a meal shortcut and keeps the disclaimer', () => {
-  assert.match(planSrc, /Food outside your meals\? Use Log a meal\./);
+test('D6: the day screen explains the outside-the-menu shortcut and keeps the disclaimer', () => {
+  assert.match(planSrc, /Food outside your meals\? Use Add food outside the menu\./);
   assert.match(planSrc, /data-action="log"/);
   assert.match(planSrc, /Support tool, not medical advice\./);
 });

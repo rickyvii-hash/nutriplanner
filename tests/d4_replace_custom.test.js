@@ -14,7 +14,7 @@ import {
 const root = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
 const foods = JSON.parse(fs.readFileSync(path.join(root, 'data', 'foods.json'), 'utf8'));
 const recipes = JSON.parse(fs.readFileSync(path.join(root, 'data', 'recipes.json'), 'utf8'));
-const logSrc = fs.readFileSync(path.join(root, 'src', 'ui', 'log.js'), 'utf8');
+const replacePickerSrc = fs.readFileSync(path.join(root, 'src', 'ui', 'replace_picker.js'), 'utf8');
 const foodsById = new Map(foods.map((f) => [f.id, f]));
 const recipesById = new Map(recipes.map((r) => [r.id, r]));
 const month = { year: 2026, month: 10 };
@@ -46,11 +46,11 @@ function runCustomReplacement(profileId, items, name) {
 
 const effectOf = (result, key) => result.effects.find((e) => e.nutrient === key);
 
-test('the Replace picker offers "I ate something else" with the free-search path', () => {
-  assert.match(logSrc, /I ate something else/);
-  assert.match(logSrc, /data-ate-elsewhere/);
-  assert.match(logSrc, /searchFoods\(/);
-  assert.match(logSrc, /replaced: \[\{ slot, fromRecipeId: currentId, recipeId: null, name \}\]/);
+test('the day-screen Replace picker offers "I ate something else" with the free-search path', () => {
+  assert.match(replacePickerSrc, /I ate something else/);
+  assert.match(replacePickerSrc, /data-ate-elsewhere/);
+  assert.match(replacePickerSrc, /searchFoods\(/);
+  assert.match(replacePickerSrc, /replaced: \[\{ slot, fromRecipeId: currentRecipe\?\.id \|\| null, recipeId: null, name \}\]/);
 });
 
 test('Cholesterol: replacing lunch with a high-satFat free food quotes the Effect row delta', () => {

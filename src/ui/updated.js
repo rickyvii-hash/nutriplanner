@@ -21,7 +21,7 @@ export function renderUpdated(ctx) {
 
   if (!proposal) {
     root.appendChild(el(`<section class="card empty-state">
-      <p class="muted">Log a meal to see an updated plan here.</p>
+      <p class="muted">Add food outside the menu to see an updated plan here.</p>
       <button type="button" class="btn-primary" data-go="plan">Back to Plan</button>
     </section>`));
     root.querySelector('[data-go="plan"]').addEventListener('click', () => ctx.navigate('plan'));

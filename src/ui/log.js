@@ -1,10 +1,7 @@
-import { todayIso } from '../engine/planner.js';
-import { activeSlots, slotLabel, slotRecipeKind } from '../engine/meal_prefs.js';
 import { searchFoods, words } from '../engine/search.js';
 import { DRINK_PRESETS, mlToGrams, listDrinkFoods } from '../engine/drinks.js';
 import { displayFoodName } from '../engine/food_display.js';
-import { el, escapeHtml, appendHtml } from './dom.js';
-import { openRecipeDetail } from './recipe_detail.js';
+import { el, escapeHtml } from './dom.js';
 import { findPlannedRecipeForEntry } from '../log_corrections.js';
 
 // Saved meals can be corrected later from the Plan screen.
@@ -193,7 +190,7 @@ export function draftGroupForRecipe(draft, recipeId, slot = null) {
   return draft.groups.find((g) => g.recipeId === recipeId && (!slot || g.slot === slot)) || null;
 }
 
-/** True while the planned recipe is shown as "In this meal". */
+/** True while the planned recipe is already added as an eaten block in the draft. */
 export function isRecipeInDraft(draft, recipeId, slot = null) {
   return Boolean(draftGroupForRecipe(draft, recipeId, slot));
 }
@@ -280,8 +277,9 @@ export function draftSkippedIds(draft) {
 }
 
 /**
- * True when "This meal" already holds something: planned meals added as eaten,
- * free-search foods, or skipped meals.
+ * True when the draft already holds something: planned meals added as eaten,
+ * free-search foods, or skipped meals. The day screen builds drafts this way;
+ * the outside-the-menu screen only adds free-search foods.
  */
 export function draftHasPending(draft) {
   const d = ensureDraft(draft);
@@ -289,8 +287,8 @@ export function draftHasPending(draft) {
 }
 
 /**
- * Replace saves its own meal and nothing else, so it may only run on an empty
- * draft; otherwise the foods already in "This meal" would be dropped silently.
+ * A Replace saves its own meal and nothing else, so it may only run on an empty
+ * draft; otherwise the foods already added would be dropped silently.
  */
 export function canReplaceMeal(draft) {
   return !draftHasPending(draft);
@@ -522,14 +520,6 @@ export function savedSlotOutcomes(log, date, planDay, recipesById) {
   return outcomes;
 }
 
-/** "eaten" → "Eaten", for the saved-state badge on a plan row. */
-export function savedOutcomeLabel(kind) {
-  if (kind === 'skipped') return 'Skipped';
-  if (kind === 'replaced') return 'Replaced';
-  if (kind === 'eaten') return 'Eaten';
-  return '';
-}
-
 /**
  * Merge a save into the log so each date/slot keeps exactly one outcome: an earlier
  * entry that settles a slot the new save also settles is replaced, not duplicated.
@@ -613,34 +603,18 @@ export function flatDraftItems(draft) {
   ];
 }
 
-/**
- * Which day the "From plan" list shows: an explicit hand-off from another screen
- * (openReplace.date), then the day selected on Plan, then today, then the first
- * planned day. A date that is not in the plan is ignored.
- */
-export function logPlanDate({
-  state, today = todayIso(), selectedDate = null, openReplace = null,
-} = {}) {
-  const days = state?.plan?.days || {};
-  const wanted = openReplace?.date || selectedDate;
-  if (wanted && days[wanted]) return wanted;
-  if (days[today]) return today;
-  return Object.keys(days).sort()[0] || null;
-}
-
 export function renderLog(ctx) {
-  const { state, recipesById, foods } = ctx;
+  const { state, foods } = ctx;
   const root = el(`<div class="screen screen-log"></div>`);
-  const today = todayIso();
 
   root.appendChild(el(`<header class="brand brand-compact">
     <button type="button" class="btn-text back" data-back>← Plan</button>
-    <div><h1>Log a meal</h1><p>From the plan or a free search.</p></div>
+    <div><h1>Outside the menu</h1><p>Anything you ate or drank that was not one of your planned meals.</p></div>
   </header>`));
 
   if (!state.plan) {
     root.appendChild(el(`<section class="card empty-state">
-      <p class="muted">Build a month plan first, then come back to log a meal.</p>
+      <p class="muted">Build a month plan first, then come back to add food outside the menu.</p>
       <button type="button" class="btn-primary" data-go="targets">Go to Targets</button>
     </section>`));
     root.querySelector('[data-go="targets"]').addEventListener('click', () => ctx.navigate('targets'));
@@ -652,104 +626,30 @@ export function renderLog(ctx) {
   const draft = ensureDraft(ctx.logDraft);
   ctx.logDraft = draft;
 
-  const mode = el(`<section class="card">
-    <div class="mode-tabs">
-      <button type="button" class="mode-tab is-active" data-mode="plan">From plan</button>
-      <button type="button" class="mode-tab" data-mode="search">Extra / outside meals</button>
-    </div>
-    <div class="mode-body" data-body="plan"></div>
-    <div class="mode-body hidden" data-body="search"></div>
+  // The former Extra flow, shown directly: no tabs and no planned-meal rows here.
+  const searchCard = el(`<section class="card">
+    <p class="muted tiny" data-extra-help>
+      Snack, drink or a restaurant meal — not tied to a planned slot.
+    </p>
+    <label class="field">
+      <span>Search a food</span>
+      <input type="search" placeholder="e.g. pizza, ice cream" data-search>
+    </label>
+    <button type="button" class="btn-secondary btn-small" data-drinks>Drinks</button>
+    <div class="search-results" data-results></div>
+    <label class="field">
+      <span>Portion (grams)</span>
+      <input type="number" min="1" max="5000" step="1" placeholder="e.g. 150" value="100" data-portion>
+    </label>
+    <p class="field-error" data-portion-error hidden>Enter a portion between 1 and 5000 g</p>
+    <button type="button" class="btn-secondary" data-add-search disabled>Add food</button>
   </section>`);
 
-  const planBody = mode.querySelector('[data-body="plan"]');
-  // A hand-off from another screen (the shopping list's Swap meal) is used once.
-  const openReplace = ctx.openReplace && typeof ctx.openReplace === 'object' ? ctx.openReplace : null;
-  ctx.openReplace = null;
-  const planDate = logPlanDate({
-    state, today, selectedDate: ctx.selectedDate, openReplace,
-  });
-  const todayMeals = state.plan.days[planDate];
-  // A slot already saved keeps that one outcome: opening Log again shows it instead
-  // of offering to log the same meal a second time.
-  const savedOutcomes = savedSlotOutcomes(state.log, planDate, todayMeals, recipesById);
-  const planDateLabel = planDate === today
-    ? `Today's planned meals (${planDate})`
-    : `Planned meals (${planDate})`;
-  planBody.appendChild(el(`<p class="field-label" data-plan-date>${planDateLabel}</p>`));
-  // Only the meals that are on are offered; a slot that is switched off has no row.
-  for (const slot of activeSlots(state.mealPrefs)) {
-    const recipe = recipesById.get(todayMeals?.[slot]);
-    if (!recipe) continue;
-    const saved = savedOutcomes.get(slot) || null;
-    const savedKind = saved?.kind || null;
-    // Both checks look at the planned slot: with two snacks a shared recipe id
-    // must not make one row look eaten or skipped when only the other one is.
-    const alreadySkipped = savedKind
-      ? savedKind === 'skipped'
-      : isRecipeSkipped(draft, recipe?.id, slot);
-    const inDraft = isRecipeInDraft(draft, recipe?.id, slot);
-    // A saved slot is locked: changes go through the correction path on Plan.
-    const locked = Boolean(savedKind) || alreadySkipped || inDraft;
-    const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}${inDraft ? ' is-in-draft' : ''}${savedKind ? ' is-logged' : ''}" data-slot="${escapeHtml(slot)}">
-      <div>
-        <div class="meal-slot">${escapeHtml(slotLabel(slot))}</div>
-        <div class="meal-name-line">
-          <button type="button" class="meal-open" data-open-recipe="${escapeHtml(recipe?.id || '')}" aria-haspopup="dialog">${recipe?.icon || ''} ${escapeHtml(recipe?.name || '')}</button>
-          ${inDraft ? '<span class="badge-in-draft">In this meal</span>' : ''}
-          ${savedKind ? `<span class="badge-logged">Logged · ${escapeHtml(savedOutcomeLabel(savedKind))}</span>` : ''}
-        </div>
-        ${savedKind ? `<div class="muted tiny" data-saved-slot="${escapeHtml(slot)}">Already logged as ${escapeHtml(savedOutcomeLabel(savedKind).toLowerCase())}. Use Change it to correct this meal.</div>` : ''}
-        ${!savedKind && alreadySkipped ? '<div class="muted tiny">Marked as skipped</div>' : ''}
-      </div>
-      <div class="meal-actions">
-        <button type="button" class="btn-secondary btn-small" data-add-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Add as eaten</button>
-        <button type="button" class="btn-secondary btn-small" data-replace-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Replace</button>
-        <button type="button" class="btn-secondary btn-small" data-skip-recipe="${recipe?.id}" ${locked ? 'disabled' : ''}>Skipped</button>
-        ${!savedKind && (inDraft || alreadySkipped) ? `<button type="button" class="btn-secondary btn-small" data-clear-choice="${escapeHtml(recipe?.id || '')}" aria-label="Clear my choice for ${escapeHtml(slotLabel(slot))}">Clear</button>` : ''}
-        ${savedKind ? `<button type="button" class="btn-text btn-small" data-change-saved="${escapeHtml(slot)}">Change it</button>` : ''}
-      </div>
-    </div>`);
-    planBody.appendChild(row);
-  }
-
-  // Correcting a saved slot happens on Plan, where its Logged meals card edits the entry.
-  planBody.querySelectorAll('[data-change-saved]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      ctx.selectedDate = planDate;
-      ctx.navigate('plan');
-    });
-  });
-
-  // The meal name opens its detail panel without leaving the Log screen.
-  planBody.querySelectorAll('[data-open-recipe]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const recipe = recipesById.get(btn.dataset.openRecipe);
-      if (recipe) openRecipeDetail(ctx, recipe, root);
-    });
-  });
-
-  const searchBody = mode.querySelector('[data-body="search"]');
-  appendHtml(searchBody, `<p class="muted tiny" data-extra-help>
-    Snack, drink or a restaurant meal — not tied to a planned slot.
-  </p>
-  <label class="field">
-    <span>Search a food</span>
-    <input type="search" placeholder="e.g. pizza, ice cream" data-search>
-  </label>
-  <button type="button" class="btn-secondary btn-small" data-drinks>Drinks</button>
-  <div class="search-results" data-results></div>
-  <label class="field">
-    <span>Portion (grams)</span>
-    <input type="number" min="1" max="5000" step="1" placeholder="e.g. 150" value="100" data-portion>
-  </label>
-  <p class="field-error" data-portion-error hidden>Enter a portion between 1 and 5000 g</p>
-  <button type="button" class="btn-secondary" data-add-search disabled>Add food</button>`);
-
-  root.appendChild(mode);
+  root.appendChild(searchCard);
 
   const loggedCard = el(`<section class="card">
     <div class="logged-card-header">
-      <h3>This meal</h3>
+      <h3>To add</h3>
       <button type="button" class="btn-text btn-small" data-clear-all hidden>Clear all</button>
     </div>
     <ul class="logged-items" data-items></ul>
@@ -772,37 +672,8 @@ export function renderLog(ctx) {
     const saveBtn = root.querySelector('[data-save]');
     ul.innerHTML = '';
 
-    // Planned meals added as eaten stay together as one block with one remove control.
-    for (const group of draft.groups) {
-      const li = el(`<li class="logged-group" data-group="${escapeHtml(group.id)}">
-        <div class="logged-group-header">
-          <button type="button" class="meal-open logged-group-title" data-open-group-recipe="${escapeHtml(group.recipeId || '')}" aria-haspopup="dialog">
-            Eaten · <span class="group-slot">${escapeHtml(group.slot)}</span> · ${escapeHtml(group.recipeName)}
-          </button>
-          <button type="button" class="btn-icon" data-remove-group="${escapeHtml(group.id)}" aria-label="Remove this whole meal">×</button>
-        </div>
-        <ul class="logged-group-items"></ul>
-      </li>`);
-      const groupList = li.querySelector('.logged-group-items');
-      group.items.forEach((it, index) => {
-        const name = foodName(it.foodId);
-        const item = el(`<li class="logged-item logged-group-item">
-          <span>${escapeHtml(name)}</span>
-          <input type="number" min="1" max="5000" step="1" value="${it.grams}"
-            data-group-edit="${escapeHtml(group.id)}" data-group-index="${index}"
-            aria-label="${escapeHtml(name)} grams">
-          <span class="muted">g</span>
-          <button type="button" class="btn-icon" data-group-del="${escapeHtml(group.id)}" data-group-index="${index}"
-            aria-label="Remove ${escapeHtml(name)}">×</button>
-        </li>`);
-        groupList.appendChild(item);
-      });
-      ul.appendChild(li);
-    }
-
-    // Foods from free search stay as flat rows.
+    // Foods from free search stay as flat rows, each one removable on its own.
     draft.items.forEach((it, index) => {
-      const food = foods.find((f) => f.id === it.foodId);
       const li = el(`<li class="logged-item">
         <span>${escapeHtml(foodName(it.foodId))}</span>
         <input type="number" min="1" value="${it.grams}" data-edit="${index}">
@@ -812,29 +683,11 @@ export function renderLog(ctx) {
       ul.appendChild(li);
     });
 
-    draft.skipped.forEach((skip, index) => {
-      const recipeId = skippedEntryRecipeId(skip);
-      const recipe = recipeId ? recipesById.get(recipeId) : null;
-      const li = el(`<li class="logged-item is-skipped">
-        <span>Skipped · ${escapeHtml(recipe?.name || recipeId || '')}</span>
-        <button type="button" class="btn-icon" data-unskip="${index}" aria-label="Remove skip">×</button>
-      </li>`);
-      ul.appendChild(li);
-    });
-
-    const hasAnything = draft.items.length > 0 || draft.groups.length > 0 || draft.skipped.length > 0;
+    const hasAnything = draft.items.length > 0;
     empty.style.display = hasAnything ? 'none' : 'block';
     saveBtn.disabled = !hasAnything;
     // Clear all only exists while the draft holds something to clear.
     root.querySelector('[data-clear-all]').hidden = !hasAnything;
-
-    // The "Eaten · …" header opens the detail panel of that group's recipe.
-    ul.querySelectorAll('[data-open-group-recipe]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const recipe = recipesById.get(btn.dataset.openGroupRecipe);
-        if (recipe) openRecipeDetail(ctx, recipe, root);
-      });
-    });
 
     ul.querySelectorAll('[data-edit]').forEach((input) => {
       input.addEventListener('change', () => {
@@ -848,48 +701,10 @@ export function renderLog(ctx) {
         paintItems();
       });
     });
-    ul.querySelectorAll('[data-group-edit]').forEach((input) => {
-      input.addEventListener('change', () => {
-        const group = draft.groups.find((g) => g.id === input.dataset.groupEdit);
-        const index = Number(input.dataset.groupIndex);
-        if (!group || !group.items[index]) return;
-        const grams = parsePortion(input.value);
-        if (grams === null) {
-          input.value = group.items[index].grams;
-          return;
-        }
-        group.items[index].grams = grams;
-        paintItems();
-      });
-    });
     ul.querySelectorAll('[data-del]').forEach((btn) => {
       btn.addEventListener('click', () => {
         draft.items.splice(Number(btn.dataset.del), 1);
         paintItems();
-      });
-    });
-    ul.querySelectorAll('[data-group-del]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const groupId = btn.dataset.groupDel;
-        removeGroupItem(draft, groupId, Number(btn.dataset.groupIndex));
-        // A block that lost its last ingredient is gone: clear the plan row state too.
-        if (draft.groups.some((g) => g.id === groupId)) paintItems();
-        else ctx.refresh();
-      });
-    });
-    ul.querySelectorAll('[data-remove-group]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        removeDraftGroup(draft, btn.dataset.removeGroup);
-        ctx.refresh();
-      });
-    });
-    ul.querySelectorAll('[data-unskip]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        // The row index names one skip, so removing one snack's skip keeps the other.
-        const index = Number(btn.dataset.unskip);
-        if (!Number.isInteger(index) || !draft.skipped[index]) return;
-        draft.skipped.splice(index, 1);
-        ctx.refresh();
       });
     });
   };
@@ -899,275 +714,11 @@ export function renderLog(ctx) {
     paintItems();
   };
 
-  mode.querySelectorAll('.mode-tab').forEach((tab) => {
-    tab.addEventListener('click', () => {
-      mode.querySelectorAll('.mode-tab').forEach((t) => t.classList.remove('is-active'));
-      tab.classList.add('is-active');
-      const which = tab.dataset.mode;
-      mode.querySelectorAll('.mode-body').forEach((b) => {
-        b.classList.toggle('hidden', b.dataset.body !== which);
-      });
-    });
-  });
-
-  root.querySelectorAll('[data-add-recipe]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const recipe = recipesById.get(btn.dataset.addRecipe);
-      if (!recipe) return;
-      // The row's stored slot (a second snack is "snack2") keeps the meal apart.
-      addRecipeGroup(draft, recipe, btn.closest('.plan-meal-row')?.dataset.slot || null);
-      // The plan row must show "In this meal" right away.
-      ctx.refresh();
-    });
-  });
-
-  root.querySelectorAll('[data-skip-recipe]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.skipRecipe;
-      if (!id) return;
-      // Skipping drops any eaten block of the same meal in the same slot: the two
-      // choices are exclusive, and the other snack stays untouched.
-      skipRecipeGroup(draft, id, btn.closest('.plan-meal-row')?.dataset.slot || null);
-      ctx.refresh();
-    });
-  });
-
-  // Clear takes back the choice made on one row only: that slot's eaten block or
-  // skip goes, every other meal in the draft stays. The row becomes neutral again.
-  root.querySelectorAll('[data-clear-choice]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const row = btn.closest('.plan-meal-row');
-      const slot = row?.dataset.slot;
-      const recipeId = btn.dataset.clearChoice;
-      if (!slot || !recipeId) return;
-      clearDraftChoice(draft, recipeId, slot);
-      ctx.refresh();
-    });
-  });
-
-  // Clear all empties "This meal" straight away: it is only a draft, so nothing to confirm.
+  // Clear all empties the draft straight away: it is only a draft, so nothing to confirm.
   root.querySelector('[data-clear-all]').addEventListener('click', () => {
     clearDraft(draft);
     ctx.refresh();
   });
-
-  // Replace a planned meal with another recipe for the same slot: log it right away
-  // and open the updated plan preview. The replaced meal is eaten, never skipped.
-  const closeReplacePickers = () => {
-    planBody.querySelectorAll('[data-replace-picker]').forEach((p) => p.remove());
-    planBody.querySelectorAll('[data-replace-blocked]').forEach((p) => p.remove());
-  };
-  // Replace must never throw away what is already in "This meal": say so under the row.
-  const showReplaceBlocked = (row) => {
-    closeReplacePickers();
-    const notice = el(`<p class="field-error replace-blocked" data-replace-blocked>${REPLACE_BLOCKED_MESSAGE}</p>`);
-    row.after(notice);
-    // The notice is about this tap only: the next tap anywhere takes it away.
-    setTimeout(() => {
-      if (notice.isConnected) document.addEventListener('click', () => notice.remove(), { once: true, capture: true });
-    }, 0);
-  };
-  const replaceMeal = (slot, fromRecipeId, recipe) => {
-    if (draftHasPending(draft)) {
-      const row = planBody.querySelector(`[data-replace-recipe="${fromRecipeId}"]`)?.closest('.plan-meal-row');
-      if (row) showReplaceBlocked(row);
-      return;
-    }
-    ctx.saveLogAndReplan({
-      items: recipe.ingredients.map((ing) => ({ foodId: ing.foodId, grams: ing.grams })),
-      skipped: draftSkippedIds(draft),
-      replaced: [{ slot, recipeId: recipe.id, fromRecipeId }],
-    });
-  };
-  const openReplacePicker = (row, slot, currentId) => {
-    if (row.nextElementSibling?.hasAttribute('data-replace-picker')) {
-      row.nextElementSibling.remove();
-      return;
-    }
-    closeReplacePickers();
-    const slotText = escapeHtml(slotLabel(slot));
-    const others = ctx.recipes.filter((r) => r.slot === slotRecipeKind(slot) && r.id !== currentId);
-    const picker = el(`<div class="replace-picker" data-replace-picker>
-      <p class="field-label">Replace ${slotText} with another ${slotText} recipe</p>
-      <div class="replace-options"></div>
-      <button type="button" class="btn-secondary" data-ate-elsewhere>I ate something else</button>
-      <div class="replace-custom hidden" data-replace-custom>
-        <p class="field-label">Search the food you ate instead</p>
-        <label class="field">
-          <span>Search a food</span>
-          <input type="search" placeholder="e.g. pizza, ice cream" data-replace-search>
-        </label>
-        <button type="button" class="btn-secondary btn-small" data-replace-drinks>Drinks</button>
-        <div class="search-results" data-replace-results></div>
-        <label class="field">
-          <span>Portion (grams)</span>
-          <input type="number" min="1" max="5000" step="1" placeholder="e.g. 150" value="100" data-replace-portion>
-        </label>
-        <p class="field-error" data-replace-portion-error hidden>Enter a portion between 1 and 5000 g</p>
-        <button type="button" class="btn-secondary" data-replace-add disabled>Add food</button>
-        <ul class="logged-items" data-replace-items></ul>
-        <p class="muted tiny" data-replace-empty>Nothing added yet.</p>
-        <p class="field-error" data-replace-blocked-custom hidden>${REPLACE_BLOCKED_MESSAGE}</p>
-        <button type="button" class="btn-primary" data-replace-save disabled>Replace with these foods</button>
-      </div>
-      <button type="button" class="btn-text" data-close-picker>Cancel</button>
-    </div>`);
-    const options = picker.querySelector('.replace-options');
-    if (others.length === 0) {
-      options.appendChild(el(`<p class="muted tiny">No other ${slotText} recipes available.</p>`));
-    }
-    for (const other of others) {
-      const b = el(`<button type="button" class="search-hit">${other.icon || ''} ${escapeHtml(other.name)}</button>`);
-      b.addEventListener('click', () => replaceMeal(slot, currentId, other));
-      options.appendChild(b);
-    }
-
-    // Second Replace path: the person ate free-search foods instead of the planned meal.
-    // They build the meal here, then it is logged as a replacement of this slot.
-    const customBox = picker.querySelector('[data-replace-custom]');
-    picker.querySelector('[data-ate-elsewhere]').addEventListener('click', () => {
-      customBox.classList.toggle('hidden');
-    });
-    const customItems = [];
-    let customSelectedId = null;
-    const customSearch = picker.querySelector('[data-replace-search]');
-    const customResults = picker.querySelector('[data-replace-results]');
-    const customPortion = picker.querySelector('[data-replace-portion]');
-    const customPortionError = picker.querySelector('[data-replace-portion-error]');
-    const customAdd = picker.querySelector('[data-replace-add]');
-    const customList = picker.querySelector('[data-replace-items]');
-    const customEmpty = picker.querySelector('[data-replace-empty]');
-    const customBlocked = picker.querySelector('[data-replace-blocked-custom]');
-    const customSave = picker.querySelector('[data-replace-save]');
-
-    // The Drinks shortcut inside "I ate something else" fills the custom selection.
-    const customDrinkPicker = createDrinkPicker(foods, (food, grams) => {
-      customResults.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
-      customSelectedId = food.id;
-      customPortion.value = grams;
-      customPortionError.classList.add('hidden');
-      customAdd.disabled = false;
-    });
-    const customDrinksButton = picker.querySelector('[data-replace-drinks]');
-    customDrinksButton.after(customDrinkPicker.element);
-    customDrinksButton.addEventListener('click', () => customDrinkPicker.toggle());
-
-    const paintCustom = () => {
-      customList.innerHTML = '';
-      customItems.forEach((it, index) => {
-        const name = foodName(it.foodId);
-        const li = el(`<li class="logged-item">
-          <span>${escapeHtml(name)}</span>
-          <input type="number" min="1" max="5000" step="1" value="${it.grams}"
-            data-custom-edit="${index}" aria-label="${escapeHtml(name)} grams">
-          <span class="muted">g</span>
-          <button type="button" class="btn-icon" data-custom-del="${index}"
-            aria-label="Remove ${escapeHtml(name)}">×</button>
-        </li>`);
-        customList.appendChild(li);
-      });
-      customEmpty.classList.toggle('hidden', customItems.length > 0);
-      customSave.disabled = customItems.length === 0;
-      customList.querySelectorAll('[data-custom-edit]').forEach((input) => {
-        input.addEventListener('change', () => {
-          const index = Number(input.dataset.customEdit);
-          const grams = parsePortion(input.value);
-          if (grams === null) {
-            input.value = customItems[index].grams;
-            return;
-          }
-          customItems[index].grams = grams;
-          customBlocked.classList.add('hidden');
-        });
-      });
-      customList.querySelectorAll('[data-custom-del]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          customItems.splice(Number(btn.dataset.customDel), 1);
-          paintCustom();
-        });
-      });
-    };
-
-    const runCustomSearch = () => {
-      const q = customSearch.value || '';
-      customResults.innerHTML = '';
-      customSelectedId = null;
-      customAdd.disabled = true;
-      if (!q.trim()) return;
-      for (const f of searchFoods(foods, q, { limit: 12 })) {
-        const shown = displayFoodName(f);
-        if (!shown) continue;
-        const b = el(`<button type="button" class="search-hit">${escapeHtml(shown)}</button>`);
-        b.addEventListener('click', () => {
-          customSelectedId = f.id;
-          customResults.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
-          b.classList.add('is-selected');
-          customAdd.disabled = false;
-        });
-        customResults.appendChild(b);
-      }
-    };
-    customSearch.addEventListener('input', runCustomSearch);
-    customPortion.addEventListener('input', () => customPortionError.classList.add('hidden'));
-    customAdd.addEventListener('click', () => {
-      if (!customSelectedId) return;
-      const grams = parsePortion(customPortion.value);
-      if (grams === null) {
-        customPortionError.classList.remove('hidden');
-        customPortion.focus();
-        return;
-      }
-      customPortionError.classList.add('hidden');
-      customItems.push({ foodId: customSelectedId, grams });
-      paintCustom();
-    });
-    customSave.addEventListener('click', () => {
-      if (customItems.length === 0) return;
-      // Same rule as a recipe Replace: never drop what is already in "This meal".
-      if (draftHasPending(draft)) {
-        customBlocked.classList.remove('hidden');
-        return;
-      }
-      const names = customItems.map((it) => foodName(it.foodId));
-      const name = names.length === 1 ? names[0] : `${names[0]} and ${names.length - 1} more`;
-      ctx.saveLogAndReplan({
-        items: customItems.map((it) => ({ foodId: it.foodId, grams: it.grams })),
-        skipped: draftSkippedIds(draft),
-        replaced: [{ slot, fromRecipeId: currentId, recipeId: null, name }],
-      });
-    });
-    paintCustom();
-
-    picker.querySelector('[data-close-picker]').addEventListener('click', () => picker.remove());
-    row.after(picker);
-  };
-  root.querySelectorAll('[data-replace-recipe]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const row = btn.closest('.plan-meal-row');
-      if (!row) return;
-      // The slot is the stored key (a second snack is "snack2"), not the shown label.
-      const slot = row.dataset.slot
-        || row.querySelector('.meal-slot')?.textContent?.trim().toLowerCase();
-      if (!slot) return;
-      // Nothing is replaced while "This meal" holds something: no picker, just the notice.
-      if (draftHasPending(draft)) {
-        showReplaceBlocked(row);
-        return;
-      }
-      openReplacePicker(row, slot, btn.dataset.replaceRecipe);
-    });
-  });
-
-  // The shopping list's "Swap meal" opens this screen with that meal's Replace
-  // picker already open. A row that is already logged or chosen stays locked.
-  if (openReplace?.slot) {
-    const forwardRow = [...planBody.querySelectorAll('.plan-meal-row')]
-      .find((row) => row.dataset.slot === openReplace.slot);
-    const forwardBtn = forwardRow?.querySelector('[data-replace-recipe]');
-    if (forwardRow && forwardBtn && !forwardBtn.disabled) {
-      openReplacePicker(forwardRow, openReplace.slot, forwardBtn.dataset.replaceRecipe);
-    }
-  }
 
   const resultsEl = root.querySelector('[data-results]');
   const searchInput = root.querySelector('[data-search]');
@@ -1209,7 +760,7 @@ export function renderLog(ctx) {
     portionError.hidden = true;
     addSearchBtn.disabled = false;
   });
-  const drinksButton = searchBody.querySelector('[data-drinks]');
+  const drinksButton = searchCard.querySelector('[data-drinks]');
   drinksButton.after(drinkPicker.element);
   drinksButton.addEventListener('click', () => drinkPicker.toggle());
 
@@ -1226,8 +777,7 @@ export function renderLog(ctx) {
   });
 
   root.querySelector('[data-save]').addEventListener('click', () => {
-    // Free-search foods are saved as extras; planned meals added as eaten stay
-    // recorded too, and skipped meals go in their own entry.
+    // Free-search foods are saved as extras: they never replace or skip a planned meal.
     ctx.saveLogAndReplan(draftSavePayload(draft));
   });
   root.querySelector('[data-back]').addEventListener('click', () => ctx.navigate('plan'));

@@ -21,7 +21,7 @@ const foods = JSON.parse(fs.readFileSync(path.join(root, 'data', 'foods.json'), 
 const recipes = JSON.parse(fs.readFileSync(path.join(root, 'data', 'recipes.json'), 'utf8'));
 const recipesById = new Map(recipes.map((r) => [r.id, r]));
 const foodsById = new Map(foods.map((f) => [f.id, f]));
-const logSrc = fs.readFileSync(path.join(root, 'src', 'ui', 'log.js'), 'utf8');
+const planSrc = fs.readFileSync(path.join(root, 'src', 'ui', 'plan.js'), 'utf8');
 const appSrc = fs.readFileSync(path.join(root, 'src', 'app.js'), 'utf8');
 
 const plan = buildPlan(profileById('cholesterol').targets, recipes, { year: 2026, month: 10 }, foodsById);
@@ -171,9 +171,8 @@ test('helpers place recipes and entries in their planned slot', () => {
   assert.ok(entrySlots(saveSkipped(lunch)[0], planDay, recipesById).has(lunch.slot));
 });
 
-test('the Log screen reads the saved log and the app merges instead of appending', () => {
-  assert.match(logSrc, /savedSlotOutcomes\(state\.log/);
-  assert.match(logSrc, /Already logged as/i);
-  assert.match(logSrc, /Change it/);
+test('the day screen reads the saved log and the app merges instead of appending', () => {
+  // Planned meals are logged and corrected on the day screen since D16.
+  assert.match(planSrc, /savedSlotOutcomes\(state\.log, selected/);
   assert.match(appSrc, /mergeLogEntries/);
 });

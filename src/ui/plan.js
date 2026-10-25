@@ -247,15 +247,15 @@ function isSkippedEntry(entry) {
 /**
  * The headline of a saved log entry. A planned meal is named by its slot
  * ("Eaten · breakfast"), so food eaten outside the plan never hides which meal
- * it was; that food keeps its own "Extra / outside meals" entry. `recipe` is the
+ * it was; that food keeps its own "Outside the menu" entry. `recipe` is the
  * planned recipe already matched for the entry, if any.
  */
 export function logEntryKind(entry, recipe = null) {
   if (isSkippedEntry(entry)) return 'Skipped';
   if (Array.isArray(entry?.replaced) && entry.replaced.length > 0) return 'Eaten · replaced';
   const hasEaten = Array.isArray(entry?.eaten) && entry.eaten.length > 0;
-  // An extra with no planned meal is food eaten outside the plan, not a slot.
-  if (entry?.extra && !hasEaten) return 'Extra / outside meals';
+  // An extra with no planned meal is food eaten outside the menu, not a slot.
+  if (entry?.extra && !hasEaten) return 'Outside the menu';
   if (!hasEaten) return 'Eaten';
   const slot = entry.eaten.find((info) => info?.slot)?.slot || recipe?.slot || null;
   return slot ? `Eaten · ${slotLabel(slot)}` : 'Eaten';
@@ -430,11 +430,11 @@ export function renderPlan(ctx) {
   const mealCard = el(`<section class="card">
     <div class="row">
       <h2>${selected === today ? 'Today' : selected}</h2>
-      <button type="button" class="btn-primary btn-small" data-action="log">Log a meal</button>
+      <button type="button" class="btn-primary btn-small" data-action="log">Add food outside the menu</button>
     </div>
     <p class="muted tiny meal-progress" data-day-progress></p>
     <ul class="meal-list"></ul>
-    <p class="muted tiny meal-log-hint">Food outside your meals? Use Log a meal.</p>
+    <p class="muted tiny meal-log-hint">Food outside your meals? Use Add food outside the menu.</p>
   </section>`);
   const list = mealCard.querySelector('.meal-list');
   // Today shows only the meals that are on; other days show the slots they hold.

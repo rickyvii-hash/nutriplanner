@@ -12,8 +12,8 @@ export const GUIDE_STEPS = [
     body: 'Build the month plan, then open the shopping list and tick what you already have at home.',
   },
   {
-    title: 'Log what you eat',
-    body: 'Log a planned meal or food eaten outside the plan. A day over a limit updates the plan and shows why.',
+    title: 'Log your food',
+    body: 'Mark planned meals on the day screen, or add food eaten outside the menu. A day over a limit updates the plan and shows why.',
   },
 ];
 

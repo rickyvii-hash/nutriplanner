@@ -31,7 +31,6 @@ const LABELS = [
   'Start over',
   'Change profile',
   'Undo',
-  'Clear',
 ];
 
 function buttonsIn(folder) {

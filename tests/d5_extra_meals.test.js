@@ -125,9 +125,9 @@ test('an eaten planned meal keeps its slot while outside food gets its own entry
   assert.equal('replaced' in extraEntry, false);
   assert.equal('skipped' in extraEntry, false);
 
-  // Labels on the Plan screen: the slot survives, the outside food reads as an extra.
+  // Labels on the Plan screen: the slot survives, the outside food reads as outside the menu.
   assert.equal(logEntryKind(plannedEntry, lunch), `Eaten · ${lunch.slot}`);
-  assert.equal(logEntryKind(extraEntry, null), 'Extra / outside meals');
+  assert.equal(logEntryKind(extraEntry, null), 'Outside the menu');
 
   // Both entries still count in the day totals.
   const averages = loggedAverages(entries, foodsById);
@@ -193,11 +193,11 @@ test('after a skipped meal, extras are added the same day as a separate extra en
   assert.equal('extra' in skipEntry, false, 'a skip-only entry is not an extra');
 });
 
-test('the log UI names the free-search path "Extra / outside meals" and the app tags extras', () => {
-  assert.match(logSrc, /Extra \/ outside meals/);
+test('the free-search screen is "Outside the menu" and the app tags extras', () => {
+  assert.match(logSrc, /Outside the menu/);
   assert.match(logSrc, /Snack, drink or a restaurant meal/);
   assert.match(logSrc, /not tied to a planned slot/);
   assert.match(logSrc, /extra: d\.items\.length > 0/);
   assert.match(appSrc, /logEntriesForSave/);
-  assert.match(planSrc, /Extra \/ outside meals/);
+  assert.match(planSrc, /Outside the menu/);
 });

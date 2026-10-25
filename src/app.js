@@ -80,8 +80,8 @@ const ctx = {
     const items = Array.isArray(payload) ? payload : (payload?.items || []);
     const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
     if (!items.length && !skipped.length) return;
-    // The Log screen logs today. The day screen passes the day it is showing, so a
-    // meal chosen on another day is saved for that day through this same path.
+    // The outside-the-menu screen logs today. The day screen passes the day it is
+    // showing, so a meal chosen on another day is saved for that day on this path.
     const when = { date: options?.date || todayIso(), time: localTime() };
     // Free-search foods are tagged extra, so a saved entry says it was eaten outside
     // the planned meals; a replacement keeps its `replaced` slot instead.
