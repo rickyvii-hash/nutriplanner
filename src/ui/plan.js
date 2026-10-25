@@ -108,6 +108,34 @@ export function mealRowModel({
   return row;
 }
 
+/**
+ * The one-shot hand-off from the shopping list's Swap meal: { date, slot }.
+ * Returns { date, slot } when the picker should open on the day screen, or null
+ * when that meal is no longer planned, is already logged, or its day is over.
+ * The day screen still renders in every case; the picker just does not open.
+ */
+export function replaceForwardSlot({
+  openReplace,
+  plan,
+  log = [],
+  date,
+  recipesById = null,
+  today = todayIso(),
+} = {}) {
+  if (!openReplace || typeof openReplace !== 'object') return null;
+  if (!date || openReplace.date !== date) return null;
+  const slot = openReplace.slot;
+  if (typeof slot !== 'string' || !slot) return null;
+  const planDay = plan?.days?.[date];
+  // A slot the day no longer holds (a replan removed it) has nothing to replace.
+  if (!planDay || !planDay[slot]) return null;
+  // A day already over accepts no new outcome, so no picker opens on it.
+  if (today && date < today) return null;
+  // A meal with a saved outcome is no longer the planned meal to swap.
+  if (savedSlotOutcomes(log, date, planDay, recipesById).get(slot)) return null;
+  return { date, slot };
+}
+
 /** True when a saved entry only records skipped planned meals. */
 function isSkippedEntry(entry) {
   return Array.isArray(entry?.skipped) && entry.skipped.length > 0
@@ -189,6 +217,12 @@ function progressClass(kind, value, daily) {
 export function renderPlan(ctx) {
   const { state, recipesById, foodsById } = ctx;
   const root = el(`<div class="screen screen-plan"></div>`);
+  // A one-shot hand-off from the shopping list is read here, once, even when the
+  // plan or that meal is gone: it then leaves no trace and shows no error.
+  const openReplace = ctx.openReplace && typeof ctx.openReplace === 'object'
+    ? ctx.openReplace
+    : null;
+  ctx.openReplace = null;
 
   const header = el(`<header class="brand brand-compact">
     <span class="logo" aria-hidden="true">🌿</span>
@@ -236,6 +270,8 @@ export function renderPlan(ctx) {
   const dates = Object.keys(state.plan.days).sort();
   const today = todayIso();
   let selected = ctx.selectedDate && state.plan.days[ctx.selectedDate] ? ctx.selectedDate : today;
+  // The Swap meal hand-off names its own day; a date not in the plan is ignored.
+  if (openReplace?.date && state.plan.days[openReplace.date]) selected = openReplace.date;
   if (!state.plan.days[selected]) selected = dates.find((d) => d >= today) || dates[0];
 
   const strip = el(`<section class="card day-strip-wrap"><div class="day-strip" role="list"></div></section>`);
@@ -280,6 +316,22 @@ export function renderPlan(ctx) {
     if (openPicker) openPicker.remove();
     openPicker = null;
   };
+  // The same Replace picker the Log screen offers, inline under a meal row.
+  const openReplacement = (item, slot, recipe) => {
+    closePicker();
+    const picker = createReplacePicker({
+      slot,
+      currentRecipe: recipe,
+      recipes: ctx.recipes,
+      foods: ctx.foods,
+      foodsById,
+      onPick: (payload) => saveOneMeal(payload),
+    });
+    item.appendChild(picker);
+    openPicker = picker;
+  };
+  // Meal rows on this day, so a hand-off can find the slot it asks for.
+  const rowsBySlot = new Map();
   // A day-screen save takes the same path the Log screen uses; only the selected
   // date changes, so a meal chosen on a day ahead is saved for that day.
   const saveOneMeal = (payload) => {
@@ -326,18 +378,7 @@ export function renderPlan(ctx) {
           closePicker();
           return;
         }
-        closePicker();
-        // The same Replace picker the Log screen offers, inline under this row.
-        const picker = createReplacePicker({
-          slot,
-          currentRecipe: recipe,
-          recipes: ctx.recipes,
-          foods: ctx.foods,
-          foodsById,
-          onPick: (payload) => saveOneMeal(payload),
-        });
-        item.appendChild(picker);
-        openPicker = picker;
+        openReplacement(item, slot, recipe);
       });
       actions.appendChild(btn);
     }
@@ -367,7 +408,18 @@ export function renderPlan(ctx) {
     }
     // A row with no allowed action keeps no empty container.
     if (actions.childElementCount === 0) actions.remove();
+    rowsBySlot.set(slot, { item, recipe });
     list.appendChild(item);
+  }
+  // The shopping list's Swap meal: open this meal's Replace picker, but only
+  // while the meal is still planned and not yet logged. Otherwise the day screen
+  // shows as usual, with no picker and no error.
+  const forward = replaceForwardSlot({
+    openReplace, plan: state.plan, log: state.log, date: selected, recipesById, today,
+  });
+  const forwardRow = forward ? rowsBySlot.get(forward.slot) : null;
+  if (forwardRow && forwardRow.recipe) {
+    openReplacement(forwardRow.item, forward.slot, forwardRow.recipe);
   }
   mealCard.querySelector('[data-action="log"]').addEventListener('click', () => ctx.navigate('log'));
   root.appendChild(mealCard);

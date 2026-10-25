@@ -5,7 +5,7 @@
  *
  * The three states live in the shopping engine, the shopping settings live in
  * the store, and the swap hand-off is a one-shot ctx.openReplace consumed by
- * the Log screen.
+ * the day screen (Plan), which opens that meal's Replace picker.
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -36,7 +36,7 @@ import {
   validateImportPayload,
   applyImportPayload,
 } from '../src/engine/export_import.js';
-import { logPlanDate } from '../src/ui/log.js';
+import { replaceForwardSlot } from '../src/ui/plan.js';
 import { renderShopping } from '../src/ui/shopping.js';
 
 const root = new URL('..', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
@@ -243,18 +243,106 @@ test('D8: save and load bring the Not found list back; Start over clears it', ()
   assert.deepEqual(startOverState(), emptyAppState());
 });
 
-// --- The Log screen date and its one-shot Replace hand-off -----------------
+// --- The day screen's one-shot Replace hand-off ---------------------------
 
-test('D8: the Log screen opens the date handed over and respects the selected date', () => {
-  const state = { plan };
-  assert.equal(logPlanDate({ state, today: '2026-10-21', selectedDate: null, openReplace: null }), '2026-10-21');
-  assert.equal(logPlanDate({ state, today: '2026-10-21', selectedDate: '2026-10-24', openReplace: null }), '2026-10-24');
-  assert.equal(logPlanDate({
-    state, today: '2026-10-21', selectedDate: '2026-10-24',
-    openReplace: { date: '2026-10-26', slot: 'lunch' },
-  }), '2026-10-26');
-  // A date that is not in the plan falls back to today.
-  assert.equal(logPlanDate({ state, today: '2026-10-21', selectedDate: '2026-11-30', openReplace: null }), '2026-10-21');
+const FORWARD_DATE = '2026-10-24';
+const FORWARD_SLOT = Object.keys(plan.days[FORWARD_DATE]).find((slot) => plan.days[FORWARD_DATE][slot]);
+const FORWARD_RECIPE = recipesById.get(plan.days[FORWARD_DATE][FORWARD_SLOT]);
+
+function forward(openReplace, extra = {}) {
+  return replaceForwardSlot({
+    openReplace,
+    plan,
+    log: [],
+    date: FORWARD_DATE,
+    recipesById,
+    today: FORWARD_DATE,
+    ...extra,
+  });
+}
+
+test('D8: Swap meal hands the day and slot to the day screen, which opens the picker', () => {
+  assert.deepEqual(
+    forward({ date: FORWARD_DATE, slot: FORWARD_SLOT }),
+    { date: FORWARD_DATE, slot: FORWARD_SLOT },
+  );
+  // A hand-off never opens on another day, or for a slot the day does not hold.
+  assert.equal(forward({ date: '2026-10-28', slot: FORWARD_SLOT }), null);
+  assert.equal(forward({ date: FORWARD_DATE, slot: 'brunch' }), null);
+  assert.equal(forward(null), null);
+  // A day already over shows no picker, exactly as it shows no action buttons.
+  assert.equal(
+    forward({ date: FORWARD_DATE, slot: FORWARD_SLOT }, { today: '2026-10-25' }),
+    null,
+  );
+});
+
+test('D8: a meal already logged is not swapped again, so the picker stays closed', () => {
+  const logged = [
+    { date: FORWARD_DATE, items: [], eaten: [{ recipeId: FORWARD_RECIPE.id, slot: FORWARD_SLOT }] },
+    {
+      date: FORWARD_DATE, items: [], skipped: [FORWARD_RECIPE.id],
+      skippedSlots: [{ recipeId: FORWARD_RECIPE.id, slot: FORWARD_SLOT }],
+    },
+    {
+      date: FORWARD_DATE, items: [],
+      replaced: [{ slot: FORWARD_SLOT, recipeId: null, fromRecipeId: FORWARD_RECIPE.id }],
+    },
+  ];
+  for (const entry of logged) {
+    assert.equal(
+      forward({ date: FORWARD_DATE, slot: FORWARD_SLOT }, { log: [entry] }),
+      null,
+      'a logged outcome closes the picker',
+    );
+  }
+});
+
+test('D8: a meal removed from the plan is not swapped and no error is shown', () => {
+  const withoutSlot = {
+    month: plan.month,
+    days: {
+      ...plan.days,
+      [FORWARD_DATE]: Object.fromEntries(
+        Object.entries(plan.days[FORWARD_DATE]).filter(([slot]) => slot !== FORWARD_SLOT),
+      ),
+    },
+  };
+  assert.equal(
+    forward({ date: FORWARD_DATE, slot: FORWARD_SLOT }, { plan: withoutSlot }),
+    null,
+  );
+  assert.equal(forward({ date: FORWARD_DATE, slot: FORWARD_SLOT }, { plan: null }), null);
+});
+
+test('D8: only in-window meals that use the ingredient offer Swap meal', () => {
+  const list = windowList();
+  const item = list.toBuy[0];
+  const offered = mealsUsingFood({
+    plan, recipes, recipesById, foodId: item.foodId,
+    fromDate: WINDOW.from, toDate: WINDOW.to,
+  });
+  const month = mealsUsingFood({
+    plan, recipes, recipesById, foodId: item.foodId,
+    fromDate: '2026-10-01', toDate: '2026-10-31',
+  });
+
+  // The list is exactly the month's meals inside the shopping window.
+  assert.deepEqual(
+    offered,
+    month.filter((meal) => meal.date >= WINDOW.from && meal.date <= WINDOW.to),
+  );
+  for (const meal of offered) {
+    assert.ok(meal.date >= WINDOW.from && meal.date <= WINDOW.to, 'Swap row inside the window');
+    assert.ok(recipesById.get(meal.recipeId).ingredients.some((ing) => ing.foodId === item.foodId));
+  }
+  // Every hand-off row points at a planned, in-window meal.
+  for (const meal of offered) {
+    assert.deepEqual(
+      forward({ date: meal.date, slot: meal.slot }, { date: meal.date, today: '2026-10-21' }),
+      { date: meal.date, slot: meal.slot },
+    );
+  }
 });
 
 // --- Screen wiring (this project has no DOM harness, as in D6/D7) ----------
@@ -278,7 +366,7 @@ test('D8: the shopping screen renders the three sections and the swap line', () 
   assert.match(src, /Support tool, not medical advice\./);
 });
 
-test('D8: the shopping screen uses the store helpers and hands the swap to Log', () => {
+test('D8: the shopping screen uses the store helpers and hands the swap to the day screen', () => {
   const src = read('src/ui/shopping.js');
   assert.match(src, /markItemInCart\(state, /);
   assert.match(src, /markItemNotFound\(state, /);
@@ -286,17 +374,24 @@ test('D8: the shopping screen uses the store helpers and hands the swap to Log',
   assert.match(src, /shoppingNowState\(/);
   assert.match(src, /ctx\.selectedDate = /);
   assert.match(src, /ctx\.openReplace = \{ date, slot \}/);
-  assert.match(src, /ctx\.navigate\('log'\)/);
+  assert.match(src, /ctx\.navigate\('plan'\)/);
+  assert.doesNotMatch(src, /ctx\.navigate\('log'\)/, 'Swap meal opens the day screen');
   assert.doesNotMatch(src, /\breplan\(/, 'no second planner on the shopping screen');
 });
 
-test('D8: the Log screen consumes the Replace hand-off once', () => {
-  const src = read('src/ui/log.js');
-  assert.match(src, /logPlanDate\(/);
+test('D8: the day screen consumes the Replace hand-off once and opens the picker', () => {
+  const src = read('src/ui/plan.js');
+  assert.match(src, /replaceForwardSlot\(/);
+  assert.match(src, /const openReplace = ctx\.openReplace/);
   assert.match(src, /ctx\.openReplace = null/);
-  assert.match(src, /openReplace/);
-  assert.match(src, /openReplacePicker\(row, /);
+  assert.match(src, /openReplacement\(/);
+  assert.match(src, /createReplacePicker\(/);
+  // The shopping rows show the hint and an Undo for a missing item.
+  const shopping = read('src/ui/shopping.js');
+  assert.match(shopping, /class="shop-item is-not-found"[\s\S]*?data-undo-food=/);
   assert.match(read('src/app.js'), /openReplace: null/);
+  // The hand-off survives the move to Plan, or its renderer could never read it.
+  assert.match(read('src/app.js'), /name !== 'plan'/);
 });
 
 // --- Phone layout ----------------------------------------------------------

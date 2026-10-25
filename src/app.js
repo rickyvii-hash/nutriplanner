@@ -29,17 +29,16 @@ const ctx = {
   recipesById: new Map(),
   screen: 'targets',
   selectedDate: null,
-  // One-shot hand-off from the shopping list: { date, slot } to open on Log.
+  // One-shot hand-off from the shopping list: { date, slot } to open on Plan.
   openReplace: null,
   proposal: null,
   logDraft: null,
   monthBanner: null,
   navigate: (name) => {
     ctx.screen = name;
-    if (name !== 'log') {
-      ctx.logDraft = null;
-      ctx.openReplace = null;
-    }
+    if (name !== 'log') ctx.logDraft = null;
+    // A Swap meal hand-off survives the move to the day screen, which reads it once.
+    if (name !== 'plan') ctx.openReplace = null;
     render();
   },
   refresh: () => {

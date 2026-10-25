@@ -211,7 +211,7 @@ export function renderShopping(ctx) {
     });
   });
 
-  // Swap a planned meal that uses the missing ingredient: the Log screen opens
+  // Swap a planned meal that uses the missing ingredient: the day screen opens
   // for that date with the meal's Replace picker already open.
   root.querySelectorAll('[data-swap-meal]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -220,7 +220,7 @@ export function renderShopping(ctx) {
       if (!date || !slot) return;
       ctx.selectedDate = date;
       ctx.openReplace = { date, slot };
-      ctx.navigate('log');
+      ctx.navigate('plan');
     });
   });
 
