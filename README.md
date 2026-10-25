@@ -31,7 +31,7 @@ npm test
 
 1. Choose a profile (Weight loss, Cholesterol, Recovery, or Athlete) and edit daily nutrient targets. A short first-run guide explains the idea; open it again from **How it works**.
 2. Under **My meals**, switch breakfast, lunch and dinner on or off and choose 0 or 1 snack. The plan uses only those slots; daily targets stay the same.
-3. Build a month plan and review today’s meals and progress bars.
+3. Build a month plan and review today’s meals. Daily progress starts at zero and only counts food you have logged (planned meals stay planned until you log them).
 4. Tick shopping-list items you already have at home.
 5. Log a meal from the plan, search a food with a portion, or add **Extra / outside meals**. Use the **Drinks** shortcut with ml presets (glass, cup, can, bottle). Extras and drinks count in the day totals and in the plan update.
 6. **Replace** a planned meal with another recipe for the same slot, or with **I ate something else**.
