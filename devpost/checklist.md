@@ -104,3 +104,5 @@ Activity mode: not started
 - 2026-10-25: History scrub + correctness round on v2: day progress comes only from what was logged (empty log ? zeros); same-day second log replans from the original plan plus the full day log; later-day logs keep accepted make-up; past days preserved when using the original plan for a same-day replan; log corrections replan from every remaining log date. Cuts unchanged (two snacks, Lab notes). Remaining known limits: expired 4-day window can re-apply on multi-accept undo; today's meals may be kept when the removed log was what changed today.
 
 - 2026-10-25: Pure plan recompute: shown plan = f(base, log, updateDecisions); expired windows and today-recalc covered by tests; 203 pass.
+
+- 2026-10-25: Contest rules round — brand-free displayed food names (22 tokens; 87 USDA rows stripped on screen); Pages relative URLs + /nutriplanner/ load test; video ~76 s with first-20s pitch and adaptive moment before 1:00; DEVPOST_SUBMISSION.md written.
