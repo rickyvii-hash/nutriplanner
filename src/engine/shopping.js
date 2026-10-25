@@ -2,6 +2,7 @@
 // and leave the to-buy list (no duplicates across sections).
 
 import { todayIso } from './planner.js';
+import { displayFoodName } from './food_display.js';
 
 const CATEGORY_ORDER = ['Produce', 'Protein', 'Dairy', 'Pantry', 'Frozen', 'Other'];
 
@@ -104,7 +105,7 @@ export function buildShoppingList({
     const food = foodsById.get(foodId);
     const item = {
       foodId,
-      name: food?.name || foodId,
+      name: displayFoodName(food) || foodId,
       category: food?.category || 'Other',
       grams: Math.round(grams),
     };

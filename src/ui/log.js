@@ -2,6 +2,7 @@ import { todayIso } from '../engine/planner.js';
 import { activeSlots, slotLabel, slotRecipeKind } from '../engine/meal_prefs.js';
 import { searchFoods, words } from '../engine/search.js';
 import { DRINK_PRESETS, mlToGrams, listDrinkFoods } from '../engine/drinks.js';
+import { displayFoodName } from '../engine/food_display.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
 import { findPlannedRecipeForEntry } from '../log_corrections.js';
@@ -29,7 +30,7 @@ const DRINK_FIRST = ['water', 'coffee', 'tea', 'milk', 'juice', 'cola', 'soda', 
 
 /** A short drink list: one everyday drink per word first, then the remaining drinks by name. */
 function drinkPreview(foods, limit) {
-  const all = listDrinkFoods(foods);
+  const all = listDrinkFoods(foods).filter((f) => displayFoodName(f));
   const picked = [];
   const seen = new Set();
   for (const word of DRINK_FIRST) {
@@ -99,7 +100,7 @@ export function createDrinkPicker(foods, onChoose) {
   };
 
   for (const food of drinks) {
-    const btn = el(`<button type="button" class="search-hit" data-drink="${escapeHtml(food.id)}">${escapeHtml(food.name)}</button>`);
+    const btn = el(`<button type="button" class="search-hit" data-drink="${escapeHtml(food.id)}">${escapeHtml(displayFoodName(food))}</button>`);
     btn.addEventListener('click', () => {
       options.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
       btn.classList.add('is-selected');
@@ -712,7 +713,7 @@ export function renderLog(ctx) {
 
   const foodName = (foodId) => {
     const food = foods.find((f) => f.id === foodId);
-    return food?.name || foodId;
+    return displayFoodName(food) || food?.id || foodId;
   };
 
   const paintItems = () => {
@@ -753,7 +754,7 @@ export function renderLog(ctx) {
     draft.items.forEach((it, index) => {
       const food = foods.find((f) => f.id === it.foodId);
       const li = el(`<li class="logged-item">
-        <span>${escapeHtml(food?.name || it.foodId)}</span>
+        <span>${escapeHtml(foodName(it.foodId))}</span>
         <input type="number" min="1" value="${it.grams}" data-edit="${index}">
         <span class="muted">g</span>
         <button type="button" class="btn-icon" data-del="${index}" aria-label="Remove">×</button>
@@ -1018,7 +1019,9 @@ export function renderLog(ctx) {
       customAdd.disabled = true;
       if (!q.trim()) return;
       for (const f of searchFoods(foods, q, { limit: 12 })) {
-        const b = el(`<button type="button" class="search-hit">${escapeHtml(f.name)}</button>`);
+        const shown = displayFoodName(f);
+        if (!shown) continue;
+        const b = el(`<button type="button" class="search-hit">${escapeHtml(shown)}</button>`);
         b.addEventListener('click', () => {
           customSelectedId = f.id;
           customResults.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
@@ -1091,7 +1094,9 @@ export function renderLog(ctx) {
     if (!q.trim()) return;
     const hits = searchFoods(foods, q, { limit: 12 });
     for (const f of hits) {
-      const b = el(`<button type="button" class="search-hit">${escapeHtml(f.name)}</button>`);
+      const shown = displayFoodName(f);
+      if (!shown) continue;
+      const b = el(`<button type="button" class="search-hit">${escapeHtml(shown)}</button>`);
       b.addEventListener('click', () => {
         selectedFoodId = f.id;
         resultsEl.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));

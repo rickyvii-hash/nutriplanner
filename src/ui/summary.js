@@ -1,5 +1,6 @@
 import { buildSummary } from '../engine/summary.js';
 import { PROFILES } from '../engine/profiles.js';
+import { displayFoodName } from '../engine/food_display.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit, formatKind } from './dom.js';
 
 function decimalsFor(key) {
@@ -81,9 +82,9 @@ export function renderSummary(ctx) {
     for (const meal of summary.meals) {
       const when = meal.time ? `${meal.date} · ${meal.time}` : meal.date;
       const items = meal.skipped
-        ? meal.items.map((item) => `<li>Skipped · ${escapeHtml(item.name)}</li>`).join('')
+        ? meal.items.map((item) => `<li>Skipped · ${escapeHtml(displayFoodName(item.name) || item.name)}</li>`).join('')
         : meal.items
-          .map((item) => `<li>${escapeHtml(item.name)} <span class="muted">${item.grams} g</span></li>`)
+          .map((item) => `<li>${escapeHtml(displayFoodName(item.name) || item.name)} <span class="muted">${item.grams} g</span></li>`)
           .join('');
       list.appendChild(el(`<li class="summary-meal${meal.skipped ? ' is-skipped' : ''}">
         <div class="summary-meal-date">${escapeHtml(when)}${meal.skipped ? ' · Skipped' : ''}</div>

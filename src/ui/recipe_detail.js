@@ -2,6 +2,7 @@
 // The links only open when the person taps one; the app never opens them itself.
 
 import { recipeNutrients, formatNutrient } from '../engine/nutrients.js';
+import { displayFoodName } from '../engine/food_display.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 
 export const DETAIL_NOTE = 'Opens a web search. NutriPlanner does not take orders.';
@@ -46,10 +47,13 @@ export function recipeDetailModel(recipe, { targets = [], foodsById } = {}) {
   const foods = foodsById instanceof Map ? foodsById : new Map(Object.entries(foodsById || {}));
   const result = recipeNutrients(recipe, foods);
 
-  const ingredients = (recipe.ingredients || []).map((ing) => ({
-    name: foods.get(ing.foodId)?.name || ing.foodId,
-    grams: ing.grams,
-  }));
+  const ingredients = (recipe.ingredients || []).map((ing) => {
+    const food = foods.get(ing.foodId);
+    return {
+      name: displayFoodName(food) || food?.id || ing.foodId,
+      grams: ing.grams,
+    };
+  });
 
   const nutrients = (Array.isArray(targets) ? targets : [])
     .filter((t) => t && result.unknown[t.nutrient] !== undefined)

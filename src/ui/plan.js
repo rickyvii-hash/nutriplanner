@@ -1,6 +1,7 @@
 import { todayIso } from '../engine/planner.js';
 import { activeSlots, slotLabel } from '../engine/meal_prefs.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
+import { displayFoodName } from '../engine/food_display.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
 import { parsePortion } from './log.js';
@@ -258,7 +259,7 @@ export function renderPlan(ctx) {
       const items = el(`<ul class="log-edit-items"></ul>`);
       entry.items.forEach((it, itemIndex) => {
         const food = foodsById.get(it.foodId);
-        const name = food?.name || it.foodId;
+        const name = displayFoodName(food) || food?.id || it.foodId;
         items.appendChild(el(`<li class="log-edit-item">
           <span>${escapeHtml(name)}</span>
           <input type="number" min="1" max="5000" step="1" value="${it.grams}"

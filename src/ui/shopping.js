@@ -7,6 +7,7 @@ import {
   SHOP_EVERY_OPTIONS,
 } from '../engine/shopping.js';
 import { todayIso } from '../engine/planner.js';
+import { displayFoodName } from '../engine/food_display.js';
 import { el, escapeHtml } from './dom.js';
 
 export function renderShopping(ctx) {
@@ -82,7 +83,7 @@ export function renderShopping(ctx) {
         const li = el(`<li class="shop-item">
           <label>
             <input type="checkbox" data-food="${escapeHtml(item.foodId)}">
-            <span>${escapeHtml(item.name)}</span>
+            <span>${escapeHtml(displayFoodName(item.name) || item.foodId)}</span>
           </label>
           <span class="muted tiny">${item.grams} g</span>
         </li>`);
@@ -105,7 +106,7 @@ export function renderShopping(ctx) {
         const li = el(`<li class="shop-item is-bought">
           <label>
             <input type="checkbox" checked data-food="${escapeHtml(item.foodId)}">
-            <span>${escapeHtml(item.name)}</span>
+            <span>${escapeHtml(displayFoodName(item.name) || item.foodId)}</span>
           </label>
           <span class="muted tiny">${item.grams} g</span>
         </li>`);
