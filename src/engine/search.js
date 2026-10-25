@@ -23,8 +23,12 @@ export const SYNONYMS = {
   noodles: ['pasta', 'noodles', 'noodle'],
   pizza: ['pizza'],
   chocolate: ['chocolate'],
+  water: ['water'],
+  tea: ['tea'],
+  milk: ['milk'],
   juice: ['juice'],
   coffee: ['coffee'],
+  espresso: ['coffee', 'espresso'],
   wine: ['wine'],
 };
 

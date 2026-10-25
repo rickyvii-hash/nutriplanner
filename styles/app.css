@@ -163,6 +163,16 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
   border: 1px solid var(--line); background: #fff; cursor: pointer;
 }
 .search-hit.is-selected { border-color: var(--green); background: var(--green-soft); }
+
+/* Drinks shortcut: short list, ml presets and the conversion note. */
+[data-drinks], [data-replace-drinks] { margin-bottom: 8px; }
+.drink-picker { margin-bottom: 10px; }
+.drink-options {
+  display: flex; flex-direction: column; gap: 4px; max-height: 220px;
+  overflow-y: auto; margin-bottom: 8px;
+}
+.drink-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.drink-presets .btn-small { flex: 1 1 auto; }
 .logged-item {
   display: grid; grid-template-columns: 1fr 72px auto auto; gap: 8px; align-items: center;
   padding: 8px 0; border-bottom: 1px solid var(--line);

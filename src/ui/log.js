@@ -1,6 +1,7 @@
 import { todayIso } from '../engine/planner.js';
 import { activeSlots, slotLabel, slotRecipeKind } from '../engine/meal_prefs.js';
-import { searchFoods } from '../engine/search.js';
+import { searchFoods, words } from '../engine/search.js';
+import { DRINK_PRESETS, mlToGrams, listDrinkFoods } from '../engine/drinks.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
 import { findPlannedRecipeForEntry } from '../log_corrections.js';
@@ -16,6 +17,117 @@ export {
 } from '../log_corrections.js';
 
 export const MAX_PORTION_GRAMS = 5000;
+
+/** The note shown under a drink portion, because drink data is per 100 g. */
+export const DRINK_ML_NOTE = 'ml converted at about 1 g per ml';
+
+/** How many drinks the Drinks shortcut lists before the search field takes over. */
+const DRINK_LIST_LIMIT = 12;
+
+/** Everyday drink words, shown first so the short list covers the usual choices. */
+const DRINK_FIRST = ['water', 'coffee', 'tea', 'milk', 'juice', 'cola', 'soda', 'beer', 'wine'];
+
+/** A short drink list: one everyday drink per word first, then the remaining drinks by name. */
+function drinkPreview(foods, limit) {
+  const all = listDrinkFoods(foods);
+  const picked = [];
+  const seen = new Set();
+  for (const word of DRINK_FIRST) {
+    // Prefer a name that starts with the word ("Milk, whole"), then any whole word match.
+    const match = all.find((f) => !seen.has(f.id) && String(f.name || '').toLowerCase().startsWith(word))
+      || all.find((f) => !seen.has(f.id) && words(f.name).includes(word));
+    if (!match) continue;
+    picked.push(match);
+    seen.add(match.id);
+  }
+  for (const food of all) {
+    if (picked.length >= limit) break;
+    if (seen.has(food.id)) continue;
+    picked.push(food);
+    seen.add(food.id);
+  }
+  return picked.slice(0, limit);
+}
+
+/** True when the food already carries a drink measure, so no conversion note is needed. */
+function hasOwnMeasure(food) {
+  return Boolean(food && (food.measureMl || food.servingMl || food.portionMl));
+}
+
+/**
+ * The Drinks shortcut of a free search: a short list of drinks, the millilitre
+ * presets and a free ml field. Choosing a drink reports the food and its grams,
+ * so the caller fills the same fields a searched food would fill.
+ */
+export function createDrinkPicker(foods, onChoose) {
+  const panel = el(`<div class="drink-picker hidden" data-drink-picker>
+    <p class="field-label">Drinks</p>
+    <div class="drink-options" data-drink-options></div>
+    <p class="field-label">Portion</p>
+    <div class="drink-presets">
+      <button type="button" class="btn-secondary btn-small" data-drink-preset="${DRINK_PRESETS.glass}">Glass 200 ml</button>
+      <button type="button" class="btn-secondary btn-small" data-drink-preset="${DRINK_PRESETS.cup}">Cup 240 ml</button>
+      <button type="button" class="btn-secondary btn-small" data-drink-preset="${DRINK_PRESETS.can}">Can 330 ml</button>
+      <button type="button" class="btn-secondary btn-small" data-drink-preset="${DRINK_PRESETS.smallBottle}">Small bottle 500 ml</button>
+    </div>
+    <label class="field">
+      <span>Amount (ml)</span>
+      <input type="number" min="1" max="5000" step="1" placeholder="e.g. 330" data-drink-ml>
+    </label>
+    <p class="muted tiny" data-drink-note hidden>${DRINK_ML_NOTE}</p>
+  </div>`);
+
+  const options = panel.querySelector('[data-drink-options]');
+  const mlInput = panel.querySelector('[data-drink-ml]');
+  const note = panel.querySelector('[data-drink-note]');
+  const drinks = drinkPreview(foods, DRINK_LIST_LIMIT);
+  let selected = null;
+  let ml = DRINK_PRESETS.glass;
+
+  if (drinks.length === 0) {
+    options.appendChild(el('<p class="muted tiny">No drinks in the food list.</p>'));
+  }
+  // The note appears on a pick, unless that food already states its own measure.
+  const syncNote = () => {
+    note.hidden = !selected || hasOwnMeasure(selected);
+  };
+  const choose = (food) => {
+    selected = food;
+    mlInput.value = ml;
+    syncNote();
+    onChoose(food, mlToGrams(ml));
+  };
+
+  for (const food of drinks) {
+    const btn = el(`<button type="button" class="search-hit" data-drink="${escapeHtml(food.id)}">${escapeHtml(food.name)}</button>`);
+    btn.addEventListener('click', () => {
+      options.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
+      btn.classList.add('is-selected');
+      choose(food);
+    });
+    options.appendChild(btn);
+  }
+  for (const btn of panel.querySelectorAll('[data-drink-preset]')) {
+    btn.addEventListener('click', () => {
+      ml = Number(btn.dataset.drinkPreset);
+      mlInput.value = ml;
+      if (selected) choose(selected);
+    });
+  }
+  mlInput.addEventListener('input', () => {
+    const value = Number(mlInput.value);
+    if (!Number.isFinite(value) || value <= 0) return;
+    ml = value;
+    if (selected) choose(selected);
+  });
+
+  return {
+    element: panel,
+    toggle() {
+      panel.classList.toggle('hidden');
+    },
+  };
+}
 
 /**
  * A portion is a real number of grams greater than 0 and at most 5000.
@@ -476,6 +588,7 @@ export function renderLog(ctx) {
     <span>Search a food</span>
     <input type="search" placeholder="e.g. pizza, ice cream" data-search>
   </label>
+  <button type="button" class="btn-secondary btn-small" data-drinks>Drinks</button>
   <div class="search-results" data-results></div>
   <label class="field">
     <span>Portion (grams)</span>
@@ -701,6 +814,7 @@ export function renderLog(ctx) {
           <span>Search a food</span>
           <input type="search" placeholder="e.g. pizza, ice cream" data-replace-search>
         </label>
+        <button type="button" class="btn-secondary btn-small" data-replace-drinks>Drinks</button>
         <div class="search-results" data-replace-results></div>
         <label class="field">
           <span>Portion (grams)</span>
@@ -742,6 +856,18 @@ export function renderLog(ctx) {
     const customEmpty = picker.querySelector('[data-replace-empty]');
     const customBlocked = picker.querySelector('[data-replace-blocked-custom]');
     const customSave = picker.querySelector('[data-replace-save]');
+
+    // The Drinks shortcut inside "I ate something else" fills the custom selection.
+    const customDrinkPicker = createDrinkPicker(foods, (food, grams) => {
+      customResults.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
+      customSelectedId = food.id;
+      customPortion.value = grams;
+      customPortionError.classList.add('hidden');
+      customAdd.disabled = false;
+    });
+    const customDrinksButton = picker.querySelector('[data-replace-drinks]');
+    customDrinksButton.after(customDrinkPicker.element);
+    customDrinksButton.addEventListener('click', () => customDrinkPicker.toggle());
 
     const paintCustom = () => {
       customList.innerHTML = '';
@@ -876,6 +1002,19 @@ export function renderLog(ctx) {
   portionInput.addEventListener('input', () => {
     portionError.hidden = true;
   });
+
+  // The Drinks shortcut fills the same selection and portion fields as a search hit.
+  const drinkPicker = createDrinkPicker(foods, (food, grams) => {
+    resultsEl.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
+    selectedFoodId = food.id;
+    portionInput.value = grams;
+    portionError.hidden = true;
+    addSearchBtn.disabled = false;
+  });
+  const drinksButton = searchBody.querySelector('[data-drinks]');
+  drinksButton.after(drinkPicker.element);
+  drinksButton.addEventListener('click', () => drinkPicker.toggle());
+
   addSearchBtn.addEventListener('click', () => {
     if (!selectedFoodId) return;
     const grams = parsePortion(portionInput.value);
