@@ -145,22 +145,41 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
     fromDate: replanFrom,
     logFromDate: logDate,
   });
+  // Days that are already over keep the meals of the plan in force now: make-up
+  // accepted for an earlier log must not be reverted when a later log is
+  // corrected. Only the days from `replanFrom` forward are recalculated.
+  const keptPastDays = {};
+  for (const [date, meals] of Object.entries(state.plan?.days || {})) {
+    if (date < today) keptPastDays[date] = { ...meals };
+  }
+  const proposal = {
+    ...result,
+    plan: { ...result.plan, days: { ...result.plan.days, ...keptPastDays } },
+  };
+  // Until the refreshed proposal is accepted the plan goes back to the baseline
+  // from today on, so no stale compensation survives; days already over keep
+  // what was accepted for them.
+  const nextDays = {};
+  for (const [date, meals] of Object.entries(basePlan.days || {})) {
+    nextDays[date] = keptPastDays[date] || { ...meals };
+  }
+  for (const [date, meals] of Object.entries(keptPastDays)) {
+    if (!nextDays[date]) nextDays[date] = meals;
+  }
   const planChanged = result.changed.length > 0;
   const next = {
     ...state,
-    // The accepted make-up is undone until the refreshed proposal is accepted
-    // again; keeping the plan therefore never keeps a stale compensation.
-    plan: basePlan,
+    plan: { ...basePlan, days: nextDays },
     planBase: null,
-    pendingProposal: planChanged ? proposalToStore(result) : null,
+    pendingProposal: planChanged ? proposalToStore(proposal) : null,
   };
   ctx.state = next;
   saveState(next);
-  ctx.proposal = planChanged ? result : null;
+  ctx.proposal = planChanged ? proposal : null;
   ctx.logDraft = null;
   ctx.logNotice = planChanged
     ? 'Log corrected. The plan was updated.'
     : 'Log corrected. The rest of the month did not need to change.';
   if (typeof ctx.navigate === 'function') ctx.navigate(planChanged ? 'updated' : 'plan');
-  return { state: next, result, planChanged };
+  return { state: next, result: proposal, planChanged };
 }
