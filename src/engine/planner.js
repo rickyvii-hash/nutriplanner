@@ -416,14 +416,19 @@ function worstOtherTarget(effects, targets, exceptNutrient) {
   return worst;
 }
 
-function buildReason({
+function buildReasonCore({
   effects, changed, keptForBought, unreachable, nothingToChange, targets, recentTotals,
   skippedNames = [], shortfall = {}, skipNoMin = false, windowDayCount = 0,
   replacements = [], replacementOver = {}, replacementUnder = {}, replacementPrimary = null,
   overshoot = {}, logDayCount = 1, logIsPast = false,
+  extrasOffset = {}, grossShortfall = {}, extrasCoveredAll = false,
 }) {
   if (skipNoMin) return SKIP_NO_MIN_REASON;
   if (nothingToChange) {
+    // The extras covered every minimum the day was short of: nothing to make up.
+    if (extrasCoveredAll) {
+      return 'No changes needed. The food you added outside the menu already covers what you skipped.';
+    }
     // With fewer meals a floor may simply not fit the chosen slots: say so instead
     // of claiming the month meets the targets.
     if (unreachable) {
@@ -519,8 +524,13 @@ function buildReason({
     const notSpread = windowDayCount > 0 && daysTouched < windowDayCount / 2
       ? ` Only ${daysTouched} of the next ${windowDayCount} days had room for a bigger meal, so part of the shortfall is not made up.`
       : '';
+    // When extras covered part of it, quote what is left of the real shortfall
+    // instead of the daily minimum, so the numbers on the screen stay honest.
+    const missedText = extrasOffset[under.t.nutrient] > 0
+      ? `about ${formatAmount(under.t.nutrient, under.missed)} of ${formatAmount(under.t.nutrient, grossShortfall[under.t.nutrient] || under.missed)}, after the food you added outside the menu`
+      : `about ${formatAmount(under.t.nutrient, under.missed)} of your ${formatAmount(under.t.nutrient, under.t.daily)} minimum`;
     return `${closestNote}You skipped ${names} ${logWhen} `
-      + `(about ${formatAmount(under.t.nutrient, under.missed)} of your ${formatAmount(under.t.nutrient, under.t.daily)} minimum), `
+      + `(${missedText}), `
       + `so ${nextDaysPhrase(daysTouched)} higher in ${nutrientWords(under.t.nutrient)}${more}.${notSpread}${keptNote}`;
   }
 
@@ -533,6 +543,20 @@ function buildReason({
   if (parts.length === 0) return `${closestNote}Small adjustments to stay closer to your targets.`.trim();
   const text = closestNote + parts.join(', ');
   return text.charAt(0).toUpperCase() + text.slice(1) + '.';
+}
+
+/**
+ * Wrap the core reason: whenever extras reduced a shortfall, the reason says so
+ * even when the plan still changes for another target. The main branches already
+ * include the exact wording; this note covers the remaining ones.
+ */
+function buildReason(args) {
+  const text = buildReasonCore(args);
+  if (!args.extrasOffset || Object.keys(args.extrasOffset).length === 0) return text;
+  if (/food you added outside the menu/i.test(text)) return text;
+  return text + (args.extrasCoveredAll
+    ? ' The food you added outside the menu already covers what you skipped.'
+    : ' The food you added outside the menu covered part of what was missing.');
 }
 
 /** Days after the log date that can change: a short, visible compensation window. */
@@ -647,8 +671,16 @@ export function replan(state) {
   // missed meals as well. The key therefore carries the planned slot, not just the
   // recipe id; a duplicate entry for the same day and slot still counts once.
   const skippedIds = [];
-  const skippedOccurrences = [];
   const skippedSeen = new Set();
+  // Minimum shortfall per logged date, before any food added outside the menu.
+  // Keeping the date is what lets an extra cover only its own day.
+  const grossShortfallByDate = new Map();
+  const addGrossShortfall = (date, nutrient, amount) => {
+    if (!(amount > 0)) return;
+    const byNutrient = grossShortfallByDate.get(date) || {};
+    byNutrient[nutrient] = (byNutrient[nutrient] || 0) + amount;
+    grossShortfallByDate.set(date, byNutrient);
+  };
   for (const entry of log || []) {
     if (!entry?.date || entry.date < logFromDate || entry.date > fromDate) continue;
     if (!Array.isArray(entry.skipped)) continue;
@@ -673,23 +705,17 @@ export function replan(state) {
       const key = `${entry.date}|${slot || ''}|${id}`;
       if (skippedSeen.has(key)) continue;
       skippedSeen.add(key);
-      skippedOccurrences.push(id);
       if (!skippedIds.includes(id)) skippedIds.push(id);
-    }
-  }
-  const skippedNames = skippedIds.map((id) => recipesById.get(id)?.name || id);
-  const shortfall = {};
-  for (const t of targets) {
-    if (t.kind !== 'min') continue;
-    let sum = 0;
-    for (const id of skippedOccurrences) {
       const recipe = recipesById.get(id);
       if (!recipe) continue;
       const r = recipeNutrients(recipe, foodsById);
-      if (!r.unknown[t.nutrient]) sum += r.totals[t.nutrient];
+      for (const t of targets) {
+        if (t.kind !== 'min' || r.unknown[t.nutrient]) continue;
+        addGrossShortfall(entry.date, t.nutrient, r.totals[t.nutrient]);
+      }
     }
-    if (sum > 0) shortfall[t.nutrient] = sum;
   }
+  const skippedNames = skippedIds.map((id) => recipesById.get(id)?.name || id);
 
   // Meals replaced on the logged days: what was eaten instead of the planned meal.
   // The difference from the plan feeds the same window rules as an off-plan meal,
@@ -729,14 +755,56 @@ export function replan(state) {
         if (before.unknown[n] || after.unknown[n]) continue;
         const delta = after.totals[n] - before.totals[n];
         if (t.kind === 'max' && delta > 0) replacementOver[n] = (replacementOver[n] || 0) + delta;
-        if (t.kind === 'min' && delta < 0) replacementUnder[n] = (replacementUnder[n] || 0) - delta;
+        if (t.kind === 'min' && delta < 0) {
+          replacementUnder[n] = (replacementUnder[n] || 0) - delta;
+          addGrossShortfall(entry.date, n, -delta);
+        }
       }
     }
   }
-  // A swap that leaves the day lower on a minimum raises the next days like a skip.
-  for (const [n, v] of Object.entries(replacementUnder)) {
-    shortfall[n] = (shortfall[n] || 0) + v;
+  // Food added outside the menu (free-search foods, drinks, custom foods) on the
+  // logged days. It offsets only minimum shortfalls and only on its own date, so
+  // energy already eaten is never asked for again. An unknown (null) value adds
+  // zero, so it can never create a certain offset.
+  const extrasByDate = new Map();
+  for (const entry of log || []) {
+    const date = entry?.date;
+    if (!date || date < logFromDate || date > fromDate) continue;
+    const items = entry.items || [];
+    if (items.length === 0) continue;
+    const outsideMenu = entry.extra === true
+      || (!entry.skipped?.length && !entry.replaced?.length && !entry.eaten?.length);
+    if (!outsideMenu) continue;
+    const r = loggedNutrients(items, foodsById);
+    extrasByDate.set(date, addTotals(extrasByDate.get(date) || emptyTotals(), r.totals));
   }
+
+  // The make-up a nutrient still needs: the day's shortfall (skips and lighter
+  // replacements) minus what the extras covered that same date, never below zero.
+  const grossShortfall = {};
+  const shortfall = {};
+  const extrasOffset = {};
+  for (const t of targets) {
+    if (t.kind !== 'min') continue;
+    let gross = 0;
+    let net = 0;
+    let offset = 0;
+    for (const [date, byNutrient] of grossShortfallByDate) {
+      const dayGross = byNutrient[t.nutrient] || 0;
+      if (dayGross <= 0) continue;
+      gross += dayGross;
+      const covered = Math.min(dayGross, Math.max(0, extrasByDate.get(date)?.[t.nutrient] || 0));
+      offset += covered;
+      net += dayGross - covered;
+    }
+    if (gross > 0) grossShortfall[t.nutrient] = gross;
+    if (offset > 0) extrasOffset[t.nutrient] = offset;
+    if (net > 0) shortfall[t.nutrient] = net;
+  }
+  // Every minimum the shorts left is covered by the extras. Maximum logic is
+  // untouched: the extras still count as eaten for an overshoot.
+  const extrasCoveredAll = Object.keys(grossShortfall).length > 0
+    && Object.keys(shortfall).length === 0;
   // The shortfall nutrient a swap must improve: calories when they fell short,
   // otherwise the minimum that fell furthest short relative to its daily value.
   let floorNutrient = null;
@@ -832,8 +900,10 @@ export function replan(state) {
     }
     if (!replacementPrimary) {
       for (const t of targets) {
-        if (t.kind !== 'min' || !replacementUnder[t.nutrient]) continue;
-        const score = replacementUnder[t.nutrient] / t.daily + (t.nutrient === 'kcal' ? 2 : 0);
+        // A minimum the extras already covered needs no make-up, so it cannot be
+        // the shortfall the reason names.
+        if (t.kind !== 'min' || !replacementUnder[t.nutrient] || !shortfall[t.nutrient]) continue;
+        const score = shortfall[t.nutrient] / t.daily + (t.nutrient === 'kcal' ? 2 : 0);
         if (!replacementPrimary || score > replacementPrimary.score) {
           replacementPrimary = { nutrient: t.nutrient, kind: 'min', score };
         }
@@ -1070,6 +1140,9 @@ export function replan(state) {
       overshoot,
       logDayCount,
       logIsPast,
+      extrasOffset,
+      grossShortfall,
+      extrasCoveredAll,
     });
 
   return {
