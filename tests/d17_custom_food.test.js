@@ -240,7 +240,8 @@ test('D17: a custom food counts in the day totals, with gaps kept partial', () =
   assert.equal(Number(formatNutrient(result, 'kcal', 0).replace(PARTIAL_MARK, '')), Number(expectedKcal.toFixed(0)));
   assert.ok(formatNutrient(result, 'fibre', 1).startsWith(PARTIAL_MARK), 'fibre is a partial sum');
   // A nutrient missing from every part reads "n/a", never 0.
-  const onlyCustom = dayProgressTotals(plan.days[FROM], [dayLog[0]], recipesById, map).result;
+  const customOnlyEntry = { ...dayLog[0], items: [dayLog[0].items[0]] };
+  const onlyCustom = dayProgressTotals(plan.days[FROM], [customOnlyEntry], recipesById, map).result;
   assert.equal(formatNutrient(onlyCustom, 'carbs', 1), 'n/a');
   assert.equal(formatNutrient(onlyCustom, 'kcal', 0), '450');
 

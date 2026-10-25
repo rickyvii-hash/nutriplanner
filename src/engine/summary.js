@@ -4,6 +4,7 @@
 // planned food is not eaten food. Missing values stay null (shown as "n/a"), never zero.
 
 import { NUTRIENT_KEYS, foodNutrients, recipeNutrients } from './nutrients.js';
+import { shownFoodName } from './custom_foods.js';
 
 export const SUMMARY_STATUS = {
   within: 'Within target',
@@ -142,10 +143,14 @@ function mealRows(log, foodsById, recipesById = new Map()) {
         date: entry.date,
         time: entry.time || '',
         skipped: false,
-        items: (entry.items || []).map((item) => ({
-          name: foodsById.get(item.foodId)?.name || item.foodId,
-          grams: item.grams,
-        })),
+        items: (entry.items || []).map((item) => {
+          const food = foodsById.get(item.foodId);
+          return {
+            name: food ? shownFoodName(food, item.name) : (item.name || item.foodId),
+            grams: item.grams,
+            custom: Boolean(food?.custom),
+          };
+        }),
       };
     });
 }

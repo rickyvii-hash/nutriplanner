@@ -85,7 +85,7 @@ export function renderSummary(ctx) {
       const items = meal.skipped
         ? meal.items.map((item) => `<li>Skipped · ${escapeHtml(displayFoodName(item.name) || item.name)}</li>`).join('')
         : meal.items
-          .map((item) => `<li>${escapeHtml(displayFoodName(item.name) || item.name)} <span class="muted">${item.grams} g</span></li>`)
+          .map((item) => `<li${item.custom ? ' class="is-custom"' : ''}>${escapeHtml(displayFoodName(item.name) || item.name)} <span class="muted">${item.grams} g</span></li>`)
           .join('');
       list.appendChild(el(`<li class="summary-meal${meal.skipped ? ' is-skipped' : ''}">
         <div class="summary-meal-date">${escapeHtml(when)}${meal.skipped ? ' · Skipped' : ''}</div>

@@ -4,6 +4,7 @@
 // overwrites data that is already saved.
 
 import { normalizeMealPrefs, activeSlots } from './meal_prefs.js';
+import { normalizeCustomFoods } from './custom_foods.js';
 import { withoutSecondSnack } from '../store.js';
 
 export const EXPORT_VERSION = 1;
@@ -63,6 +64,8 @@ export function buildExportPayload(state) {
   // Only written when there is something to restore, so a backup of an older
   // state stays exactly as it was and older files stay readable.
   if (notFound.length > 0) payload.notFound = notFound;
+  const customFoods = normalizeCustomFoods(s.customFoods);
+  if (customFoods.length > 0) payload.customFoods = customFoods;
   return payload;
 }
 
@@ -117,13 +120,23 @@ export function validateImportPayload(data) {
   if (data.shopStart !== undefined && data.shopStart !== null && typeof data.shopStart !== 'string') {
     return reject('This backup has an unexpected format for the shopping start date.');
   }
-  if (data.updateDecisions !== undefined && data.updateDecisions !== null) {
-    if (!Array.isArray(data.updateDecisions)) {
+  if (data.updateDecisions !== undefined && data.updateDecisions !== null) {    if (!Array.isArray(data.updateDecisions)) {
       return reject('This backup has an unexpected format for plan update decisions.');
     }
     for (const d of data.updateDecisions) {
       if (!isPlainObject(d) || typeof d.triggerDate !== 'string' || typeof d.accepted !== 'boolean') {
         return reject('This backup has an unexpected format for plan update decisions.');
+      }
+    }
+  }
+
+  if (data.customFoods !== undefined && data.customFoods !== null) {
+    if (!Array.isArray(data.customFoods)) {
+      return reject('This backup has an unexpected format for the foods you added.');
+    }
+    for (const food of data.customFoods) {
+      if (!isPlainObject(food)) {
+        return reject('This backup has an unexpected format for the foods you added.');
       }
     }
   }
@@ -158,6 +171,8 @@ export function applyImportPayload(currentState, data) {
     plan: data.plan ?? null,
     planBase: data.planBase ?? null,
     log: (data.log ?? []).map((entry) => ({ ...entry })),
+    // An older backup without this list restores no foods the person added.
+    customFoods: normalizeCustomFoods(data.customFoods),
     bought: [...(data.bought ?? [])],
     // An older backup without this list restores it as empty.
     notFound: [...(data.notFound ?? [])],

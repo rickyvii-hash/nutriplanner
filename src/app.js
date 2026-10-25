@@ -7,6 +7,9 @@ import {
 import { buildExportPayload, applyImportPayload, EXPORT_FILE_NAME } from './engine/export_import.js';
 import { registerDisplayFoods } from './engine/food_display.js';
 import {
+  allFoodsWithCustomFoods, buildCustomFood, foodIndexWithCustomFoods, removeCustomFoodFromList,
+} from './engine/custom_foods.js';
+import {
   buildPlan, replan, todayIso, localTime,
 } from './engine/planner.js';
 import { renderTargets } from './ui/targets.js';
@@ -24,6 +27,8 @@ const app = document.getElementById('app');
 
 const ctx = {
   state: loadState(),
+  // The database foods as loaded; `foods` also holds the foods the person added.
+  dbFoods: [],
   foods: [],
   recipes: [],
   foodsById: new Map(),
@@ -47,6 +52,31 @@ const ctx = {
   refresh: () => {
     ctx.suppressStripScroll = true;
     render({ keepScroll: true });
+  },
+  // Keep the search list and the nutrient lookup in step with the saved state.
+  // The list is updated in place so a screen that already holds it sees the change.
+  refreshFoods: () => {
+    const customFoods = Array.isArray(ctx.state.customFoods) ? ctx.state.customFoods : [];
+    ctx.foods.length = 0;
+    ctx.foods.push(...allFoodsWithCustomFoods(ctx.dbFoods, customFoods));
+    ctx.foodsById = foodIndexWithCustomFoods(ctx.dbFoods, customFoods, ctx.state.log || []);
+  },
+  // Save a food the person typed. The values are for one portion, so one portion
+  // equals exactly what was entered; a nutrient left empty stays unknown.
+  addCustomFood: (value) => {
+    const customFoods = Array.isArray(ctx.state.customFoods) ? ctx.state.customFoods : [];
+    const food = buildCustomFood(value, customFoods);
+    ctx.state = { ...ctx.state, customFoods: [...customFoods, food] };
+    saveState(ctx.state);
+    ctx.refreshFoods();
+    return food;
+  },
+  // Remove a food from the searchable list; meals already logged keep it.
+  removeCustomFood: (id) => {
+    const customFoods = Array.isArray(ctx.state.customFoods) ? ctx.state.customFoods : [];
+    ctx.state = { ...ctx.state, customFoods: removeCustomFoodFromList(customFoods, id) };
+    saveState(ctx.state);
+    ctx.refreshFoods();
   },
   onChange: (next) => {
     ctx.state = next;
@@ -258,6 +288,9 @@ function render({ keepScroll = false } = {}) {
   const scroll = keepScroll && typeof window !== 'undefined'
     ? { x: window.scrollX, y: window.scrollY }
     : null;
+  // Every screen reads the same lookup, so a saved, removed or restored food is
+  // reflected everywhere on the next paint.
+  ctx.refreshFoods();
   app.innerHTML = '';
   const notice = getStorageNotice();
   if (notice) {
@@ -294,10 +327,10 @@ async function start() {
       loadJson('data/foods.json'),
       loadJson('data/recipes.json'),
     ]);
-    ctx.foods = foods;
+    ctx.dbFoods = foods;
     registerDisplayFoods(foods);
     ctx.recipes = recipes;
-    ctx.foodsById = new Map(foods.map((f) => [f.id, f]));
+    ctx.refreshFoods();
     ctx.recipesById = new Map(recipes.map((r) => [r.id, r]));
     // Keep one shopping window on record, starting today until you shop again.
     ctx.state = {

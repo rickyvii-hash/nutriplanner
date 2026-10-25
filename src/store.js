@@ -3,6 +3,7 @@
 import {
   defaultMealPrefs, normalizeMealPrefs, activeSlots, MAX_SNACKS,
 } from './engine/meal_prefs.js';
+import { normalizeCustomFoods } from './engine/custom_foods.js';
 
 const KEY = 'nutriplanner-v1';
 
@@ -20,6 +21,8 @@ export function emptyAppState() {
     // from here, so a make-up for a meal that is later removed cannot survive.
     planBase: null,
     log: [],
+    // Foods the person added themselves ("Add my own food"), saved on this device.
+    customFoods: [],
     bought: [],
     // Ingredients that were not in the shop, so they are never counted as bought.
     notFound: [],
@@ -50,6 +53,7 @@ export function startOverState() {
 export const START_OVER_ITEMS = [
   'Your month plan',
   'Your meal logs',
+  'Foods you added yourself',
   'Shopping ticks (items you marked bought)',
   'Shopping items marked not found',
   'A pending plan update proposal',
@@ -340,7 +344,7 @@ export function loadState() {
       return { ...EMPTY };
     }
     const raw = localStorage.getItem(KEY);
-    if (!raw) return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [] };
+    if (!raw) return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [], customFoods: [] };
     const data = JSON.parse(raw);
     const loaded = {
       profileId: data.profileId ?? null,
@@ -352,6 +356,8 @@ export function loadState() {
       plan: data.plan ?? null,
       planBase: data.planBase && typeof data.planBase === 'object' ? data.planBase : null,
       log: Array.isArray(data.log) ? data.log : [],
+      // Older saved data has no foods the person added: the list starts empty.
+      customFoods: normalizeCustomFoods(data.customFoods),
       bought: Array.isArray(data.bought) ? data.bought : [],
       // Older saved data has no not-found list: it starts empty.
       notFound: Array.isArray(data.notFound)
@@ -376,7 +382,7 @@ export function loadState() {
     };
   } catch {
     storageNotice = 'Saved data could not be read; starting fresh for this session.';
-    return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [] };
+    return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [], customFoods: [] };
   }
 }
 
@@ -397,6 +403,7 @@ export function saveState(state) {
         plan: state.plan,
         planBase: state.planBase || null,
         log: state.log,
+        customFoods: normalizeCustomFoods(state.customFoods),
         bought: state.bought,
         notFound: Array.isArray(state.notFound) ? state.notFound : [],
         keptForBought: state.keptForBought || [],

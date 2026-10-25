@@ -2,7 +2,11 @@ import { todayIso } from '../engine/planner.js';
 import { activeSlots, slotLabel } from '../engine/meal_prefs.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { displayFoodName } from '../engine/food_display.js';
+import {
+  gramsForPortions, parsePortions, portionsFromGrams, shownFoodName,
+} from '../engine/custom_foods.js';
 import { pendingProposalForPlan } from '../store.js';
+import { isUserFood } from './custom_food.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
 import { createReplacePicker } from './replace_picker.js';
@@ -681,13 +685,21 @@ export function renderPlan(ctx) {
       const items = el(`<ul class="log-edit-items"></ul>`);
       entry.items.forEach((it, itemIndex) => {
         const food = foodsById.get(it.foodId);
-        const name = displayFoodName(food) || food?.id || it.foodId;
+        const custom = isUserFood(food);
+        // Database names are shown brand-free; a food the person added keeps its own name.
+        const name = food && !custom
+          ? (displayFoodName(food) || shownFoodName(food, it.name || it.foodId))
+          : shownFoodName(food, it.name || it.foodId);
+        // A food the person added is logged in portions, not grams.
+        const amount = custom ? portionsFromGrams(it.grams) : it.grams;
+        const unit = custom ? 'portions' : 'g';
+        const bounds = custom ? 'min="0.25" max="50" step="0.25" data-correct-portions' : 'min="1" max="5000" step="1"';
         items.appendChild(el(`<li class="log-edit-item">
           <span>${escapeHtml(name)}</span>
-          <input type="number" min="1" max="5000" step="1" value="${it.grams}"
+          <input type="number" ${bounds} value="${amount}"
             data-correct-entry="${index}" data-correct-item="${itemIndex}"
-            aria-label="${escapeHtml(name)} grams">
-          <span class="muted">g</span>
+            aria-label="${escapeHtml(name)} ${unit}">
+          <span class="muted">${unit}</span>
         </li>`));
       });
       li.appendChild(items);
@@ -726,6 +738,17 @@ export function renderPlan(ctx) {
       const itemIndex = Number(input.dataset.correctItem);
       const entry = ctx.state.log?.[index];
       if (!entry) return;
+      if (input.hasAttribute('data-correct-portions')) {
+        const portions = parsePortions(input.value);
+        if (portions === null) {
+          input.value = portionsFromGrams(entry.items[itemIndex]?.grams ?? 0);
+          return;
+        }
+        const grams = gramsForPortions(portions);
+        const items = entry.items.map((it, i) => (i === itemIndex ? { ...it, grams } : it));
+        updateAfterCorrection(updateLogEntryItems(ctx.state, index, items), entry);
+        return;
+      }
       const grams = parsePortion(input.value);
       if (grams === null) {
         input.value = entry.items[itemIndex]?.grams ?? '';

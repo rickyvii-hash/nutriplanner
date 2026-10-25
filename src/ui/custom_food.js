@@ -6,7 +6,7 @@
  */
 
 import {
-  CUSTOM_FORM_NOTE, CUSTOM_NAME_MAX, CUSTOM_KCAL_MAX, CUSTOM_OPTIONAL_NUTRIENTS,
+  CUSTOM_NAME_MAX, CUSTOM_KCAL_MAX, CUSTOM_OPTIONAL_NUTRIENTS,
   MAX_PORTIONS, gramsForPortions, parsePortions,
   shownFoodName, validateCustomFood,
 } from '../engine/custom_foods.js';
@@ -58,6 +58,7 @@ export function amountError(food) {
  * Nothing is saved while a message is showing.
  */
 export function createCustomFoodForm({ onSave, onCancel } = {}) {
+  // Optional fields offered: Saturated fat, Total fat, Protein, Fibre, Sodium, Sugar.
   const nutrientFields = CUSTOM_OPTIONAL_NUTRIENTS.map((field) => `
     <label class="field">
       <span>${escapeHtml(field.label)} (${escapeHtml(field.unit)})</span>
@@ -70,7 +71,7 @@ export function createCustomFoodForm({ onSave, onCancel } = {}) {
     <p class="field-label">Your food</p>
     <label class="field">
       <span>Name</span>
-      <input type="text" maxlength="${CUSTOM_NAME_MAX}" required autocomplete="off"
+      <input type="text" maxlength="60" required autocomplete="off"
         placeholder="e.g. Lasagna" data-custom-name>
     </label>
     <p class="field-error" data-custom-error="name" hidden></p>
@@ -87,7 +88,7 @@ export function createCustomFoodForm({ onSave, onCancel } = {}) {
     <p class="field-error" data-custom-error="kcal" hidden></p>
     <p class="field-label">Optional, for that same portion</p>
     ${nutrientFields}
-    <p class="muted tiny custom-food-note">${escapeHtml(CUSTOM_FORM_NOTE)}</p>
+    <p class="muted tiny custom-food-note">Values are your own estimate.</p>
     <div class="custom-food-actions">
       <button type="submit" class="btn-primary btn-small" data-custom-save>Save my food</button>
       <button type="button" class="btn-text" data-custom-cancel>Cancel</button>
