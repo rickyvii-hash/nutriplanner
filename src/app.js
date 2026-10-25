@@ -2,7 +2,9 @@ import {
   loadState, saveState, getStorageNotice, clearState,
   proposalToStore, pendingProposalForPlan, withoutPendingProposal,
   acceptUpdatedPlan, applyStaleMonthOnStart, startOverState, changeProfileState,
+  startScreenFor,
 } from './store.js';
+import { buildExportPayload, applyImportPayload, EXPORT_FILE_NAME } from './engine/export_import.js';
 import {
   buildPlan, replan, todayIso, localTime,
 } from './engine/planner.js';
@@ -13,7 +15,7 @@ import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
 import { shouldShowNav } from './ui/nav.js';
-import { openStartOverPanel, openChangeProfilePanel } from './ui/reset.js';
+import { openStartOverPanel, openChangeProfilePanel, openRestorePanel } from './ui/reset.js';
 
 const app = document.getElementById('app');
 
@@ -124,6 +126,34 @@ const ctx = {
     ctx.selectedDate = null;
     ctx.monthBanner = null;
     ctx.screen = 'targets';
+    render();
+  },
+  // Download my data: a local JSON file built from what is saved right now.
+  downloadData: () => {
+    const payload = buildExportPayload(ctx.state);
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = EXPORT_FILE_NAME;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  },
+  // Restore from file asks for confirmation before replacing anything.
+  openRestore: (data, summary) => openRestorePanel(ctx, data, summary),
+  confirmRestore: (data) => {
+    const next = applyImportPayload(ctx.state, data);
+    // applyImportPayload returns the same state when the file is not valid.
+    if (next === ctx.state) return;
+    ctx.state = next;
+    saveState(ctx.state);
+    ctx.proposal = null;
+    ctx.logDraft = null;
+    ctx.selectedDate = null;
+    ctx.monthBanner = null;
+    ctx.screen = startScreenFor(ctx.state);
     render();
   },
   confirmChangeProfile: ({ keepLog = true } = {}) => {
