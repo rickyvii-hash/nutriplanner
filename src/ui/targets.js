@@ -3,6 +3,7 @@ import { NUTRIENTS } from '../engine/nutrients.js';
 import { todayIso, rebuildPlanMeals } from '../engine/planner.js';
 import { normalizeMealPrefs } from '../engine/meal_prefs.js';
 import { validateImportPayload } from '../engine/export_import.js';
+import { withTargetsEdited } from '../store.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit, formatKind } from './dom.js';
 
 const MEAL_LABELS = [
@@ -267,12 +268,13 @@ export function renderTargets(ctx) {
   root.appendChild(actions);
   root.appendChild(guideFooter(ctx));
 
+  // Any target edit drops a pending update proposal: it was computed on the old targets.
   const syncField = (i, field, value) => {
     const next = state.targets.map((t, idx) => {
       if (idx !== i) return { ...t };
       return { ...t, [field]: value };
     });
-    onChange({ ...state, targets: next });
+    onChange(withTargetsEdited(state, next));
   };
 
   root.querySelectorAll('[data-field]').forEach((input) => {
@@ -299,7 +301,7 @@ export function renderTargets(ctx) {
   root.querySelectorAll('[data-remove]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const i = Number(btn.dataset.remove);
-      onChange({ ...state, targets: state.targets.filter((_, idx) => idx !== i) });
+      onChange(withTargetsEdited(state, state.targets.filter((_, idx) => idx !== i)));
     });
   });
 
@@ -321,7 +323,7 @@ export function renderTargets(ctx) {
     addTargetBtn.addEventListener('click', () => {
       const target = nextCustomTarget(state.targets);
       if (!target) return;
-      onChange({ ...state, targets: [...state.targets, target] });
+      onChange(withTargetsEdited(state, [...state.targets, target]));
     });
   }
 

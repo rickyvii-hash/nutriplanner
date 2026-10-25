@@ -1,6 +1,6 @@
 // Device-local persistence. No accounts, no cloud.
 
-import { defaultMealPrefs, normalizeMealPrefs } from './engine/meal_prefs.js';
+import { defaultMealPrefs, normalizeMealPrefs, activeSlots } from './engine/meal_prefs.js';
 
 const KEY = 'nutriplanner-v1';
 
@@ -149,6 +149,60 @@ export function withoutPendingProposal(state) {
 }
 
 /**
+ * State after the daily targets were edited (a value changed, a target added or
+ * removed). A pending proposal was worked out against the old targets, so it is
+ * dropped: "Use updated" can never apply numbers that no longer match the targets.
+ */
+export function withTargetsEdited(state, targets) {
+  if (!state) return state;
+  return {
+    ...state,
+    targets: Array.isArray(targets) ? targets : [],
+    pendingProposal: null,
+  };
+}
+
+/** A copy of a month plan without the legacy second snack, or the plan itself when it has none. */
+function withoutSecondSnackDays(plan) {
+  if (!plan || !plan.days || typeof plan.days !== 'object') return plan;
+  let changed = false;
+  const days = {};
+  for (const [date, day] of Object.entries(plan.days)) {
+    if (day && Object.prototype.hasOwnProperty.call(day, 'snack2')) {
+      const { snack2, ...rest } = day;
+      days[date] = rest;
+      changed = true;
+    } else {
+      days[date] = day;
+    }
+  }
+  return changed ? { ...plan, days } : plan;
+}
+
+/**
+ * Saved data from an older version could hold a second snack. This version plans one
+ * snack at most, so `snack2` is removed from the plan, the plan kept for corrections
+ * and a pending proposal on load: the day values and the shopping list then match the
+ * meals the screens show.
+ */
+export function withoutSecondSnack(state) {
+  if (!state) return state;
+  const prefs = normalizeMealPrefs(state.mealPrefs);
+  if (activeSlots(prefs).includes('snack2')) return state;
+  const plan = withoutSecondSnackDays(state.plan);
+  const planBase = withoutSecondSnackDays(state.planBase);
+  const pending = state.pendingProposal;
+  const pendingPlan = pending?.plan ? withoutSecondSnackDays(pending.plan) : null;
+  const pendingProposal = pendingPlan && pendingPlan !== pending.plan
+    ? { ...pending, plan: pendingPlan }
+    : pending;
+  if (plan === state.plan && planBase === state.planBase && pendingProposal === pending) {
+    return state;
+  }
+  return { ...state, plan, planBase, pendingProposal };
+}
+
+/**
  * Apply an accepted update proposal. The plan before the update is remembered in
  * `planBase` (the first time only), so a later log correction can replan from the
  * plan that existed before any make-up was accepted instead of from the already
@@ -235,7 +289,7 @@ export function loadState() {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [] };
     const data = JSON.parse(raw);
-    return {
+    const loaded = {
       profileId: data.profileId ?? null,
       guideDismissed: data.guideDismissed === true,
       targets: Array.isArray(data.targets) ? data.targets : [],
@@ -252,6 +306,8 @@ export function loadState() {
         : null,
       labNotes: Array.isArray(data.labNotes) ? data.labNotes : [],
     };
+    // An older saved plan may still hold a second snack; the screens offer one.
+    return withoutSecondSnack(loaded);
   } catch {
     storageNotice = 'Saved data could not be read; starting fresh for this session.';
     return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [] };

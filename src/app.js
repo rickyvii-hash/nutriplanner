@@ -48,6 +48,9 @@ const ctx = {
   },
   onChange: (next) => {
     ctx.state = next;
+    // The open proposal lives only as long as the saved one: editing targets (or
+    // anything else that drops it) must not leave the old numbers on screen.
+    if (!next.pendingProposal) ctx.proposal = null;
     saveState(ctx.state);
     render();
   },

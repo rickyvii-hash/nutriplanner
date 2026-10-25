@@ -4,6 +4,7 @@
 // overwrites data that is already saved.
 
 import { normalizeMealPrefs, activeSlots } from './meal_prefs.js';
+import { withoutSecondSnack } from '../store.js';
 
 export const EXPORT_VERSION = 1;
 export const EXPORT_APP_NAME = 'NutriPlanner';
@@ -122,7 +123,7 @@ export function applyImportPayload(currentState, data) {
   const check = validateImportPayload(data);
   if (!check.ok) return currentState;
 
-  return {
+  const restored = {
     profileId: typeof data.profileId === 'string' ? data.profileId : null,
     targets: (data.targets ?? []).map((t) => ({ ...t })),
     mealPrefs: normalizeMealPrefs(data.mealPrefs),
@@ -136,4 +137,6 @@ export function applyImportPayload(currentState, data) {
     pendingProposal: null,
     labNotes: (data.labNotes ?? []).map((note) => ({ ...note })),
   };
+  // An older backup may hold a second snack: the restored plan shows one snack only.
+  return withoutSecondSnack(restored);
 }
