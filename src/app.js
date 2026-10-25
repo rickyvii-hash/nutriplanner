@@ -67,13 +67,15 @@ const ctx = {
     ctx.selectedDate = todayIso();
     ctx.navigate('plan');
   },
-  saveLogAndReplan: (payload) => {
+  saveLogAndReplan: (payload, options = {}) => {
     if (!ctx.state.plan) return;
     // Accept either a food-item array (older callers) or { items, skipped, replaced, eaten, extra }.
     const items = Array.isArray(payload) ? payload : (payload?.items || []);
     const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
     if (!items.length && !skipped.length) return;
-    const when = { date: todayIso(), time: localTime() };
+    // The Log screen logs today. The day screen passes the day it is showing, so a
+    // meal chosen on another day is saved for that day through this same path.
+    const when = { date: options?.date || todayIso(), time: localTime() };
     // Free-search foods are tagged extra, so a saved entry says it was eaten outside
     // the planned meals; a replacement keeps its `replaced` slot instead.
     const entries = logEntriesForSave(

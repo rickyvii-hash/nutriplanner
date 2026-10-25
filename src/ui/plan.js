@@ -4,7 +4,15 @@ import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients
 import { displayFoodName } from '../engine/food_display.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
-import { parsePortion } from './log.js';
+import { createReplacePicker } from './replace_picker.js';
+import {
+  parsePortion,
+  newLogDraft,
+  addRecipeGroup,
+  skipRecipeGroup,
+  draftSavePayload,
+  savedSlotOutcomes,
+} from './log.js';
 import {
   removeLogEntry,
   updateLogEntryItems,
@@ -13,6 +21,92 @@ import {
   findPlannedRecipeForEntry,
   applyLogCorrection,
 } from '../log_corrections.js';
+
+/** Every status a day-screen meal row can show. */
+export const MEAL_STATUS_LABELS = {
+  planned: 'Planned',
+  eaten: 'Eaten',
+  skipped: 'Skipped',
+  replaced: 'Replaced',
+};
+
+/**
+ * The save payload of one day-screen action for one planned meal. It is built with
+ * the same draft helpers the Log screen uses, so "Ate it" and "Skipped" save exactly
+ * the log entry a Log save would: one meal, the same payload shape.
+ * Returns null for an unknown action or a missing recipe.
+ */
+export function dayMealSavePayload(recipe, slot, action) {
+  if (!recipe) return null;
+  const draft = newLogDraft();
+  if (action === 'eat') addRecipeGroup(draft, recipe, slot || null);
+  else if (action === 'skip') skipRecipeGroup(draft, recipe.id, slot || null);
+  else return null;
+  return draftSavePayload(draft);
+}
+
+/**
+ * The row model of one meal of the selected day: its status from the saved log and
+ * the actions the existing rules allow. A meal with no saved outcome is Planned and
+ * offers Ate it / Skipped / Replace while the day is today or ahead. A day already
+ * over cannot receive a new outcome, but a saved one can still be Undo or changed
+ * through the same correction rules the Logged meals card uses. A replaced meal can
+ * only be undone: it is redone through Replace, never flipped to a skip.
+ */
+export function mealRowModel({
+  date,
+  slot,
+  recipe = null,
+  log = [],
+  planDay = null,
+  recipesById = null,
+  outcomes = null,
+  today = todayIso(),
+} = {}) {
+  const saved = outcomes || savedSlotOutcomes(log, date, planDay, recipesById);
+  const outcome = saved.get(slot) || null;
+  const status = outcome?.kind || 'planned';
+  const planRecipe = recipe
+    || (outcome?.recipeId && recipesById?.get ? recipesById.get(outcome.recipeId) : null)
+    || null;
+  const past = Boolean(date && today && date < today);
+  const open = !past;
+  const entryIndex = Number.isInteger(outcome?.index) ? outcome.index : null;
+
+  const row = {
+    slot,
+    date,
+    past,
+    status,
+    statusLabel: MEAL_STATUS_LABELS[status] || MEAL_STATUS_LABELS.planned,
+    entryIndex,
+    recipeId: outcome?.recipeId || planRecipe?.id || null,
+    canEat: false,
+    canSkip: false,
+    canReplace: false,
+    canUndo: false,
+    canChange: false,
+    changeTo: null,
+  };
+
+  if (!outcome) {
+    const hasRecipe = Boolean(planRecipe);
+    row.canEat = open && hasRecipe;
+    row.canSkip = open && hasRecipe;
+    row.canReplace = open && hasRecipe;
+    return row;
+  }
+
+  row.canUndo = entryIndex !== null;
+  if (status === 'eaten') {
+    row.canChange = row.canUndo;
+    row.changeTo = 'skipped';
+  } else if (status === 'skipped' && planRecipe) {
+    row.canChange = row.canUndo;
+    row.changeTo = 'eaten';
+  }
+  return row;
+}
 
 /** True when a saved entry only records skipped planned meals. */
 function isSkippedEntry(entry) {
@@ -172,24 +266,107 @@ export function renderPlan(ctx) {
       <button type="button" class="btn-primary btn-small" data-action="log">Log a meal</button>
     </div>
     <ul class="meal-list"></ul>
+    <p class="muted tiny meal-log-hint">Food outside your meals? Use Log a meal.</p>
   </section>`);
   const list = mealCard.querySelector('.meal-list');
   // Today shows only the meals that are on; other days show the slots they hold.
   const daySlots = selected === today
     ? activeSlots(state.mealPrefs).filter((slot) => meals?.[slot])
     : Object.keys(meals || {}).filter((slot) => meals[slot]);
+  // One saved outcome per planned slot, read exactly as the Log screen reads it.
+  const outcomes = savedSlotOutcomes(state.log, selected, meals, recipesById);
+  let openPicker = null;
+  const closePicker = () => {
+    if (openPicker) openPicker.remove();
+    openPicker = null;
+  };
+  // A day-screen save takes the same path the Log screen uses; only the selected
+  // date changes, so a meal chosen on a day ahead is saved for that day.
+  const saveOneMeal = (payload) => {
+    if (!payload || typeof ctx.saveLogAndReplan !== 'function') return;
+    ctx.saveLogAndReplan(payload, { date: selected });
+  };
+  // Undo and Change use the same correction path as the Logged meals card below.
+  const correctMeal = (nextState) => {
+    if (!nextState || nextState === ctx.state) return;
+    applyLogCorrection(ctx, nextState, { fromDate: selected });
+  };
+
   for (const slot of daySlots) {
     const recipe = recipesById.get(meals[slot]);
+    const row = mealRowModel({ date: selected, slot, recipe, outcomes, recipesById, today });
     const item = el(`<li class="meal-item" data-slot="${escapeHtml(slot)}">
       <button type="button" class="meal-open" data-open-recipe="${escapeHtml(recipe?.id || '')}" aria-haspopup="dialog">
         <span class="meal-slot">${escapeHtml(slotLabel(slot))}</span>
         <span class="meal-name">${recipe?.icon || ''} ${escapeHtml(recipe?.name || meals[slot])}</span>
+        <span class="meal-status meal-status-${escapeHtml(row.status)}" data-meal-status>${escapeHtml(row.statusLabel)}</span>
       </button>
+      <div class="meal-row-actions"></div>
     </li>`);
     // Tapping a planned meal opens its detail panel in place; it never leaves the screen.
     item.querySelector('[data-open-recipe]').addEventListener('click', () => {
       if (recipe) openRecipeDetail(ctx, recipe, root);
     });
+
+    const actions = item.querySelector('.meal-row-actions');
+    if (row.canEat) {
+      const btn = el(`<button type="button" class="btn-secondary btn-small" data-meal-eat="${escapeHtml(slot)}">Ate it</button>`);
+      btn.addEventListener('click', () => saveOneMeal(dayMealSavePayload(recipe, slot, 'eat')));
+      actions.appendChild(btn);
+    }
+    if (row.canSkip) {
+      const btn = el(`<button type="button" class="btn-secondary btn-small" data-meal-skip="${escapeHtml(slot)}">Skipped</button>`);
+      btn.addEventListener('click', () => saveOneMeal(dayMealSavePayload(recipe, slot, 'skip')));
+      actions.appendChild(btn);
+    }
+    if (row.canReplace) {
+      const btn = el(`<button type="button" class="btn-secondary btn-small" data-meal-replace="${escapeHtml(slot)}">Replace</button>`);
+      btn.addEventListener('click', () => {
+        if (openPicker && item.contains(openPicker)) {
+          closePicker();
+          return;
+        }
+        closePicker();
+        // The same Replace picker the Log screen offers, inline under this row.
+        const picker = createReplacePicker({
+          slot,
+          currentRecipe: recipe,
+          recipes: ctx.recipes,
+          foods: ctx.foods,
+          foodsById,
+          onPick: (payload) => saveOneMeal(payload),
+        });
+        item.appendChild(picker);
+        openPicker = picker;
+      });
+      actions.appendChild(btn);
+    }
+    if (row.canUndo) {
+      const btn = el(`<button type="button" class="btn-secondary btn-small" data-meal-undo="${row.entryIndex}">Undo</button>`);
+      btn.addEventListener('click', () => {
+        const entry = ctx.state.log?.[row.entryIndex];
+        if (!entry) return;
+        correctMeal(removeLogEntry(ctx.state, row.entryIndex));
+      });
+      actions.appendChild(btn);
+    }
+    if (row.canChange) {
+      const btn = el(`<button type="button" class="btn-secondary btn-small" data-meal-change="${row.entryIndex}" data-change-to="${escapeHtml(row.changeTo)}">Change</button>`);
+      btn.addEventListener('click', () => {
+        const entry = ctx.state.log?.[row.entryIndex];
+        if (!entry) return;
+        if (row.changeTo === 'skipped') {
+          correctMeal(convertLogEntryToSkipped(ctx.state, row.entryIndex, row.recipeId, slot));
+        } else if (row.changeTo === 'eaten') {
+          const planned = recipe || recipesById.get(row.recipeId);
+          if (!planned) return;
+          correctMeal(convertSkippedEntryToEaten(ctx.state, row.entryIndex, planned, slot));
+        }
+      });
+      actions.appendChild(btn);
+    }
+    // A row with no allowed action keeps no empty container.
+    if (actions.childElementCount === 0) actions.remove();
     list.appendChild(item);
   }
   mealCard.querySelector('[data-action="log"]').addEventListener('click', () => ctx.navigate('log'));

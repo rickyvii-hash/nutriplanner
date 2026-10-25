@@ -133,6 +133,23 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
   justify-content: flex-end; max-width: 11.5rem;
 }
 .meal-actions .btn-small { flex: 1 1 auto; min-width: 5.2rem; padding: 8px 10px; }
+/* Day screen: status chip and the row actions, kept inline and wrapping on a phone. */
+.meal-item { flex-wrap: wrap; }
+.meal-item .meal-open { flex-wrap: wrap; min-width: 0; }
+.meal-status {
+  display: inline-block; font-size: 0.72rem; font-weight: 600; line-height: 1.4;
+  padding: 2px 8px; border-radius: 99px; background: var(--line); color: var(--muted);
+}
+.meal-status-eaten { background: var(--green-soft); color: var(--green); }
+.meal-status-skipped { background: var(--tan-soft); color: #7a5a2b; }
+.meal-status-replaced { background: var(--tan-soft); color: #7a5a2b; }
+.meal-row-actions {
+  display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end;
+  flex: 1 1 auto; max-width: 100%;
+}
+.meal-row-actions .btn-small { flex: 1 1 auto; min-height: 44px; padding: 8px 10px; }
+.meal-log-hint { margin: 8px 0 0; }
+.meal-item .replace-picker { flex: 1 1 100%; min-width: 0; }
 .meal-slot {
   display: inline-block; font-size: 0.72rem; background: var(--green-soft); color: var(--green);
   padding: 2px 8px; border-radius: 99px; text-transform: capitalize; margin-bottom: 4px;
