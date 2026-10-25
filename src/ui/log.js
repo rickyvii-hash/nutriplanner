@@ -24,6 +24,36 @@ export {
 
 export const MAX_PORTION_GRAMS = 5000;
 
+/** The portion field's default amount, shown again after every add. */
+export const DEFAULT_FOOD_PORTION = '100';
+
+/** The line announced under the list after an add, without any brand token. */
+export function addedFoodStatus(food) {
+  const name = displayFoodName(food) || String(food?.name ?? '').trim();
+  return `Added ${name}.`;
+}
+
+/**
+ * The state after a successful "Add food": the food is one more line of the
+ * list, nothing stays selected and the portion field goes back to its default,
+ * so a second tap on "Add food" cannot add the same food again by accident.
+ * Choosing a food again turns the button back on, so the same food can still be
+ * added a second time on purpose.
+ */
+export function stateAfterFoodAdd(items, food, grams) {
+  const item = { foodId: food.id, grams };
+  // The name of a food the person added travels with the line; database foods
+  // keep their USDA name in the food list.
+  if (isUserFood(food)) item.name = food.name;
+  return {
+    items: [...(Array.isArray(items) ? items : []), item],
+    selectedFood: null,
+    portion: DEFAULT_FOOD_PORTION,
+    addEnabled: false,
+    status: addedFoodStatus(food),
+  };
+}
+
 /** Confirmation shown when leaving Outside the menu with foods still in "To add". */
 export const DISCARD_DRAFT_COPY = {
   title: 'Discard what you entered?',
@@ -703,6 +733,7 @@ export function renderLog(ctx) {
       <button type="button" class="btn-text btn-small" data-clear-all hidden>Clear all</button>
     </div>
     <ul class="logged-items" data-items></ul>
+    <p class="sr-only" role="status" aria-live="polite" data-add-status></p>
     <p class="muted tiny empty-hint" data-empty>Nothing added yet.</p>
     <button type="button" class="btn-primary" data-save disabled>Save and update plan</button>
   </section>`);
@@ -771,15 +802,6 @@ export function renderLog(ctx) {
     });
   };
 
-  const addFood = (food, grams) => {
-    const item = { foodId: food.id, grams };
-    // The name of a food the person added travels with the line, so the log
-    // still reads it if the food is removed from the list later.
-    if (isUserFood(food)) item.name = food.name;
-    draft.items.push(item);
-    paintItems();
-  };
-
   // Clear all empties the draft straight away: it is only a draft, so nothing to confirm.
   root.querySelector('[data-clear-all]').addEventListener('click', () => {
     clearDraft(draft);
@@ -789,6 +811,7 @@ export function renderLog(ctx) {
   const resultsEl = root.querySelector('[data-results]');
   const searchInput = root.querySelector('[data-search]');
   const addSearchBtn = root.querySelector('[data-add-search]');
+  const addStatus = root.querySelector('[data-add-status]');
 
   const portionInput = root.querySelector('[data-portion]');
   const portionLabel = portionInput.closest('.field')?.querySelector('span') || null;
@@ -882,7 +905,16 @@ export function renderLog(ctx) {
       return;
     }
     portionError.hidden = true;
-    addFood(selectedFood, grams);
+    const after = stateAfterFoodAdd(draft.items, selectedFood, grams);
+    draft.items = after.items;
+    selectedFood = after.selectedFood;
+    setAmountMode({ custom: false, labelEl: portionLabel, inputEl: portionInput });
+    portionInput.value = after.portion;
+    addSearchBtn.disabled = !after.addEnabled;
+    addStatus.textContent = after.status;
+    // The chosen row is no longer selected either, so the screen reads as done.
+    resultsEl.querySelectorAll('.search-hit.is-selected').forEach((hit) => hit.classList.remove('is-selected'));
+    paintItems();
   });
 
   root.querySelector('[data-save]').addEventListener('click', () => {

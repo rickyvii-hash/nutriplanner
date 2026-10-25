@@ -295,7 +295,7 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 .freq-option {
   font: inherit; font-weight: 600; color: var(--green); background: #fff;
   border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; cursor: pointer;
-  min-height: 44px;
+  min-height: 44px; min-width: 44px;
 }
 .freq-option.is-active { background: var(--green); border-color: var(--green); color: #fff; }
 .summary-cta .row { align-items: flex-start; }
@@ -403,6 +403,8 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
 }
 .btn-small { min-width: 44px; }
 .target-row select, .target-row input, .logged-item input { min-height: 44px; }
+/* Text, number and search fields and selects are full-height touch targets too. */
+input[type="text"], input[type="number"], input[type="search"], select { min-height: 44px; }
 input[type="checkbox"], input[type="radio"] { min-width: 28px; min-height: 28px; }
 /* The shopping list and My meals ticks are full 44 px targets. */
 .shop-item input[type="checkbox"], .my-meals input[type="checkbox"] { width: 44px; height: 44px; }

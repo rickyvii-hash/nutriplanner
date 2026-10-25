@@ -8,7 +8,7 @@ import {
   customFoodRemovalNote, customFoodUsedInLog, portionsFromGrams, shownFoodName,
 } from '../engine/custom_foods.js';
 import { el, escapeHtml } from './dom.js';
-import { createDrinkPicker, parsePortion } from './log.js';
+import { createDrinkPicker, parsePortion, stateAfterFoodAdd } from './log.js';
 import {
   NO_RESULTS_TEXT, amountError, amountGrams, createCustomFoodForm, isUserFood,
   searchResultRow, setAmountMode,
@@ -77,6 +77,7 @@ export function createReplacePicker({
       <p class="field-error" data-replace-portion-error hidden>Enter a portion between 1 and 5000 g</p>
       <button type="button" class="btn-secondary" data-replace-add disabled>Add food</button>
       <ul class="logged-items" data-replace-items></ul>
+      <p class="sr-only" role="status" aria-live="polite" data-replace-status></p>
       <p class="muted tiny" data-replace-empty>Nothing added yet.</p>
       <button type="button" class="btn-primary" data-replace-save disabled>Replace with these foods</button>
     </div>
@@ -103,7 +104,7 @@ export function createReplacePicker({
     customBox.classList.toggle('hidden');
   });
 
-  const customItems = [];
+  let customItems = [];
   let selectedFood = null;
   const searchInput = picker.querySelector('[data-replace-search]');
   const results = picker.querySelector('[data-replace-results]');
@@ -116,6 +117,7 @@ export function createReplacePicker({
   const saveBtn = picker.querySelector('[data-replace-save]');
   const noResults = picker.querySelector('[data-no-results]');
   const noteEl = picker.querySelector('[data-custom-note]');
+  const addStatus = picker.querySelector('[data-replace-status]');
 
   const findFood = (foodId) => foodsById?.get?.(foodId) || foods.find((f) => f.id === foodId) || null;
 
@@ -242,11 +244,19 @@ export function createReplacePicker({
       return;
     }
     portionError.classList.add('hidden');
-    const item = { foodId: selectedFood.id, grams };
-    // The name of a food the person added travels with the line.
-    if (isUserFood(selectedFood)) item.name = selectedFood.name;
-    item.name = item.name || foodName(foods, foodsById, selectedFood.id);
-    customItems.push(item);
+    const food = selectedFood;
+    const after = stateAfterFoodAdd(customItems, food, grams);
+    customItems = after.items;
+    // The payload names the foods, so the display name travels with the line.
+    const added = customItems[customItems.length - 1];
+    added.name = added.name || foodName(foods, foodsById, food.id);
+    selectedFood = after.selectedFood;
+    setAmountMode({ custom: false, labelEl: portionLabel, inputEl: portionInput });
+    portionInput.value = after.portion;
+    addBtn.disabled = !after.addEnabled;
+    addStatus.textContent = after.status;
+    // The chosen row is no longer selected either, so a second tap adds nothing.
+    results.querySelectorAll('.search-hit.is-selected').forEach((hit) => hit.classList.remove('is-selected'));
     paintCustom();
   });
 
