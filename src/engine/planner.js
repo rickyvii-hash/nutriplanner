@@ -353,6 +353,10 @@ function effectOnTargets(oldDayAvg, newDayAvg, targets) {
     else if (afterDist < beforeDist - 0.01) status = 'Closer to target';
     else if (t.kind === 'max' && after < before) status = 'Lower over the next days';
     else if (t.kind === 'min' && after > before) status = 'Higher over the next days';
+    // A maximum that really rose and a minimum that really fell are not
+    // "adjusted": the status says which way the day total moved.
+    else if (t.kind === 'max' && after > before) status = 'Higher over the next days';
+    else if (t.kind === 'min' && after < before) status = 'Lower over the next days';
     else status = 'Adjusted';
     const within = t.kind === 'max' ? after <= goal : after >= goal;
     if (within && afterDist <= beforeDist) status = 'Within target';
@@ -373,7 +377,12 @@ function effectOnTargets(oldDayAvg, newDayAvg, targets) {
   });
 }
 
-function averageDailyTotals(plan, recipesById, foodsById, dates) {
+/**
+ * Average of the whole day totals over `dates`.
+ * `extraByDate` adds expected food planned outside the menu to its own day, so
+ * the "after" side on Plan updated counts the planned meal as well (D27).
+ */
+function averageDailyTotals(plan, recipesById, foodsById, dates, extraByDate = null) {
   if (dates.length === 0) return { totals: emptyTotals(), incomplete: {}, unknown: {} };
   let sum = emptyTotals();
   const incomplete = {};
@@ -381,8 +390,18 @@ function averageDailyTotals(plan, recipesById, foodsById, dates) {
   for (const date of dates) {
     const day = dayTotals(plan.days[date], recipesById, foodsById);
     sum = addTotals(sum, day.totals);
+    const extra = extraByDate?.get?.(date) || null;
+    if (extra) {
+      sum = addTotals(sum, extra.totals);
+      for (const k of NUTRIENT_KEYS) {
+        // A value the planned food does not carry makes the sum partial,
+        // never a certain number.
+        if (extra.incomplete[k] || extra.unknown[k]) incomplete[k] = true;
+      }
+    }
     for (const k of NUTRIENT_KEYS) {
-      if (day.unknown[k]) unknownCount[k] = (unknownCount[k] || 0) + 1;
+      const known = !day.unknown[k] || Boolean(extra && !extra.unknown[k]);
+      if (!known) unknownCount[k] = (unknownCount[k] || 0) + 1;
       if (day.unknown[k] || day.incomplete[k]) incomplete[k] = true;
     }
   }
@@ -456,7 +475,9 @@ function plannedFoodList(names) {
 
 /**
  * The reason shown when a planned meal lowered the other meals of its own day.
- * The per-day number is the same rounded change the Effect rows print.
+ * The per-day numbers are the same rounded numbers the Effect rows print: the
+ * "about X less" is how much the day's other meals gave up, and the goal line
+ * compares the whole day (changed meals plus the planned food) with the maximum.
  */
 function plannedExtraReason({ notes, effects, changed, nothingToChange }) {
   const note = notes[0];
@@ -467,13 +488,49 @@ function plannedExtraReason({ notes, effects, changed, nothingToChange }) {
     return `You planned ${names} on ${date}. That day's other meals do not need to change.`;
   }
   const key = note.primary.nutrient;
+  const words = nutrientWords(key);
   const effect = effects.find((e) => e.nutrient === key);
-  const change = effectChange(key, effect);
-  if (change === 0) {
-    return `You planned ${names} on ${date}, so that day's other meals are about the same in ${nutrientWords(key)}.`;
+  if (!effect) {
+    return `You planned ${names} on ${date}, so that day's other meals are lighter in ${words} to leave room.`;
   }
-  const direction = change < 0 ? 'lower' : 'higher';
-  return `You planned ${names} on ${date}, so that day's other meals are about ${formatAmount(key, Math.abs(change))} ${direction} in ${nutrientWords(key)}.`;
+  // How much the day's planned meals gave up: rounded exactly like the Effect row.
+  const before = effectValue(key, note.beforeTotals?.[key] ?? effect.before);
+  const afterMeals = effectValue(key, note.afterTotals?.[key] ?? effect.after);
+  const lighter = before - afterMeals;
+  const room = Math.abs(lighter) < 0.05
+    ? `that day's other meals are about the same in ${words}`
+    : `that day's other meals are lighter in ${words} (about ${formatAmount(key, Math.abs(lighter))} less) to leave room`;
+  // What the change protects: the whole day total, planned food included. The
+  // energy line is quoted in a unit the Effect row prints exactly, so the screen
+  // never has to show a float tail next to a rounded number.
+  const energyEffect = effects.find((e) => e.nutrient === 'kcal' && effectChange('kcal', e) !== 0)
+    || effects.find((e) => e.nutrient === 'sodium' && effectChange('sodium', e) !== 0)
+    || null;
+  let totalLine = '';
+  if (energyEffect) {
+    const energyNutrient = energyEffect.nutrient;
+    const energyChange = effectChange(energyNutrient, energyEffect);
+    const energyWords = energyNutrient === 'kcal' ? 'energy' : nutrientWords(energyNutrient);
+    totalLine = ` Counting the planned food, the day ends about ${formatAmount(energyNutrient, Math.abs(energyChange))} ${energyChange < 0 ? 'lower' : 'higher'} in ${energyWords} on average.`;
+  }
+  const afterShown = effectValue(key, effect.after);
+  const goalShown = effectValue(key, effect.daily);
+  let goalLine;
+  if (effect.afterUnknown || effect.afterIncomplete) {
+    goalLine = ` The day's ${words} is not fully known.`;
+  } else if (afterShown <= goalShown) {
+    goalLine = ` The day stays within your goal (${afterShown} ${unitWords(key)} against max ${goalShown} ${unitWords(key)}).`;
+  } else {
+    goalLine = ` The day still goes over your goal by about ${formatAmount(key, afterShown - goalShown)}.`;
+  }
+  return `You planned ${names} on ${date}, so ${room}.${goalLine}${totalLine}`;
+}
+
+/** The unit an Effect row prints for a nutrient. */
+function unitWords(key) {
+  if (key === 'kcal') return 'kcal';
+  if (key === 'sodium') return 'mg';
+  return 'g';
 }
 
 function buildReasonCore({
@@ -856,6 +913,15 @@ export function replan(state) {
     plannedByDate.set(extra.date, addTotals(plannedByDate.get(extra.date) || emptyTotals(), r.totals));
     extrasByDate.set(extra.date, addTotals(extrasByDate.get(extra.date) || emptyTotals(), r.totals));
   }
+  // The planned food of a date as one nutrient result (several planned meals on
+  // the same day are summed), so the Effect rows can count it in the day total.
+  const plannedNutrientsByDate = new Map();
+  for (const date of plannedByDate.keys()) {
+    const items = plannedForPlan
+      .filter((extra) => extra.date === date)
+      .flatMap((extra) => extra.items);
+    plannedNutrientsByDate.set(date, loggedNutrients(items, foodsById));
+  }
 
   // The make-up a nutrient still needs: the day's shortfall (skips and lighter
   // replacements) minus what the extras covered that same date, never below zero.
@@ -911,7 +977,11 @@ export function replan(state) {
       changed: [],
       effects: effectOnTargets(
         averageDailyTotals(plan, recipesById, foodsById, allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS)),
-        averageDailyTotals(plan, recipesById, foodsById, allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS)),
+        averageDailyTotals(
+          plan, recipesById, foodsById,
+          allDates.filter((d) => d > fromDate).slice(0, WINDOW_DAYS),
+          plannedNutrientsByDate,
+        ),
         targets.map((t) => ({ ...t, originalDaily: t.daily })),
       ),
       reason: SKIP_NO_MIN_REASON,
@@ -1205,7 +1275,9 @@ export function replan(state) {
   const changedDates = [...new Set(changed.map((c) => c.date))].sort();
   const effectDates = changedDates.length > 0 ? changedDates : compareDates;
   const oldAvg = averageDailyTotals(plan, recipesById, foodsById, effectDates);
-  const newAvg = averageDailyTotals(newPlan, recipesById, foodsById, effectDates);
+  // The after side is the changed planned meals PLUS the food planned outside the
+  // menu on that day: the screen must never make the day look lighter than it will be.
+  const newAvg = averageDailyTotals(newPlan, recipesById, foodsById, effectDates, plannedNutrientsByDate);
   const effects = effectOnTargets(oldAvg, newAvg, targets.map((t) => ({ ...t, originalDaily: t.daily })));
 
   // Unreachable: a target is still badly missed on the new average over the whole window.
@@ -1238,7 +1310,14 @@ export function replan(state) {
         primary = t;
       }
     }
-    plannedNotes.push({ date, names, primary });
+    plannedNotes.push({
+      date,
+      names,
+      primary,
+      // Day meal totals on both sides, for the sentence the reason shows.
+      beforeTotals: dayTotals(plan.days[date], recipesById, foodsById).totals,
+      afterTotals: dayTotals(newPlan.days[date], recipesById, foodsById).totals,
+    });
   }
 
   const nothingToChange = changed.length === 0;

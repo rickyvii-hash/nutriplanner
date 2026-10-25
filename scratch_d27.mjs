@@ -1,0 +1,21 @@
+import fs from 'node:fs';
+import { profileById } from './src/engine/profiles.js';
+import { buildPlan, replan, dayTotals } from './src/engine/planner.js';
+import { makePlannedExtra } from './src/engine/planned_extras.js';
+import { loggedNutrients } from './src/engine/nutrients.js';
+
+const foods = JSON.parse(fs.readFileSync('data/foods.json', 'utf8'));
+const recipes = JSON.parse(fs.readFileSync('data/recipes.json', 'utf8'));
+const foodsById = new Map(foods.map((f) => [f.id, f]));
+const recipesById = new Map(recipes.map((r) => [r.id, r]));
+const targets = profileById('cholesterol').targets;
+const plan = buildPlan(targets, recipes, { year: 2026, month: 10 }, foodsById);
+const DATE = '2026-10-28';
+const extra = makePlannedExtra({ id: 'p1', date: DATE, time: '20:00', items: [{ foodId: 'pizza-cheese', grams: 350 }] });
+console.log('pizza totals', loggedNutrients(extra.items, foodsById).totals);
+console.log('before day', dayTotals(plan.days[DATE], recipesById, foodsById).totals);
+const res = replan({ targets, recipes, plan, log: [], bought: [], foodsById, fromDate: '2026-10-25', plannedExtras: [extra] });
+console.log('reason:', res.reason);
+console.log('changed', res.changed.map((c) => c.date + ' ' + c.slot));
+console.log('effects', res.effects.map((e) => ({ n: e.nutrient, before: e.before, after: e.after, status: e.status })));
+console.log('after day (plan only)', dayTotals(res.plan.days[DATE], recipesById, foodsById).totals);
