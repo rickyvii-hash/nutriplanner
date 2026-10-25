@@ -129,8 +129,19 @@ export const REPLACE_BLOCKED_MESSAGE = 'Clear This meal first, or save it, befor
  */
 export function draftSavePayload(draft) {
   const d = ensureDraft(draft);
+  // Each planned meal keeps its own ingredients, so saving two meals can store
+  // one log entry per slot instead of one flattened entry.
+  const groups = d.groups.map((g) => ({
+    recipeId: g.recipeId,
+    slot: g.slot,
+    items: g.items.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+  }));
+  // Free-search foods are the extras: they are not tied to a planned slot.
+  const extras = d.items.map((it) => ({ foodId: it.foodId, grams: it.grams }));
   return {
     items: flatDraftItems(d),
+    groups,
+    extras,
     skipped: draftSkippedIds(d),
     eaten: d.groups.map((g) => ({ recipeId: g.recipeId, slot: g.slot })),
     extra: d.items.length > 0,
@@ -138,29 +149,79 @@ export function draftSavePayload(draft) {
 }
 
 /**
- * The log entries a save appends. Food goes in one entry; skipped planned meals
- * stay in their own entry. When the food came from free search the entry is marked
- * `extra: true`, unless it is a replacement (then `replaced` names the slot it
- * stands for). Extras never replace or skip a planned slot on their own.
+ * The log entries a save appends. Every planned meal eaten gets its own entry,
+ * so a correction on one slot never rewrites a sibling slot saved at the same
+ * time. Skipped planned meals also get one entry each. Free-search foods are
+ * extras: they are marked `extra: true` and never replace or skip a planned
+ * slot; they join a single planned entry, or keep their own entry when several
+ * planned meals are saved together. When the food came from a replacement, the
+ * entry names the slot it stands for instead.
  */
 export function logEntriesForSave(payload, when) {
   const items = Array.isArray(payload?.items) ? payload.items : [];
   const skipped = Array.isArray(payload?.skipped) ? payload.skipped : [];
   const replaced = Array.isArray(payload?.replaced) ? payload.replaced : [];
   const eaten = Array.isArray(payload?.eaten) ? payload.eaten : [];
+  const planned = (Array.isArray(payload?.groups) ? payload.groups : [])
+    .filter((g) => g && Array.isArray(g.items))
+    .map((g) => ({
+      recipeId: g.recipeId || null,
+      slot: g.slot || null,
+      items: g.items.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+    }));
+  const cleanItems = items.map((it) => ({ foodId: it.foodId, grams: it.grams }));
+  // Extras are the free-search foods. Older payloads without `extras` keep the
+  // old meaning: the flat items are extras only when no planned meal is eaten.
+  const extras = Array.isArray(payload?.extras)
+    ? payload.extras.map((it) => ({ foodId: it.foodId, grams: it.grams }))
+    : (planned.length === 0 && eaten.length === 0 ? cleanItems : []);
   const extra = Boolean(payload?.extra) && replaced.length === 0;
   const entries = [];
-  if (items.length > 0) {
+
+  if (planned.length > 0) {
+    // One entry per planned eaten slot, carrying only that slot's food.
+    planned.forEach((group) => {
+      // A single planned meal may share its entry with the extras, as before.
+      const groupExtras = planned.length === 1 ? extras : [];
+      entries.push({
+        ...when,
+        items: [...group.items, ...groupExtras],
+        eaten: [{ recipeId: group.recipeId, slot: group.slot }],
+        ...(extra && groupExtras.length > 0 ? { extra: true } : {}),
+      });
+    });
+    if (planned.length > 1 && extras.length > 0) {
+      entries.push({
+        ...when,
+        items: extras,
+        ...(extra ? { extra: true } : {}),
+      });
+    }
+  } else if (eaten.length > 0) {
+    // Older payloads carry a flat food list with the eaten metadata. The foods
+    // cannot be split by slot, so they stay with the first entry and are never
+    // counted twice; every other eaten slot still gets its own entry.
+    eaten.forEach((slotInfo, index) => {
+      entries.push({
+        ...when,
+        items: index === 0 ? cleanItems : [],
+        eaten: [{ recipeId: slotInfo?.recipeId || null, slot: slotInfo?.slot || null }],
+        ...(index === 0 && extra ? { extra: true } : {}),
+        ...(index === 0 && replaced.length ? { replaced: [...replaced] } : {}),
+      });
+    });
+  } else if (items.length > 0) {
     entries.push({
       ...when,
-      items: items.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+      items: cleanItems,
       ...(extra ? { extra: true } : {}),
       ...(replaced.length ? { replaced: [...replaced] } : {}),
-      ...(eaten.length ? { eaten: [...eaten] } : {}),
     });
   }
-  if (skipped.length > 0) {
-    entries.push({ ...when, skipped: [...skipped], items: [] });
+
+  // One skip entry per skipped planned meal: a later correction touches only that slot.
+  for (const recipeId of new Set(skipped.filter(Boolean))) {
+    entries.push({ ...when, skipped: [recipeId], items: [] });
   }
   return entries;
 }

@@ -44,29 +44,62 @@ export function updateLogEntryItems(state, index, items) {
 
 /**
  * Change a saved Eaten entry into Skipped for the same planned recipe.
- * The eaten food no longer counts, and the planned recipe is recorded as skipped.
+ * When the entry holds more than one eaten slot, only that recipe becomes
+ * skipped: the other slots move into their own entries and keep their food.
  */
 export function convertLogEntryToSkipped(state, index, recipeId) {
   const entry = logEntryAt(state, index);
   if (!entry || !recipeId) return state;
+  const eaten = Array.isArray(entry.eaten) ? entry.eaten.filter(Boolean) : [];
+  const targetInEntry = eaten.some((slotInfo) => slotInfo.recipeId === recipeId);
+  const siblings = eaten.filter((slotInfo) => slotInfo.recipeId !== recipeId);
   const log = state.log.slice();
-  log[index] = { date: entry.date, time: entry.time, skipped: [recipeId], items: [] };
+  const skippedEntry = { date: entry.date, time: entry.time, skipped: [recipeId], items: [] };
+  log[index] = skippedEntry;
+  if (!targetInEntry || siblings.length === 0) {
+    // A single eaten slot (or an older entry with no slot metadata) becomes skipped whole.
+    return { ...state, log, pendingProposal: null };
+  }
+  // The entry held several eaten slots: split the siblings out. Older flattened
+  // entries hold a single food list, so their food stays with the first sibling
+  // and is counted once; per-slot saves keep their own food.
+  const siblingEntries = siblings.map((slotInfo, i) => ({
+    date: entry.date,
+    time: entry.time,
+    items: i === 0
+      ? (entry.items || []).map((it) => ({ foodId: it.foodId, grams: it.grams }))
+      : [],
+    eaten: [{ recipeId: slotInfo.recipeId || null, slot: slotInfo.slot || null }],
+  }));
+  log.splice(index + 1, 0, ...siblingEntries);
   return { ...state, log, pendingProposal: null };
 }
 
 /**
  * Change a saved Skipped entry into Eaten: the planned recipe's ingredients are
- * logged again with the recipe's own portions.
+ * logged again with the recipe's own portions. When the entry skipped several
+ * planned meals, only this recipe turns eaten; the others stay skipped.
  */
 export function convertSkippedEntryToEaten(state, index, recipe) {
   const entry = logEntryAt(state, index);
   if (!entry || !recipe || !Array.isArray(recipe.ingredients)) return state;
-  const log = state.log.slice();
-  log[index] = {
+  const remaining = (Array.isArray(entry.skipped) ? entry.skipped : [])
+    .filter((id) => id && id !== recipe.id);
+  const eatenEntry = {
     date: entry.date,
     time: entry.time,
     items: recipe.ingredients.map((ing) => ({ foodId: ing.foodId, grams: ing.grams })),
+    eaten: [{ recipeId: recipe.id, slot: recipe.slot || null }],
   };
+  const log = state.log.slice();
+  if (remaining.length === 0) {
+    log[index] = eatenEntry;
+    return { ...state, log, pendingProposal: null };
+  }
+  // The entry skipped several meals: it keeps the other skips, the eaten meal
+  // gets its own entry.
+  log[index] = { date: entry.date, time: entry.time, skipped: remaining, items: [] };
+  log.splice(index + 1, 0, eatenEntry);
   return { ...state, log, pendingProposal: null };
 }
 
