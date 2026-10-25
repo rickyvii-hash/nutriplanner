@@ -88,10 +88,14 @@ const ctx = {
       planDay: ctx.state.plan.days[when.date],
       recipesById: ctx.recipesById,
     });
+    // Replan from the month plan as it was before any accepted update: the saved plan
+    // already holds the make-up for the earlier log, so replanning from it would apply
+    // that make-up twice. The full merged log is used, so one replan of every entry sees
+    // the same food as logging them one at a time.
     const result = replan({
       targets: ctx.state.targets,
       recipes: ctx.recipes,
-      plan: ctx.state.plan,
+      plan: ctx.state.planBase || ctx.state.plan,
       log,
       bought: ctx.state.bought || [],
       foodsById: ctx.foodsById,
