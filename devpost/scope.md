@@ -45,6 +45,8 @@ A person sets targets, gets a month plan and a tickable shopping list, logs a me
 - Health disclaimer
 - Example profiles: weight loss, cholesterol, recovery, athlete
 - Shopping by frequency, with "I'm shopping now"
+- My meals: breakfast/lunch/dinner on or off, 0 or 1 snack; plan uses only chosen slots
+- Drinks shortcut with ml presets; Download my data / Restore from file; first-run guide
 - A printable summary to share with a doctor
 
 ## Later
