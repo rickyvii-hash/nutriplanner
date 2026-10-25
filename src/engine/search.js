@@ -3,7 +3,7 @@
 // prefix of the food name or id, so "cola" never matches "chocolate chip cookies".
 // Foods that match all words directly rank above foods found through a synonym.
 
-import { displayFoodName } from './food_display.js';
+import { foodSearchLabel } from './custom_foods.js';
 
 /** Small English synonym map for the off-plan foods people search for most. */
 export const SYNONYMS = {
@@ -97,7 +97,7 @@ function scoreFood(food, query, queryWords) {
   const nameWords = words(food.name);
   const idWords = words(food.id || '');
   // The label the UI actually shows, so a query also matches the brand-free name.
-  const displayWords = words(displayFoodName(food));
+  const displayWords = words(foodSearchLabel(food));
 
   if (name === query || (id && id === query.replace(/\s+/g, '-'))) return 100;
   if (name.startsWith(query)) return 80;
@@ -144,7 +144,7 @@ export function searchFoods(foods, query, { limit = 12 } = {}) {
   for (const food of foods) {
     if (!food || !food.name) continue;
     // A food whose label cannot be made brand-free is not offered in search.
-    if (!displayFoodName(food)) continue;
+    if (!foodSearchLabel(food)) continue;
     const score = scoreFood(food, text, queryWords);
     if (score > 0) scored.push({ food, score });
   }

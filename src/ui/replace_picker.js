@@ -4,13 +4,19 @@
 
 import { searchFoods } from '../engine/search.js';
 import { slotRecipeKind, slotLabel } from '../engine/meal_prefs.js';
-import { displayFoodName } from '../engine/food_display.js';
+import {
+  customFoodRemovalNote, customFoodUsedInLog, portionsFromGrams, shownFoodName,
+} from '../engine/custom_foods.js';
 import { el, escapeHtml } from './dom.js';
 import { createDrinkPicker, parsePortion } from './log.js';
+import {
+  NO_RESULTS_TEXT, amountError, amountGrams, createCustomFoodForm, isUserFood,
+  searchResultRow, setAmountMode,
+} from './custom_food.js';
 
-function foodName(foods, foodsById, foodId) {
-  const food = foodsById?.get ? foodsById.get(foodId) : (foods || []).find((f) => f.id === foodId);
-  return displayFoodName(food) || food?.id || foodId;
+function foodName(foods, foodsById, foodId, fallback = '') {
+  const food = foodsById?.get?.(foodId) || (foods || []).find((f) => f.id === foodId) || null;
+  return shownFoodName(food, fallback || foodId);
 }
 
 /** The payload for swapping a planned meal with another recipe for the same slot. */
@@ -43,6 +49,7 @@ export function createReplacePicker({
   recipes = [],
   foods = [],
   foodsById = null,
+  ctx = null,
   onPick,
 }) {
   const otherRecipes = recipes.filter((r) => r.slot === slotRecipeKind(slot) && r.id !== currentRecipe?.id);
@@ -59,6 +66,10 @@ export function createReplacePicker({
       </label>
       <button type="button" class="btn-secondary btn-small" data-replace-drinks>Drinks</button>
       <div class="search-results" data-replace-results></div>
+      <p class="muted tiny no-results" data-no-results hidden>${escapeHtml(NO_RESULTS_TEXT)}</p>
+      <p class="muted tiny custom-food-note" data-custom-note hidden></p>
+      <button type="button" class="btn-text btn-small" data-custom-add>Add my own food</button>
+      <div data-custom-host></div>
       <label class="field">
         <span>Portion (grams)</span>
         <input type="number" min="1" max="5000" step="1" placeholder="e.g. 150" value="100" data-replace-portion>
@@ -93,25 +104,39 @@ export function createReplacePicker({
   });
 
   const customItems = [];
-  let selectedId = null;
+  let selectedFood = null;
   const searchInput = picker.querySelector('[data-replace-search]');
   const results = picker.querySelector('[data-replace-results]');
   const portionInput = picker.querySelector('[data-replace-portion]');
+  const portionLabel = portionInput.closest('.field')?.querySelector('span') || null;
   const portionError = picker.querySelector('[data-replace-portion-error]');
   const addBtn = picker.querySelector('[data-replace-add]');
   const itemList = picker.querySelector('[data-replace-items]');
   const emptyNote = picker.querySelector('[data-replace-empty]');
   const saveBtn = picker.querySelector('[data-replace-save]');
+  const noResults = picker.querySelector('[data-no-results]');
+  const noteEl = picker.querySelector('[data-custom-note]');
+
+  const findFood = (foodId) => foodsById?.get?.(foodId) || foods.find((f) => f.id === foodId) || null;
+
+  const showNote = (text) => {
+    noteEl.textContent = text || '';
+    noteEl.hidden = !text;
+  };
 
   const paintCustom = () => {
     itemList.innerHTML = '';
     customItems.forEach((it, index) => {
-      const name = foodName(foods, foodsById, it.foodId);
+      const custom = isUserFood(findFood(it.foodId));
+      const amount = custom ? portionsFromGrams(it.grams) : it.grams;
+      const unit = custom ? 'portions' : 'g';
+      const bounds = custom ? 'min="0.25" max="50" step="0.25"' : 'min="1" max="5000" step="1"';
+      const name = foodName(foods, foodsById, it.foodId, it.name);
       itemList.appendChild(el(`<li class="logged-item">
         <span>${escapeHtml(name)}</span>
-        <input type="number" min="1" max="5000" step="1" value="${it.grams}"
-          data-custom-edit="${index}" aria-label="${escapeHtml(name)} grams">
-        <span class="muted">g</span>
+        <input type="number" ${bounds} value="${amount}"
+          data-custom-edit="${index}" aria-label="${escapeHtml(name)} ${unit}">
+        <span class="muted">${unit}</span>
         <button type="button" class="btn-icon" data-custom-del="${index}"
           aria-label="Remove ${escapeHtml(name)}">×</button>
       </li>`));
@@ -121,12 +146,17 @@ export function createReplacePicker({
     itemList.querySelectorAll('[data-custom-edit]').forEach((input) => {
       input.addEventListener('change', () => {
         const index = Number(input.dataset.customEdit);
-        const grams = parsePortion(input.value);
+        const item = customItems[index];
+        if (!item) return;
+        const food = findFood(item.foodId);
+        const grams = isUserFood(food)
+          ? amountGrams(food, input.value, parsePortion)
+          : parsePortion(input.value);
         if (grams === null) {
-          input.value = customItems[index].grams;
+          input.value = isUserFood(food) ? portionsFromGrams(item.grams) : item.grams;
           return;
         }
-        customItems[index].grams = grams;
+        item.grams = grams;
       });
     });
     itemList.querySelectorAll('[data-custom-del]').forEach((btn) => {
@@ -137,50 +167,86 @@ export function createReplacePicker({
     });
   };
 
-  const runSearch = () => {
-    const query = searchInput.value || '';
-    results.innerHTML = '';
-    selectedId = null;
-    addBtn.disabled = true;
-    if (!query.trim()) return;
-    for (const food of searchFoods(foods, query, { limit: 12 })) {
-      const shown = displayFoodName(food);
-      if (!shown) continue;
-      const btn = el(`<button type="button" class="search-hit">${escapeHtml(shown)}</button>`);
-      btn.addEventListener('click', () => {
-        selectedId = food.id;
-        results.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
-        btn.classList.add('is-selected');
-        addBtn.disabled = false;
-      });
-      results.appendChild(btn);
-    }
-  };
-  searchInput.addEventListener('input', runSearch);
-  portionInput.addEventListener('input', () => portionError.classList.add('hidden'));
-
-  const drinkPicker = createDrinkPicker(foods, (food, grams) => {
-    results.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
-    selectedId = food.id;
-    portionInput.value = grams;
+  const choose = (food) => {
+    selectedFood = food;
+    setAmountMode({ custom: isUserFood(food), labelEl: portionLabel, inputEl: portionInput });
+    portionError.textContent = amountError(food);
     portionError.classList.add('hidden');
     addBtn.disabled = false;
+  };
+
+  const runSearch = (autoSelectId = null) => {
+    const query = searchInput.value || '';
+    results.innerHTML = '';
+    selectedFood = null;
+    addBtn.disabled = true;
+    noResults.hidden = true;
+    if (!query.trim()) return;
+    for (const food of searchFoods(foods, query, { limit: 12 })) {
+      const row = searchResultRow(food, {
+        onSelect: (picked) => choose(picked),
+        onRemove: (removed) => {
+          const used = customFoodUsedInLog(ctx?.state?.log || [], removed.id);
+          ctx?.removeCustomFood?.(removed.id);
+          showNote(customFoodRemovalNote(removed.name, used));
+          runSearch();
+        },
+      });
+      results.appendChild(row);
+    }
+    if (results.children.length === 0) noResults.hidden = false;
+    if (autoSelectId) {
+      const b = results.querySelector(`[data-food-id="${autoSelectId}"]`);
+      if (b) b.click();
+    }
+  };
+  searchInput.addEventListener('input', () => {
+    showNote('');
+    runSearch();
+  });
+  portionInput.addEventListener('input', () => portionError.classList.add('hidden'));
+
+  // "Add my own food": the same form the Outside the menu screen offers.
+  const customForm = createCustomFoodForm({
+    onSave: (value) => {
+      if (!ctx?.addCustomFood) return;
+      const food = ctx.addCustomFood(value);
+      customForm.close();
+      showNote('');
+      searchInput.value = food.name;
+      runSearch(food.id);
+    },
+    onCancel: () => customForm.close(),
+  });
+  picker.querySelector('[data-custom-host]').appendChild(customForm.element);
+  picker.querySelector('[data-custom-add]').addEventListener('click', () => {
+    showNote('');
+    customForm.open();
+  });
+
+  const drinkPicker = createDrinkPicker(foods, (food, grams) => {
+    choose(food);
+    portionInput.value = grams;
   });
   const drinksBtn = picker.querySelector('[data-replace-drinks]');
   drinksBtn.after(drinkPicker.element);
   drinksBtn.addEventListener('click', () => drinkPicker.toggle());
 
   addBtn.addEventListener('click', () => {
-    if (!selectedId) return;
-    const grams = parsePortion(portionInput.value);
+    if (!selectedFood) return;
+    const grams = amountGrams(selectedFood, portionInput.value, parsePortion);
     if (grams === null) {
+      portionError.textContent = amountError(selectedFood);
       portionError.classList.remove('hidden');
       portionInput.focus();
       return;
     }
     portionError.classList.add('hidden');
-    const name = foodName(foods, foodsById, selectedId);
-    customItems.push({ foodId: selectedId, grams, name });
+    const item = { foodId: selectedFood.id, grams };
+    // The name of a food the person added travels with the line.
+    if (isUserFood(selectedFood)) item.name = selectedFood.name;
+    item.name = item.name || foodName(foods, foodsById, selectedFood.id);
+    customItems.push(item);
     paintCustom();
   });
 

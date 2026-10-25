@@ -1,6 +1,13 @@
 import { searchFoods, words } from '../engine/search.js';
 import { DRINK_PRESETS, mlToGrams, listDrinkFoods } from '../engine/drinks.js';
 import { displayFoodName } from '../engine/food_display.js';
+import {
+  customFoodUsedInLog, customFoodRemovalNote, gramsForPortions, portionsFromGrams, shownFoodName,
+} from '../engine/custom_foods.js';
+import {
+  NO_RESULTS_TEXT, amountError, amountGrams, createCustomFoodForm, isUserFood,
+  searchResultRow, setAmountMode,
+} from './custom_food.js';
 import { el, escapeHtml } from './dom.js';
 import { findPlannedRecipeForEntry } from '../log_corrections.js';
 
@@ -15,6 +22,17 @@ export {
 } from '../log_corrections.js';
 
 export const MAX_PORTION_GRAMS = 5000;
+
+/**
+ * One logged food line. A food the person added keeps its name with the line,
+ * so a log whose custom food was later removed still reads the name it had
+ * instead of a bare id.
+ */
+function savedItem(item) {
+  const out = { foodId: item.foodId, grams: item.grams };
+  if (typeof item.name === 'string' && item.name) out.name = item.name;
+  return out;
+}
 
 /** The note shown under a drink portion, because drink data is per 100 g. */
 export const DRINK_ML_NOTE = 'ml converted at about 1 g per ml';
@@ -307,10 +325,10 @@ export function draftSavePayload(draft) {
   const groups = d.groups.map((g) => ({
     recipeId: g.recipeId,
     slot: g.slot,
-    items: g.items.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+    items: g.items.map(savedItem),
   }));
   // Free-search foods are the extras: they are not tied to a planned slot.
-  const extras = d.items.map((it) => ({ foodId: it.foodId, grams: it.grams }));
+  const extras = d.items.map(savedItem);
   // The slot is saved with each skip, so a skipped `snack2` is not read back as `snack`.
   const skipRecords = draftSkipRecords(d);
   return {
@@ -344,13 +362,13 @@ export function logEntriesForSave(payload, when) {
     .map((g) => ({
       recipeId: g.recipeId || null,
       slot: g.slot || null,
-      items: g.items.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+      items: g.items.map(savedItem),
     }));
-  const cleanItems = items.map((it) => ({ foodId: it.foodId, grams: it.grams }));
+  const cleanItems = items.map(savedItem);
   // Extras are the free-search foods. Older payloads without `extras` keep the
   // old meaning: the flat items are extras only when no planned meal is eaten.
   const extras = Array.isArray(payload?.extras)
-    ? payload.extras.map((it) => ({ foodId: it.foodId, grams: it.grams }))
+    ? payload.extras.map(savedItem)
     : (planned.length === 0 && eaten.length === 0 ? cleanItems : []);
   const extra = Boolean(payload?.extra) && replaced.length === 0;
   const entries = [];
@@ -598,8 +616,8 @@ export function flatDraftItems(draft) {
   const groups = Array.isArray(draft?.groups) ? draft.groups : [];
   const items = Array.isArray(draft?.items) ? draft.items : [];
   return [
-    ...groups.flatMap((g) => g.items.map((it) => ({ foodId: it.foodId, grams: it.grams }))),
-    ...items.map((it) => ({ foodId: it.foodId, grams: it.grams })),
+    ...groups.flatMap((g) => g.items.map(savedItem)),
+    ...items.map(savedItem),
   ];
 }
 
@@ -637,6 +655,10 @@ export function renderLog(ctx) {
     </label>
     <button type="button" class="btn-secondary btn-small" data-drinks>Drinks</button>
     <div class="search-results" data-results></div>
+    <p class="muted tiny no-results" data-no-results hidden>${escapeHtml(NO_RESULTS_TEXT)}</p>
+    <p class="muted tiny custom-food-note" data-custom-note hidden></p>
+    <button type="button" class="btn-text btn-small" data-custom-add>Add my own food</button>
+    <div data-custom-host></div>
     <label class="field">
       <span>Portion (grams)</span>
       <input type="number" min="1" max="5000" step="1" placeholder="e.g. 150" value="100" data-portion>
@@ -659,12 +681,11 @@ export function renderLog(ctx) {
   root.appendChild(loggedCard);
   root.appendChild(el(`<p class="footer-note">Support tool, not medical advice.</p>`));
 
-  let selectedFoodId = null;
+  let selectedFood = null;
 
-  const foodName = (foodId) => {
-    const food = foods.find((f) => f.id === foodId);
-    return displayFoodName(food) || food?.id || foodId;
-  };
+  const findFood = (foodId) => ctx.foodsById?.get?.(foodId) || foods.find((f) => f.id === foodId) || null;
+
+  const foodName = (item) => shownFoodName(findFood(item.foodId), item.name || item.foodId);
 
   const paintItems = () => {
     const ul = root.querySelector('[data-items]');
@@ -674,10 +695,18 @@ export function renderLog(ctx) {
 
     // Foods from free search stay as flat rows, each one removable on its own.
     draft.items.forEach((it, index) => {
+      const food = findFood(it.foodId);
+      // A food the person added is logged in portions; one portion is what was typed.
+      const custom = isUserFood(food);
+      const amount = custom ? portionsFromGrams(it.grams) : it.grams;
+      const unit = custom ? 'portions' : 'g';
+      const bounds = custom ? 'min="0.25" max="50" step="0.25"' : 'min="1" max="5000" step="1"';
+      const name = foodName(it);
       const li = el(`<li class="logged-item">
-        <span>${escapeHtml(foodName(it.foodId))}</span>
-        <input type="number" min="1" value="${it.grams}" data-edit="${index}">
-        <span class="muted">g</span>
+        <span>${escapeHtml(name)}</span>
+        <input type="number" ${bounds} value="${amount}" data-edit="${index}"
+          aria-label="${escapeHtml(name)} ${unit}">
+        <span class="muted">${unit}</span>
         <button type="button" class="btn-icon" data-del="${index}" aria-label="Remove">×</button>
       </li>`);
       ul.appendChild(li);
@@ -692,12 +721,17 @@ export function renderLog(ctx) {
     ul.querySelectorAll('[data-edit]').forEach((input) => {
       input.addEventListener('change', () => {
         const index = Number(input.dataset.edit);
-        const grams = parsePortion(input.value);
+        const item = draft.items[index];
+        if (!item) return;
+        const custom = isUserFood(findFood(item.foodId));
+        const grams = custom
+          ? amountGrams(findFood(item.foodId), input.value, parsePortion)
+          : parsePortion(input.value);
         if (grams === null) {
-          input.value = draft.items[index].grams;
+          input.value = custom ? portionsFromGrams(item.grams) : item.grams;
           return;
         }
-        draft.items[index].grams = grams;
+        item.grams = grams;
         paintItems();
       });
     });
@@ -709,8 +743,12 @@ export function renderLog(ctx) {
     });
   };
 
-  const addFood = (foodId, grams) => {
-    draft.items.push({ foodId, grams });
+  const addFood = (food, grams) => {
+    const item = { foodId: food.id, grams };
+    // The name of a food the person added travels with the line, so the log
+    // still reads it if the food is removed from the list later.
+    if (isUserFood(food)) item.name = food.name;
+    draft.items.push(item);
     paintItems();
   };
 
@@ -724,56 +762,99 @@ export function renderLog(ctx) {
   const searchInput = root.querySelector('[data-search]');
   const addSearchBtn = root.querySelector('[data-add-search]');
 
-  const runSearch = () => {
+  const portionInput = root.querySelector('[data-portion]');
+  const portionLabel = portionInput.closest('.field')?.querySelector('span') || null;
+  const portionError = root.querySelector('[data-portion-error]');
+  const noResults = searchCard.querySelector('[data-no-results]');
+  const noteEl = searchCard.querySelector('[data-custom-note]');
+
+  const showNote = (text) => {
+    noteEl.textContent = text || '';
+    noteEl.hidden = !text;
+  };
+
+  const choose = (food, { resetAmount = true } = {}) => {
+    selectedFood = food;
+    setAmountMode({ custom: isUserFood(food), labelEl: portionLabel, inputEl: portionInput });
+    portionError.textContent = amountError(food);
+    portionError.hidden = true;
+    if (!resetAmount) portionInput.value = '';
+    addSearchBtn.disabled = false;
+  };
+
+  const runSearch = (autoSelectId = null) => {
     const q = searchInput.value || '';
     resultsEl.innerHTML = '';
-    selectedFoodId = null;
+    selectedFood = null;
     addSearchBtn.disabled = true;
+    noResults.hidden = true;
     if (!q.trim()) return;
     const hits = searchFoods(foods, q, { limit: 12 });
-    for (const f of hits) {
-      const shown = displayFoodName(f);
-      if (!shown) continue;
-      const b = el(`<button type="button" class="search-hit">${escapeHtml(shown)}</button>`);
-      b.addEventListener('click', () => {
-        selectedFoodId = f.id;
-        resultsEl.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
-        b.classList.add('is-selected');
-        addSearchBtn.disabled = false;
+    for (const food of hits) {
+      const row = searchResultRow(food, {
+        onSelect: (picked) => choose(picked),
+        onRemove: (removed) => {
+          const used = customFoodUsedInLog(ctx.state.log, removed.id);
+          ctx.removeCustomFood(removed.id);
+          showNote(customFoodRemovalNote(removed.name, used));
+          runSearch();
+        },
       });
-      resultsEl.appendChild(b);
+      resultsEl.appendChild(row);
+    }
+    if (resultsEl.children.length === 0) noResults.hidden = false;
+    if (autoSelectId) {
+      const b = resultsEl.querySelector(`[data-food-id="${autoSelectId}"]`);
+      if (b) b.click();
     }
   };
-  searchInput.addEventListener('input', runSearch);
+  searchInput.addEventListener('input', () => {
+    showNote('');
+    runSearch();
+  });
 
-  const portionInput = root.querySelector('[data-portion]');
-  const portionError = root.querySelector('[data-portion-error]');
+  // "Add my own food": the same small form the Replace picker offers.
+  const customForm = createCustomFoodForm({
+    onSave: (value) => {
+      const food = ctx.addCustomFood(value);
+      customForm.close();
+      showNote('');
+      // The saved food is searched straight away, so it can be logged at once.
+      searchInput.value = food.name;
+      runSearch(food.id);
+    },
+    onCancel: () => customForm.close(),
+  });
+  searchCard.querySelector('[data-custom-host]').appendChild(customForm.element);
+  searchCard.querySelector('[data-custom-add]').addEventListener('click', () => {
+    showNote('');
+    customForm.open();
+  });
+
   portionInput.addEventListener('input', () => {
     portionError.hidden = true;
   });
 
   // The Drinks shortcut fills the same selection and portion fields as a search hit.
   const drinkPicker = createDrinkPicker(foods, (food, grams) => {
-    resultsEl.querySelectorAll('.search-hit').forEach((x) => x.classList.remove('is-selected'));
-    selectedFoodId = food.id;
+    choose(food);
     portionInput.value = grams;
-    portionError.hidden = true;
-    addSearchBtn.disabled = false;
   });
   const drinksButton = searchCard.querySelector('[data-drinks]');
   drinksButton.after(drinkPicker.element);
   drinksButton.addEventListener('click', () => drinkPicker.toggle());
 
   addSearchBtn.addEventListener('click', () => {
-    if (!selectedFoodId) return;
-    const grams = parsePortion(portionInput.value);
+    if (!selectedFood) return;
+    const grams = amountGrams(selectedFood, portionInput.value, parsePortion);
     if (grams === null) {
+      portionError.textContent = amountError(selectedFood);
       portionError.hidden = false;
       portionInput.focus();
       return;
     }
     portionError.hidden = true;
-    addFood(selectedFoodId, grams);
+    addFood(selectedFood, grams);
   });
 
   root.querySelector('[data-save]').addEventListener('click', () => {
