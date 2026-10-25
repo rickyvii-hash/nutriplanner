@@ -88,18 +88,25 @@ const ctx = {
       planDay: ctx.state.plan.days[when.date],
       recipesById: ctx.recipesById,
     });
-    // Replan from the month plan as it was before any accepted update: the saved plan
-    // already holds the make-up for the earlier log, so replanning from it would apply
-    // that make-up twice. The full merged log is used, so one replan of every entry sees
-    // the same food as logging them one at a time.
+    // A second log on the same day replans from the month plan as it was before any
+    // accepted update: the saved plan already holds the make-up for the earlier log,
+    // so replanning from it would apply that make-up twice. The full merged log is
+    // used, so one replan of every entry sees the same food as logging them one at a
+    // time. The first log of a later day instead starts from the current plan, so the
+    // make-up already accepted for past days is kept and only today and the days
+    // after it change for the new log.
+    const hadPriorToday = (ctx.state.log || []).some((entry) => entry?.date === when.date);
+    const basePlan = hadPriorToday
+      ? (ctx.state.planBase || ctx.state.plan)
+      : ctx.state.plan;
     const result = replan({
       targets: ctx.state.targets,
       recipes: ctx.recipes,
-      plan: ctx.state.planBase || ctx.state.plan,
+      plan: basePlan,
       log,
       bought: ctx.state.bought || [],
       foodsById: ctx.foodsById,
-      fromDate: todayIso(),
+      fromDate: when.date,
       mealPrefs: ctx.state.mealPrefs,
     });
     ctx.state = { ...ctx.state, log, pendingProposal: proposalToStore(result) };
