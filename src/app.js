@@ -22,6 +22,8 @@ import {
 } from './engine/lab_notes.js';
 import { shouldShowNav } from './ui/nav.js';
 import { openStartOverPanel, openChangeProfilePanel, openRestorePanel } from './ui/reset.js';
+import { shouldShowGuide, dismissGuideState } from './engine/guide.js';
+import { openGuide } from './ui/guide.js';
 
 const app = document.getElementById('app');
 
@@ -133,6 +135,14 @@ const ctx = {
   },
   removeLabNote: (id) => {
     ctx.state = { ...ctx.state, labNotes: removeLabNoteEntry(ctx.state.labNotes, id) };
+    saveState(ctx.state);
+    render();
+  },
+  // The guide opens from the Targets "How it works" link, without touching the dismiss flag.
+  openGuide: () => openGuide(ctx, { firstRun: false }),
+  // Closing the first-run guide keeps it from opening automatically on later visits.
+  dismissGuide: () => {
+    ctx.state = dismissGuideState(ctx.state);
     saveState(ctx.state);
     render();
   },
@@ -279,6 +289,8 @@ async function start() {
       ctx.screen = 'targets';
     }
     render();
+    // First paint on an empty device: three short steps over the profile choice.
+    if (shouldShowGuide(ctx.state)) openGuide(ctx, { firstRun: true });
   } catch (err) {
     app.innerHTML = `<div class="screen">
       <header class="brand"><span class="logo" aria-hidden="true">🌿</span>

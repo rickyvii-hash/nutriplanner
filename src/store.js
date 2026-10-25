@@ -8,6 +8,8 @@ const KEY = 'nutriplanner-v1';
 export function emptyAppState() {
   return {
     profileId: null,
+    // The first-run guide closes for good once dismissed; "How it works" still opens it.
+    guideDismissed: false,
     targets: [],
     // Which daily meals are on (breakfast, lunch, dinner and 0–2 snacks).
     mealPrefs: defaultMealPrefs(),
@@ -221,6 +223,7 @@ export function loadState() {
     const data = JSON.parse(raw);
     return {
       profileId: data.profileId ?? null,
+      guideDismissed: data.guideDismissed === true,
       targets: Array.isArray(data.targets) ? data.targets : [],
       mealPrefs: normalizeMealPrefs(data.mealPrefs),
       plan: data.plan ?? null,
@@ -252,6 +255,7 @@ export function saveState(state) {
       KEY,
       JSON.stringify({
         profileId: state.profileId,
+        guideDismissed: Boolean(state.guideDismissed),
         targets: state.targets,
         mealPrefs: normalizeMealPrefs(state.mealPrefs),
         plan: state.plan,

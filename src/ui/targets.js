@@ -46,6 +46,19 @@ export function parseTargetDaily(raw) {
   return value;
 }
 
+/** Footer with the "How it works" link and the health disclaimer, shown on every Targets view. */
+function guideFooter(ctx) {
+  const footer = el(`<p class="footer-note footer-with-guide">
+    <button type="button" class="btn-text" data-action="how-it-works">How it works</button>
+    <span aria-hidden="true">·</span>
+    <span>Support tool, not medical advice.</span>
+  </p>`);
+  footer.querySelector('[data-action="how-it-works"]')?.addEventListener('click', () => {
+    ctx.openGuide?.();
+  });
+  return footer;
+}
+
 export function renderTargets(ctx) {
   const { state, onChange } = ctx;
   const root = el(`<div class="screen screen-targets"></div>`);
@@ -81,7 +94,7 @@ export function renderTargets(ctx) {
       grid.appendChild(card);
     }
     root.appendChild(choose);
-    root.appendChild(el(`<p class="footer-note">Support tool, not medical advice.</p>`));
+    root.appendChild(guideFooter(ctx));
     return root;
   }
 
@@ -251,7 +264,7 @@ export function renderTargets(ctx) {
     <button type="button" class="btn-primary" data-action="build">Build my month plan</button>
   </div>`);
   root.appendChild(actions);
-  root.appendChild(el(`<p class="footer-note">Support tool, not medical advice.</p>`));
+  root.appendChild(guideFooter(ctx));
 
   const syncField = (i, field, value) => {
     const next = state.targets.map((t, idx) => {
