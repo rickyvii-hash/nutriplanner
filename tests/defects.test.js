@@ -5,7 +5,7 @@ import {
   buildPlan, replan, dayTotals, LAST_DAY_REASON,
 } from '../src/engine/planner.js';
 import {
-  NUTRIENT_KEYS, foodNutrients, sumNutrients, formatNutrient, recipeNutrients,
+  NUTRIENT_KEYS, foodNutrients, sumNutrients, formatNutrient,
 } from '../src/engine/nutrients.js';
 import { profileById } from '../src/engine/profiles.js';
 import { dayValueText, dayProgressTotals } from '../src/ui/plan.js';
@@ -142,16 +142,12 @@ test('plan progress: a skipped planned meal is left out of the day values', () =
   const log = [{ date, time: '13:00', skipped: [lunch.id], items: [] }];
   const { result, note } = dayProgressTotals(day, log, recipesById, foodsById);
 
-  const lunchTotals = recipeNutrients(lunch, foodsById);
-  // Every known nutrient is plan minus the skipped recipe, never the full plan.
+  // Progress comes from the log only: other planned meals are a plan, not food eaten.
   for (const key of ['kcal', 'protein', 'carbs']) {
-    assert.ok(
-      Math.abs(result.totals[key] - (full.totals[key] - lunchTotals.totals[key])) < 1e-9,
-      `${key} must exclude the skipped lunch`,
-    );
+    assert.equal(result.totals[key], 0, `${key} must not count uneaten planned meals`);
   }
-  assert.ok(result.totals.kcal < full.totals.kcal, 'progress is lower than the full plan');
-  assert.match(note, /skipped/i, 'the screen explains that skipped meals are not counted');
+  assert.ok(full.totals.kcal > 0, 'the plan itself still holds the day');
+  assert.match(note, /skipped|logged/i, 'the screen explains that skipped meals are not counted');
 });
 
 test('plan progress: a logged meal still wins over the planned values', () => {
