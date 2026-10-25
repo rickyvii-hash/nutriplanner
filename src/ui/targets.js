@@ -1,6 +1,14 @@
 import { PROFILES } from '../engine/profiles.js';
 import { NUTRIENTS } from '../engine/nutrients.js';
+import { todayIso, rebuildPlanMeals } from '../engine/planner.js';
+import { normalizeMealPrefs } from '../engine/meal_prefs.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit, formatKind } from './dom.js';
+
+const MEAL_LABELS = [
+  ['breakfast', 'Breakfast'],
+  ['lunch', 'Lunch'],
+  ['dinner', 'Dinner'],
+];
 
 /** Sensible starting value for a custom target, never 0. */
 export const CUSTOM_TARGET_DEFAULTS = {
@@ -124,6 +132,57 @@ export function renderTargets(ctx) {
     row.querySelector('[data-field="kind"]').value = t.kind;
     targetsEl.appendChild(row);
   });
+
+  // My meals: which daily slots the plan fills. Turning one off keeps the same
+  // daily targets, so the remaining meals carry more.
+  const prefs = normalizeMealPrefs(state.mealPrefs);
+  const mealsCard = el(`<section class="card my-meals">
+    <h3>My meals</h3>
+    <p class="muted tiny">Fewer meals still use the same daily targets, so each meal carries more.</p>
+    <div class="meal-pref-grid">
+      ${MEAL_LABELS.map(([key, label]) => `<label class="meal-pref">
+        <input type="checkbox" data-meal="${key}"${prefs[key] ? ' checked' : ''}>
+        <span>${label}</span>
+      </label>`).join('')}
+    </div>
+    <p class="field-label">Snacks per day</p>
+    <div class="freq-options" role="group" aria-label="Snacks per day">
+      ${[0, 1, 2].map((n) => `<button type="button" class="freq-option${prefs.snacks === n ? ' is-active' : ''}" data-snacks="${n}" aria-pressed="${prefs.snacks === n ? 'true' : 'false'}">${n}</button>`).join('')}
+    </div>
+  </section>`);
+
+  const applyMealPrefs = (nextPrefs) => {
+    const clean = normalizeMealPrefs(nextPrefs);
+    const next = { ...state, mealPrefs: clean };
+    // A plan already built is refilled from today on; past days keep what was stored.
+    if (state.plan && Array.isArray(ctx.recipes) && ctx.recipes.length > 0) {
+      next.plan = rebuildPlanMeals(
+        state.plan,
+        state.targets,
+        ctx.recipes,
+        ctx.foodsById || new Map(),
+        clean,
+        todayIso(),
+      );
+      next.planBase = null;
+      next.keptForBought = [];
+      next.pendingProposal = null;
+    }
+    onChange(next);
+  };
+
+  mealsCard.querySelectorAll('[data-meal]').forEach((input) => {
+    input.addEventListener('change', () => {
+      const key = input.dataset.meal;
+      applyMealPrefs({ ...prefs, [key]: input.checked });
+    });
+  });
+  mealsCard.querySelectorAll('[data-snacks]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      applyMealPrefs({ ...prefs, snacks: Number(btn.dataset.snacks) });
+    });
+  });
+  root.appendChild(mealsCard);
 
   root.appendChild(list);
 

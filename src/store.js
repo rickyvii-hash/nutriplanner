@@ -1,5 +1,7 @@
 // Device-local persistence. No accounts, no cloud.
 
+import { defaultMealPrefs, normalizeMealPrefs } from './engine/meal_prefs.js';
+
 const KEY = 'nutriplanner-v1';
 
 /** A fresh, empty device state (the shape every screen expects). */
@@ -7,6 +9,8 @@ export function emptyAppState() {
   return {
     profileId: null,
     targets: [],
+    // Which daily meals are on (breakfast, lunch, dinner and 0–2 snacks).
+    mealPrefs: defaultMealPrefs(),
     plan: null,
     // The month plan as it was before an accepted update: a correction replans
     // from here, so a make-up for a meal that is later removed cannot survive.
@@ -210,11 +214,12 @@ export function loadState() {
       return { ...EMPTY };
     }
     const raw = localStorage.getItem(KEY);
-    if (!raw) return { ...EMPTY, bought: [], log: [], targets: [], keptForBought: [] };
+    if (!raw) return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [] };
     const data = JSON.parse(raw);
     return {
       profileId: data.profileId ?? null,
       targets: Array.isArray(data.targets) ? data.targets : [],
+      mealPrefs: normalizeMealPrefs(data.mealPrefs),
       plan: data.plan ?? null,
       planBase: data.planBase && typeof data.planBase === 'object' ? data.planBase : null,
       log: Array.isArray(data.log) ? data.log : [],
@@ -228,7 +233,7 @@ export function loadState() {
     };
   } catch {
     storageNotice = 'Saved data could not be read; starting fresh for this session.';
-    return { ...EMPTY, bought: [], log: [], targets: [], keptForBought: [] };
+    return { ...EMPTY, mealPrefs: defaultMealPrefs(), bought: [], log: [], targets: [], keptForBought: [] };
   }
 }
 
@@ -244,6 +249,7 @@ export function saveState(state) {
       JSON.stringify({
         profileId: state.profileId,
         targets: state.targets,
+        mealPrefs: normalizeMealPrefs(state.mealPrefs),
         plan: state.plan,
         planBase: state.planBase || null,
         log: state.log,

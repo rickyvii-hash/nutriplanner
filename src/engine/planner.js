@@ -2,6 +2,9 @@
 // "reason" text on Plan updated comes from real numbers, not invented copy.
 
 import { recipeNutrients, loggedNutrients, NUTRIENT_KEYS } from './nutrients.js';
+import {
+  defaultMealPrefs, normalizeMealPrefs, activeSlots, perSlotCapFactor, slotRecipeKind,
+} from './meal_prefs.js';
 
 const SLOTS = ['breakfast', 'lunch', 'dinner', 'snack'];
 
@@ -50,7 +53,9 @@ export function dayTotals(dayMeals, recipesById, foodsById) {
   const incomplete = {};
   const known = {};
   let hasMeal = false;
-  for (const slot of SLOTS) {
+  // Every slot the day actually holds: a day built with fewer meals simply has
+  // fewer keys, and a second snack is just another key.
+  for (const slot of Object.keys(dayMeals || {})) {
     const id = dayMeals?.[slot];
     if (!id) continue;
     const recipe = recipesById.get(id);
@@ -102,7 +107,8 @@ export function scoreAgainstTargets(totals, targets) {
 }
 
 function recipesForSlot(recipes, slot) {
-  return recipes.filter((r) => r.slot === slot);
+  // Both snack slots draw from the recipes whose slot is "snack".
+  return recipes.filter((r) => r.slot === slotRecipeKind(slot));
 }
 
 /**
@@ -136,12 +142,27 @@ function cooldownDays(recipes, slot) {
  * that exceed any bound are skipped. When given and nothing fits, returns null.
  * lowerBounds: { nutrient: minDayTotal } optional floor on the summed day totals, so a swapped
  * day never drops below what it had before.
+ * slots: the daily slots to fill, in order (default: every slot). Off slots are left out
+ * of the returned day object.
  */
 export function fillDay(
   recipes, targets, foodsById, boughtSet, avoidBySlot = {}, capBySlot = {}, floorBySlot = {},
-  upperBounds = null, lowerBounds = null,
+  upperBounds = null, lowerBounds = null, slots = SLOTS, applySoftCaps = true,
 ) {
-  const options = SLOTS.map((slot) => {
+  const active = Array.isArray(slots) && slots.length > 0 ? slots : SLOTS;
+  // Soft caps for max targets when fewer than the default four meals are on
+  // (initial build only): one meal never carries the whole day's maximum alone.
+  // Full four-slot days and replan make-up swaps skip these so existing behaviour stays.
+  const softCaps = {};
+  if (applySoftCaps && active.length < 4) {
+    const slotCapFactor = perSlotCapFactor(active.length);
+    for (const t of targets) {
+      if (t.kind !== 'max' || !t.daily || t.daily <= 0) continue;
+      softCaps[t.nutrient] = t.daily * slotCapFactor;
+    }
+  }
+  const softCapKeys = Object.keys(softCaps);
+  const options = active.map((slot) => {
     const all = recipesForSlot(recipes, slot);
     if (all.length === 0) throw new Error(`No recipes for slot ${slot}`);
     const cap = capBySlot[slot];
@@ -160,6 +181,14 @@ export function fillDay(
         const value = totalsOf.get(r.id)[n];
         return r.id === keepId ? value >= v - 1e-9 : value > v + 1e-9;
       }));
+    }
+    if (softCapKeys.length > 0) {
+      // A meal over its share is only dropped while another combination exists;
+      // when nothing is left, the closest plan is used as before.
+      const withinSoftCaps = allowed.filter(
+        (r) => softCapKeys.every((n) => totalsOf.get(r.id)[n] <= softCaps[n] + 1e-9),
+      );
+      if (withinSoftCaps.length > 0) allowed = withinSoftCaps;
     }
     const pool = allowed.length > 0 ? allowed : all;
     const avoid = avoidBySlot[slot];
@@ -194,30 +223,67 @@ export function fillDay(
   };
   walk(0, emptyTotals(), 0);
   if (best === null) return null;
-  return Object.fromEntries(SLOTS.map((slot, i) => [slot, best[i]]));
+  return Object.fromEntries(active.map((slot, i) => [slot, best[i]]));
 }
 
 /**
  * Build a full month plan. `month` is { year, month } (month 1–12).
- * Returns { month: "YYYY-MM", days: { "YYYY-MM-DD": { breakfast, lunch, dinner, snack } } }.
+ * `options.mealPrefs` chooses the daily slots; the default is all four.
+ * Returns { month: "YYYY-MM", days: { "YYYY-MM-DD": { breakfast, lunch, dinner, snack } } },
+ * where a day only holds the slots that are on.
  */
-export function buildPlan(targets, recipes, month, foodsById, bought = []) {
+export function buildPlan(targets, recipes, month, foodsById, bought = [], options = {}) {
   const boughtSet = new Set(bought);
+  const prefs = normalizeMealPrefs(options.mealPrefs || defaultMealPrefs());
+  const slots = activeSlots(prefs);
   const days = {};
   const recent = {};
-  for (const slot of SLOTS) recent[slot] = [];
+  for (const slot of slots) recent[slot] = [];
   for (const date of daysInMonth(month.year, month.month)) {
     const avoid = {};
-    for (const slot of SLOTS) {
+    for (const slot of slots) {
       avoid[slot] = new Set(recent[slot].slice(-cooldownDays(recipes, slot)));
     }
-    days[date] = fillDay(recipes, targets, foodsById, boughtSet, avoid);
-    for (const slot of SLOTS) recent[slot].push(days[date][slot]);
+    days[date] = fillDay(recipes, targets, foodsById, boughtSet, avoid, {}, {}, null, null, slots);
+    for (const slot of slots) recent[slot].push(days[date][slot]);
   }
   return {
     month: `${month.year}-${pad(month.month)}`,
     days,
   };
+}
+
+/**
+ * Refill the meals of an existing plan from `fromDate` on with new meal preferences.
+ * Days before fromDate keep exactly what was stored (logged and planned history is
+ * never rewritten); today and the future are rebuilt like a fresh plan.
+ */
+export function rebuildPlanMeals(plan, targets, recipes, foodsById, prefs, fromDate) {
+  if (!plan || !plan.days) return plan;
+  const normalized = normalizeMealPrefs(prefs || defaultMealPrefs());
+  const slots = activeSlots(normalized);
+  const dates = Object.keys(plan.days).sort();
+  const days = Object.fromEntries(dates.map((date) => [date, { ...plan.days[date] }]));
+  // Variety carries over from the days that stay as they are.
+  const recent = {};
+  for (const slot of slots) recent[slot] = [];
+  for (const date of dates) {
+    if (date >= fromDate) break;
+    for (const slot of slots) {
+      const id = plan.days[date]?.[slot];
+      if (id) recent[slot].push(id);
+    }
+  }
+  for (const date of dates) {
+    if (date < fromDate) continue;
+    const avoid = {};
+    for (const slot of slots) {
+      avoid[slot] = new Set(recent[slot].slice(-cooldownDays(recipes, slot)));
+    }
+    days[date] = fillDay(recipes, targets, foodsById, new Set(), avoid, {}, {}, null, null, slots);
+    for (const slot of slots) recent[slot].push(days[date][slot]);
+  }
+  return { month: plan.month, days };
 }
 
 /** True when a log entry only records skipped planned meals (never counted as eaten). */
@@ -358,6 +424,12 @@ function buildReason({
 }) {
   if (skipNoMin) return SKIP_NO_MIN_REASON;
   if (nothingToChange) {
+    // With fewer meals a floor may simply not fit the chosen slots: say so instead
+    // of claiming the month meets the targets.
+    if (unreachable) {
+      return 'No changes are needed to the remaining days. Not every target can be met with '
+        + 'the meals you chose, so this is the closest plan.';
+    }
     return 'No changes needed — the rest of the month still meets your targets.';
   }
   const daysTouched = new Set(changed.map((c) => c.date)).size;
@@ -508,6 +580,7 @@ export function effectChange(key, effect) {
  * whose log feeds the replan; it defaults to `fromDate`, and differs only when a
  * correction on a past day is recalculated from today: the past days cannot change
  * but every entry logged since then still counts in the totals.
+ * `mealPrefs` chooses which daily slots exist; the default is all four.
  */
 export function replan(state) {
   const {
@@ -519,8 +592,11 @@ export function replan(state) {
     foodsById,
     fromDate = todayIso(),
     logFromDate = fromDate,
+    mealPrefs,
   } = state;
 
+  const prefs = normalizeMealPrefs(mealPrefs || defaultMealPrefs());
+  const slots = activeSlots(prefs);
   const recipesById = new Map(recipes.map((r) => [r.id, r]));
   const boughtSet = new Set(bought);
   const allDates = Object.keys(plan.days || {}).sort();
@@ -776,11 +852,11 @@ export function replan(state) {
     for (const date of windowDates) {
       const idx = allDates.indexOf(date);
       const avoid = {};
-      for (const slot of SLOTS) {
+      for (const slot of slots) {
         const k = cooldownDays(recipes, slot);
-        const before = allDates.slice(Math.max(0, idx - k), idx).map((d) => newPlan.days[d][slot]);
-        const after = allDates.slice(idx + 1, idx + 1 + k).filter((d) => !windowSet.has(d)).map((d) => newPlan.days[d][slot]);
-        avoid[slot] = new Set([...before, ...after]);
+        const before = allDates.slice(Math.max(0, idx - k), idx).map((d) => newPlan.days[d]?.[slot]);
+        const after = allDates.slice(idx + 1, idx + 1 + k).filter((d) => !windowSet.has(d)).map((d) => newPlan.days[d]?.[slot]);
+        avoid[slot] = new Set([...before, ...after].filter(Boolean));
       }
       const dayTargets = targetsForDay(date);
       // Maxima: only swap towards less of the nutrient that went over.
@@ -788,7 +864,7 @@ export function replan(state) {
       const caps = {};
       const floors = {};
       if (adjustedMax) {
-        for (const slot of SLOTS) {
+        for (const slot of slots) {
           const old = recipesById.get(plan.days[date]?.[slot]);
           if (!old) continue;
           const totals = recipeNutrients(old, foodsById).totals;
@@ -798,7 +874,7 @@ export function replan(state) {
       if (adjustedMin && floorNutrient) {
         // A swapped meal must have more of the shortfall nutrient the reason names
         // (calories when that fell short), never less than the meal it replaces.
-        for (const slot of SLOTS) {
+        for (const slot of slots) {
           const old = recipesById.get(plan.days[date]?.[slot]);
           if (!old) continue;
           const totals = recipeNutrients(old, foodsById).totals;
@@ -832,7 +908,7 @@ export function replan(state) {
           const ceiling = base + factor * bump;
           day = fillDay(
             recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors,
-            { [primaryNutrient]: ceiling }, lowerBounds,
+            { [primaryNutrient]: ceiling }, lowerBounds, slots, false,
           );
           if (day) {
             primaryCeiling = ceiling;
@@ -840,22 +916,22 @@ export function replan(state) {
           }
         }
       } else {
-        day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors);
+        day = fillDay(recipes, dayTargets, foodsById, boughtSet, avoid, caps, floors, null, null, slots, false);
       }
       // No combination fits even after the retries: leave this day as it was.
       if (!day) continue;
       const prev = plan.days[date];
       let merged = { ...day };
       const keptHere = [];
-      for (const slot of SLOTS) {
+      for (const slot of slots) {
         const prevRecipe = recipesById.get(prev?.[slot]);
-        if (!prevRecipe || avoid[slot].has(prevRecipe.id)) continue;
+        if (!prevRecipe || avoid[slot]?.has(prevRecipe.id)) continue;
         // Keep the old meal only when it has a bigger share of food already at home than its replacement;
         // if everything is at home there is no pantry reason to keep it.
         if (boughtShare(prevRecipe, boughtSet) <= boughtShare(recipesById.get(day[slot]), boughtSet)) continue;
         // Keep the old meal when it uses bought food and does not worsen the score much.
         let soFar = emptyTotals();
-        for (const s of SLOTS) {
+        for (const s of slots) {
           if (s === slot) break;
           const rec = recipesById.get(merged[s]);
           if (rec) soFar = addTotals(soFar, recipeNutrients(rec, foodsById).totals);
@@ -883,9 +959,19 @@ export function replan(state) {
     }
   }
 
+  // Every slot a changed day holds on either side: the active slots plus anything a
+  // day stored earlier, so a slot that is switched off is still reported honestly.
+  const dayKeys = (date) => {
+    const keys = [...slots];
+    for (const slot of [...Object.keys(plan.days[date] || {}), ...Object.keys(newPlan.days[date] || {})]) {
+      if (!keys.includes(slot)) keys.push(slot);
+    }
+    return keys;
+  };
+
   const changed = [];
   for (const date of windowDates) {
-    for (const slot of SLOTS) {
+    for (const slot of dayKeys(date)) {
       const before = plan.days[date]?.[slot];
       const after = newPlan.days[date]?.[slot];
       if (before !== after) {
@@ -921,7 +1007,7 @@ export function replan(state) {
     if (t.kind === 'max' && v > t.daily * 1.15) unreachable = true;
     if (t.kind === 'min' && v < t.daily * 0.85) unreachable = true;
   }
-  const sampleDay = fillDay(recipes, targets, foodsById, boughtSet);
+  const sampleDay = fillDay(recipes, targets, foodsById, boughtSet, {}, {}, {}, null, null, slots);
   const sample = dayTotals(sampleDay, recipesById, foodsById);
   if (scoreAgainstTargets(sample.totals, targets).unmet >= targets.length) unreachable = true;
 

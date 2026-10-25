@@ -1,4 +1,5 @@
-import { dayTotals, todayIso, SLOTS } from '../engine/planner.js';
+import { dayTotals, todayIso } from '../engine/planner.js';
+import { activeSlots, slotLabel } from '../engine/meal_prefs.js';
 import { foodNutrients, formatNutrient, sumNutrients } from '../engine/nutrients.js';
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
@@ -50,7 +51,7 @@ export function dayProgressTotals(dayMeals, dayLog, recipesById, foodsById) {
   if (skippedIds.size > 0) {
     // Keep the planned meals that were not skipped; the skipped one is gone.
     const remaining = {};
-    for (const slot of SLOTS) {
+    for (const slot of Object.keys(dayMeals || {})) {
       const id = dayMeals?.[slot];
       if (id && !skippedIds.has(id)) remaining[slot] = id;
     }
@@ -160,11 +161,15 @@ export function renderPlan(ctx) {
     <ul class="meal-list"></ul>
   </section>`);
   const list = mealCard.querySelector('.meal-list');
-  for (const slot of SLOTS) {
+  // Today shows only the meals that are on; other days show the slots they hold.
+  const daySlots = selected === today
+    ? activeSlots(state.mealPrefs).filter((slot) => meals?.[slot])
+    : Object.keys(meals || {}).filter((slot) => meals[slot]);
+  for (const slot of daySlots) {
     const recipe = recipesById.get(meals[slot]);
-    const item = el(`<li class="meal-item">
+    const item = el(`<li class="meal-item" data-slot="${escapeHtml(slot)}">
       <button type="button" class="meal-open" data-open-recipe="${escapeHtml(recipe?.id || '')}" aria-haspopup="dialog">
-        <span class="meal-slot">${slot}</span>
+        <span class="meal-slot">${escapeHtml(slotLabel(slot))}</span>
         <span class="meal-name">${recipe?.icon || ''} ${escapeHtml(recipe?.name || meals[slot])}</span>
       </button>
     </li>`);
@@ -337,8 +342,10 @@ export function renderPlan(ctx) {
     const up = el(`<section class="card"><h3>Upcoming days</h3><ul class="upcoming"></ul></section>`);
     const ul = up.querySelector('.upcoming');
     for (const date of upcoming) {
-      const meals = ['breakfast', 'lunch', 'dinner', 'snack']
-        .map((slot) => recipesById.get(state.plan.days[date][slot]))
+      const dayMeals = state.plan.days[date] || {};
+      const meals = Object.keys(dayMeals)
+        .filter((slot) => dayMeals[slot])
+        .map((slot) => recipesById.get(dayMeals[slot]))
         .filter(Boolean)
         .map((r) => `<li>${r.icon || ''} ${escapeHtml(r.name)}</li>`)
         .join('');

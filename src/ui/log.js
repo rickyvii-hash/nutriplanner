@@ -1,4 +1,5 @@
-import { todayIso, SLOTS } from '../engine/planner.js';
+import { todayIso } from '../engine/planner.js';
+import { activeSlots, slotLabel, slotRecipeKind } from '../engine/meal_prefs.js';
 import { searchFoods } from '../engine/search.js';
 import { el, escapeHtml, appendHtml } from './dom.js';
 import { openRecipeDetail } from './recipe_detail.js';
@@ -418,8 +419,10 @@ export function renderLog(ctx) {
   // of offering to log the same meal a second time.
   const savedOutcomes = savedSlotOutcomes(state.log, planDate, todayMeals, recipesById);
   planBody.appendChild(el(`<p class="field-label" data-plan-date>Today's planned meals (${planDate})</p>`));
-  for (const slot of SLOTS) {
-    const recipe = recipesById.get(todayMeals[slot]);
+  // Only the meals that are on are offered; a slot that is switched off has no row.
+  for (const slot of activeSlots(state.mealPrefs)) {
+    const recipe = recipesById.get(todayMeals?.[slot]);
+    if (!recipe) continue;
     const saved = savedOutcomes.get(slot) || null;
     const savedKind = saved?.kind || null;
     const alreadySkipped = savedKind
@@ -428,9 +431,9 @@ export function renderLog(ctx) {
     const inDraft = isRecipeInDraft(draft, recipe?.id);
     // A saved slot is locked: changes go through the correction path on Plan.
     const locked = Boolean(savedKind) || alreadySkipped || inDraft;
-    const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}${inDraft ? ' is-in-draft' : ''}${savedKind ? ' is-logged' : ''}">
+    const row = el(`<div class="plan-meal-row${alreadySkipped ? ' is-skipped' : ''}${inDraft ? ' is-in-draft' : ''}${savedKind ? ' is-logged' : ''}" data-slot="${escapeHtml(slot)}">
       <div>
-        <div class="meal-slot">${slot}</div>
+        <div class="meal-slot">${escapeHtml(slotLabel(slot))}</div>
         <div class="meal-name-line">
           <button type="button" class="meal-open" data-open-recipe="${escapeHtml(recipe?.id || '')}" aria-haspopup="dialog">${recipe?.icon || ''} ${escapeHtml(recipe?.name || '')}</button>
           ${inDraft ? '<span class="badge-in-draft">In this meal</span>' : ''}
@@ -686,9 +689,10 @@ export function renderLog(ctx) {
       return;
     }
     closeReplacePickers();
-    const others = ctx.recipes.filter((r) => r.slot === slot && r.id !== currentId);
+    const slotText = escapeHtml(slotLabel(slot));
+    const others = ctx.recipes.filter((r) => r.slot === slotRecipeKind(slot) && r.id !== currentId);
     const picker = el(`<div class="replace-picker" data-replace-picker>
-      <p class="field-label">Replace ${slot} with another ${slot} recipe</p>
+      <p class="field-label">Replace ${slotText} with another ${slotText} recipe</p>
       <div class="replace-options"></div>
       <button type="button" class="btn-secondary" data-ate-elsewhere>I ate something else</button>
       <div class="replace-custom hidden" data-replace-custom>
@@ -713,7 +717,7 @@ export function renderLog(ctx) {
     </div>`);
     const options = picker.querySelector('.replace-options');
     if (others.length === 0) {
-      options.appendChild(el(`<p class="muted tiny">No other ${slot} recipes available.</p>`));
+      options.appendChild(el(`<p class="muted tiny">No other ${slotText} recipes available.</p>`));
     }
     for (const other of others) {
       const b = el(`<button type="button" class="search-hit">${other.icon || ''} ${escapeHtml(other.name)}</button>`);
@@ -830,7 +834,9 @@ export function renderLog(ctx) {
     btn.addEventListener('click', () => {
       const row = btn.closest('.plan-meal-row');
       if (!row) return;
-      const slot = row.querySelector('.meal-slot')?.textContent?.trim().toLowerCase();
+      // The slot is the stored key (a second snack is "snack2"), not the shown label.
+      const slot = row.dataset.slot
+        || row.querySelector('.meal-slot')?.textContent?.trim().toLowerCase();
       if (!slot) return;
       // Nothing is replaced while "This meal" holds something: no picker, just the notice.
       if (draftHasPending(draft)) {

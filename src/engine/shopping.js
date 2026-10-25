@@ -87,7 +87,8 @@ export function buildShoppingList({
   for (const [date, meals] of Object.entries(plan?.days || {})) {
     if (date < fromDate) continue;
     if (toDate && date > toDate) continue;
-    for (const slot of ['breakfast', 'lunch', 'dinner', 'snack']) {
+    // Every meal slot the day holds, including a second snack; switched-off slots are absent.
+    for (const slot of Object.keys(meals || {})) {
       const recipe = recipesById.get(meals[slot]);
       if (!recipe) continue;
       for (const ing of recipe.ingredients) {

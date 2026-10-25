@@ -177,6 +177,7 @@ export function applyLogCorrection(ctx, correctedState, { fromDate } = {}) {
     foodsById: ctx.foodsById || new Map(),
     fromDate: replanFrom,
     logFromDate: logDate,
+    mealPrefs: state.mealPrefs,
   });
   // Days that are already over keep the meals of the plan in force now: make-up
   // accepted for an earlier log must not be reverted when a later log is

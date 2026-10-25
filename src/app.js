@@ -50,6 +50,7 @@ const ctx = {
       { year: now.getFullYear(), month: now.getMonth() + 1 },
       ctx.foodsById,
       ctx.state.bought || [],
+      { mealPrefs: ctx.state.mealPrefs },
     );
     // A new month plan replaces any leftover update proposal and clears a stale-month banner.
     ctx.state = withoutPendingProposal({ ...ctx.state, plan, planBase: null, keptForBought: [] });
@@ -88,6 +89,7 @@ const ctx = {
       bought: ctx.state.bought || [],
       foodsById: ctx.foodsById,
       fromDate: todayIso(),
+      mealPrefs: ctx.state.mealPrefs,
     });
     ctx.state = { ...ctx.state, log, pendingProposal: proposalToStore(result) };
     saveState(ctx.state);

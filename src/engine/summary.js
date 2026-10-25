@@ -86,7 +86,8 @@ export function planAverages(plan, recipesById, foodsById) {
   const acc = emptyAccumulator();
   for (const date of dates) {
     const meals = plan.days[date];
-    for (const slot of ['breakfast', 'lunch', 'dinner', 'snack']) {
+    // Every slot the day holds: fewer meals or a second snack change the keys, not the maths.
+    for (const slot of Object.keys(meals || {})) {
       const recipe = recipesById.get(meals[slot]);
       if (!recipe) continue;
       // Keep what the recipe knows AND remember what it does not: a recipe with a missing nutrient
