@@ -15,6 +15,7 @@ import {
 import { renderTargets } from './ui/targets.js';
 import { renderPlan, daySaveDecision } from './ui/plan.js';
 import { renderLog, logEntriesForSave, mergeLogEntries } from './ui/log.js';
+import { recomputePlanAfterSave } from './engine/plan_from_log.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
 import { renderSummary } from './ui/summary.js';
@@ -112,9 +113,13 @@ const ctx = {
     const items = Array.isArray(payload) ? payload : (payload?.items || []);
     const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
     if (!items.length && !skipped.length) return;
-    // The outside-the-menu screen logs today. The day screen passes the day it is
-    // showing, so a meal chosen on another day is saved for that day on this path.
-    const when = { date: options?.date || todayIso(), time: localTime() };
+    // The outside-the-menu screen logs now or an earlier moment. The day screen
+    // passes the day it is showing, so a meal chosen on another day is saved for
+    // that day on this path.
+    const when = {
+      date: options?.date || payload?.when?.date || todayIso(),
+      time: options?.time || payload?.when?.time || localTime(),
+    };
     // Free-search foods are tagged extra, so a saved entry says it was eaten outside
     // the planned meals; a replacement keeps its `replaced` slot instead.
     const entries = logEntriesForSave(
@@ -129,6 +134,47 @@ const ctx = {
       planDay: ctx.state.plan.days[when.date],
       recipesById: ctx.recipesById,
     });
+    const today = todayIso();
+    if (when.date < today) {
+      // An extra dated before today counts on that day exactly as if it had been
+      // in the log all along. The shown plan is recomputed from the base plan and
+      // the whole log: the days already over (date < when.date is not enough,
+      // so every day before today) stay frozen and the make-up window starts
+      // from today. No second planner is involved.
+      const recomputed = recomputePlanAfterSave({
+        planBase: ctx.state.planBase || ctx.state.plan,
+        plan: ctx.state.plan,
+        log,
+        decisions: ctx.state.updateDecisions || [],
+        today,
+        targets: ctx.state.targets,
+        recipes: ctx.recipes,
+        foodsById: ctx.foodsById,
+        bought: ctx.state.bought || [],
+        mealPrefs: ctx.state.mealPrefs,
+        fromDate: when.date,
+      });
+      const result = recomputed.result;
+      ctx.state = {
+        ...ctx.state,
+        log,
+        updateDecisions: recomputed.decisions,
+        pendingProposal: proposalToStore(result),
+      };
+      saveState(ctx.state);
+      ctx.proposal = result;
+      ctx.logDraft = null;
+      if (options.stay) return result;
+      // The person sees where the entry went: the day screen opens on that date.
+      ctx.selectedDate = when.date;
+      if (recomputed.proposal) {
+        ctx.navigate('updated');
+        return result;
+      }
+      ctx.dayStatus = `Added for ${when.date}. Plan unchanged.`;
+      ctx.navigate('plan');
+      return result;
+    }
     // A second log on the same day replans from the month plan as it was before any
     // accepted update: the saved plan already holds the make-up for the earlier log,
     // so replanning from it would apply that make-up twice. The full merged log is

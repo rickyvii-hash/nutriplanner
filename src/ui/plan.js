@@ -20,6 +20,7 @@ import {
   skipRecipeGroup,
   draftSavePayload,
   savedSlotOutcomes,
+  logEntriesForDate,
 } from './log.js';
 import {
   removeLogEntry,
@@ -716,9 +717,8 @@ export function renderPlan(ctx) {
   // Logged meals for this day can be corrected in place. Every saved entry shows
   // controls to remove it, change an eaten meal into skipped (and back), or edit
   // the portions of the food it holds.
-  const dayEntries = (state.log || [])
-    .map((entry, index) => ({ entry, index }))
-    .filter(({ entry }) => entry.date === selected);
+  // The saved entries of this day, in the order they were eaten: by time.
+  const dayEntries = logEntriesForDate(state.log, selected);
   const planDay = state.plan.days[selected];
   const loggedCard = el(`<section class="card">
     <h3>Logged meals</h3>

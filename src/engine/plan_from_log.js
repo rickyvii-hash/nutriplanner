@@ -35,6 +35,30 @@ export function normalizeUpdateDecisions(decisions, log, plan) {
   return { decisions: kept, dropped };
 }
 
+/**
+ * The shown plan after a log save that carries a chosen date and time (D25).
+ *
+ * For a save dated today or later this is the same recompute the outside-the-menu
+ * path has always used: a replan from that day, with the days already over kept
+ * as they are. For a save dated before today the entry is treated exactly as if
+ * it had been in the log all along: the plan is recomputed from the base plan and
+ * the whole log (a pure function of the two), the days before today stay frozen
+ * and the make-up window starts from today, never from the past date.
+ *
+ * Returns the same shape as recomputeShownPlan.
+ */
+export function recomputePlanAfterSave(options = {}) {
+  const {
+    when = null,
+    fromDate = null,
+    today = todayIso(),
+    plan = null,
+    ...rest
+  } = options;
+  const date = fromDate || when?.date || today;
+  return recomputeShownPlan({ ...rest, plan, today, fromDate: date });
+}
+
 /** A shallow day copy, so callers can never mutate a saved plan. */
 function copyDays(plan) {
   const days = {};

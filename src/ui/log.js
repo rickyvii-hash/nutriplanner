@@ -1,3 +1,4 @@
+import { todayIso, localTime } from '../engine/planner.js';
 import { searchFoods, words } from '../engine/search.js';
 import { DRINK_PRESETS, mlToGrams, listDrinkFoods } from '../engine/drinks.js';
 import { displayFoodName } from '../engine/food_display.js';
@@ -23,6 +24,80 @@ export {
 } from '../log_corrections.js';
 
 export const MAX_PORTION_GRAMS = 5000;
+
+/** What the date/time control says when the chosen moment has not happened yet. */
+export const EATEN_WHEN_ERROR = 'Pick a time that has already passed.';
+
+/** The plan month as the date field may use it: its first and last day. */
+export function eatenWhenBounds(plan) {
+  const dates = Object.keys(plan?.days || {}).filter(Boolean).sort();
+  if (dates.length === 0) return { firstDate: null, lastDate: null };
+  return { firstDate: dates[0], lastDate: dates[dates.length - 1] };
+}
+
+function isDateText(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(String(value || ''));
+}
+
+function isTimeText(value) {
+  return /^\d{2}:\d{2}$/.test(String(value || ''));
+}
+
+/**
+ * True when the chosen date and time are a moment that has already happened,
+ * inside the plan month. A date after today, a time later than now on today, or
+ * a date outside the plan month is refused with one plain sentence.
+ * Returns { ok, message }.
+ */
+export function validateEatenWhen({
+  date = '',
+  time = '',
+  now = new Date(),
+  today = null,
+  nowTime = null,
+  firstDate = null,
+  lastDate = null,
+} = {}) {
+  const day = today || todayIso(now);
+  const clock = nowTime || localTime(now);
+  const refuse = { ok: false, message: EATEN_WHEN_ERROR };
+  if (!isDateText(date) || !isTimeText(time)) return refuse;
+  if (date > day) return refuse;
+  if (date === day && time > clock) return refuse;
+  if (firstDate && date < firstDate) return refuse;
+  if (lastDate && date > lastDate) return refuse;
+  return { ok: true, message: null };
+}
+
+/** The date and time a save should store: now by default, or the chosen moment. */
+export function whenForSave({
+  earlier = false, date = '', time = '', now = new Date(),
+} = {}) {
+  if (earlier) return { date, time };
+  return { date: todayIso(now), time: localTime(now) };
+}
+
+/** The calm line shown when an earlier extra changed nothing on the plan. */
+export function pastExtraStatus(date) {
+  return `Added for ${date}. Plan unchanged.`;
+}
+
+/**
+ * The saved entries of one date, ordered by time. The day screen lists them
+ * under "Logged meals"; the original index still points at the saved entry for
+ * the correction controls. Entries without a time keep their saved order first.
+ */
+export function logEntriesForDate(log, date) {
+  return (Array.isArray(log) ? log : [])
+    .map((entry, index) => ({ entry, index }))
+    .filter(({ entry }) => entry?.date === date)
+    .sort((a, b) => {
+      const at = a.entry.time || '';
+      const bt = b.entry.time || '';
+      if (at !== bt) return at < bt ? -1 : 1;
+      return a.index - b.index;
+    });
+}
 
 /** The portion field's default amount, shown again after every add. */
 export const DEFAULT_FOOD_PORTION = '100';
@@ -394,6 +469,9 @@ export function draftSavePayload(draft) {
     skippedSlots: skipRecords,
     eaten: d.groups.map((g) => ({ recipeId: g.recipeId, slot: g.slot })),
     extra: d.items.length > 0,
+    // The chosen "when" travels with the payload when the screen set one, so the
+    // one-argument save path keeps working.
+    ...(d.when && d.when.date && d.when.time ? { when: { ...d.when } } : {}),
   };
 }
 
@@ -702,8 +780,28 @@ export function renderLog(ctx) {
   const draft = ensureDraft(ctx.logDraft);
   ctx.logDraft = draft;
 
+  const whenBounds = eatenWhenBounds(state.plan);
+  const nowDay = todayIso();
+  const nowClock = localTime();
+
   // The former Extra flow, shown directly: no tabs and no planned-meal rows here.
   const searchCard = el(`<section class="card">
+    <p class="field-label">When did you eat it?</p>
+    <div class="when-chips" role="group" aria-label="When did you eat it?">
+      <button type="button" class="when-chip is-active" data-when-now aria-pressed="true">Just now</button>
+      <button type="button" class="when-chip" data-when-earlier aria-pressed="false">Earlier</button>
+    </div>
+    <div class="when-panel hidden" data-when-panel>
+      <label class="field">
+        <span>Date</span>
+        <input type="date" min="${escapeHtml(whenBounds.firstDate || nowDay)}" max="${nowDay}" value="${nowDay}" data-when-date>
+      </label>
+      <label class="field">
+        <span>Time</span>
+        <input type="time" value="${nowClock}" data-when-time>
+      </label>
+      <p class="field-error" data-when-error hidden>${escapeHtml(EATEN_WHEN_ERROR)}</p>
+    </div>
     <p class="muted tiny" data-extra-help>
       Snack, drink or a restaurant meal — not tied to a planned slot.
     </p>
@@ -742,6 +840,54 @@ export function renderLog(ctx) {
 
   let selectedFood = null;
 
+  // The date/time control: "Just now" is the default, "Earlier" reveals a past
+  // date and time. The Save button stays off until the chosen moment is valid.
+  let earlier = false;
+  const whenError = searchCard.querySelector('[data-when-error]');
+  const whenDate = searchCard.querySelector('[data-when-date]');
+  const whenTime = searchCard.querySelector('[data-when-time]');
+  const nowButton = searchCard.querySelector('[data-when-now]');
+  const earlierButton = searchCard.querySelector('[data-when-earlier]');
+  const saveBtn = root.querySelector('[data-save]');
+
+  const whenCheck = () => (earlier
+    ? validateEatenWhen({
+      date: whenDate.value,
+      time: whenTime.value,
+      firstDate: whenBounds.firstDate,
+      lastDate: whenBounds.lastDate,
+    })
+    : { ok: true, message: null });
+
+  const updateSaveState = () => {
+    const check = whenCheck();
+    if (earlier) {
+      whenError.textContent = check.ok ? '' : check.message;
+      whenError.hidden = check.ok;
+    } else {
+      whenError.hidden = true;
+    }
+    saveBtn.disabled = draft.items.length === 0 || !check.ok;
+  };
+
+  const selectWhen = (nextEarlier) => {
+    earlier = nextEarlier;
+    nowButton.classList.toggle('is-active', !earlier);
+    earlierButton.classList.toggle('is-active', earlier);
+    nowButton.setAttribute('aria-pressed', String(!earlier));
+    earlierButton.setAttribute('aria-pressed', String(earlier));
+    searchCard.querySelector('[data-when-panel]').classList.toggle('hidden', !earlier);
+    if (earlier) {
+      if (!whenDate.value) whenDate.value = nowDay;
+      if (!whenTime.value) whenTime.value = localTime();
+    }
+    updateSaveState();
+  };
+  nowButton.addEventListener('click', () => selectWhen(false));
+  earlierButton.addEventListener('click', () => selectWhen(true));
+  whenDate.addEventListener('input', updateSaveState);
+  whenTime.addEventListener('input', updateSaveState);
+
   const findFood = (foodId) => ctx.foodsById?.get?.(foodId) || foods.find((f) => f.id === foodId) || null;
 
   const foodName = (item) => shownFoodName(findFood(item.foodId), item.name || item.foodId);
@@ -749,7 +895,6 @@ export function renderLog(ctx) {
   const paintItems = () => {
     const ul = root.querySelector('[data-items]');
     const empty = root.querySelector('[data-empty]');
-    const saveBtn = root.querySelector('[data-save]');
     ul.innerHTML = '';
 
     // Foods from free search stay as flat rows, each one removable on its own.
@@ -773,7 +918,8 @@ export function renderLog(ctx) {
 
     const hasAnything = draft.items.length > 0;
     empty.style.display = hasAnything ? 'none' : 'block';
-    saveBtn.disabled = !hasAnything;
+    // The Save button also respects the date/time choice.
+    updateSaveState();
     // Clear all only exists while the draft holds something to clear.
     root.querySelector('[data-clear-all]').hidden = !hasAnything;
 
@@ -918,7 +1064,20 @@ export function renderLog(ctx) {
   });
 
   root.querySelector('[data-save]').addEventListener('click', () => {
-    // Free-search foods are saved as extras: they never replace or skip a planned meal.
+    const check = whenCheck();
+    if (!check.ok) {
+      whenError.textContent = check.message;
+      whenError.hidden = false;
+      return;
+    }
+    // The chosen moment travels with the entry: "just now", or the past date and
+    // time the person picked. Free-search foods are saved as extras: they never
+    // replace or skip a planned meal.
+    draft.when = whenForSave({
+      earlier,
+      date: whenDate.value,
+      time: whenTime.value,
+    });
     ctx.saveLogAndReplan(draftSavePayload(draft));
   });
   root.querySelector('[data-back]').addEventListener('click', () => {

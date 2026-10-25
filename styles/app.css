@@ -173,6 +173,15 @@ h3 { font-size: 1.05rem; margin-bottom: 10px; }
   background: #fff; cursor: pointer; color: var(--muted); font-weight: 600;
 }
 .mode-tab.is-active { background: var(--green-soft); color: var(--green); border-color: var(--sage); }
+
+/* When did you eat it: two chips and the past date/time fields. */
+.when-chips { display: flex; gap: 6px; margin-bottom: 10px; }
+.when-chip {
+  flex: 1; font: inherit; padding: 8px 10px; border-radius: 12px; border: 1px solid var(--line);
+  background: #fff; cursor: pointer; color: var(--muted); font-weight: 600;
+}
+.when-chip.is-active { background: var(--green-soft); color: var(--green); border-color: var(--sage); }
+.when-panel { margin-bottom: 10px; }
 .field { display: block; margin-bottom: 10px; }
 .field span { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
 .field-error { color: #9a6b2f; font-size: 0.82rem; margin: 4px 0 8px; }
