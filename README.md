@@ -1,6 +1,6 @@
-﻿# NutriPlanner
+# NutriPlanner
 
-An adaptive monthly meal planner that rebuilds your plan around what you actually ate, bought and prepared.
+An adaptive monthly meal planner that rebuilds your plan around what you actually ate and what you already bought or have at home.
 
 Nutrient values come from a curated set of USDA FoodData Central foods. Missing values show as **n/a**, never as zero. This is a support tool, not medical advice.
 
@@ -12,18 +12,7 @@ Nutrient values come from a curated set of USDA FoodData Central foods. Missing 
 ## Try it online
 
 Try it online: https://rickyvii-hash.github.io/nutriplanner/  
-*(Publish this folder with GitHub Pages, then paste the site URL here.)*
-
-### Enable GitHub Pages (after you create a public repo for this folder)
-
-1. Push **only** the contents of this `project/app` folder to the repository default branch (for example `main`), or put them under a `docs/` folder.
-2. On GitHub: **Settings → Pages**.
-3. Source: **Deploy from a branch**.
-4. Branch: `main` (or your default) and folder: **/ (root)** if the app files are at the repo root, or **/docs** if you copied them into `docs/`.
-5. Save. After a minute, open `https://<user>.github.io/<repo>/` (or the `/docs` URL GitHub shows).
-6. Asset paths are relative (`styles/…`, `src/…`, `data/…`), so the app also works under a project-pages sub-path such as `/<repo>/`.
-
-Leave the Pages URL as a placeholder until the owner publishes the public repository.
+The app is a static site served from the root of this repository with GitHub Pages. Asset paths are relative (`styles/...`, `src/...`, `data/...`), so it also works under a project sub-path.
 
 ## Start the app locally
 

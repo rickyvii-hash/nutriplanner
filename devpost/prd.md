@@ -5,7 +5,7 @@ status: approved
 
 # NutriPlanner — Product Requirements
 
-An adaptive monthly meal planner for people following a personal nutrition goal: it rebuilds the plan around what they actually ate, bought and prepared.
+An adaptive monthly meal planner for people following a personal nutrition goal: it rebuilds the plan around what they actually ate, bought or already at home.
 Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 
 ## The Core Journey
@@ -15,7 +15,7 @@ Source: `scope.md > The Unique Kernel`, `scope.md > The Core Loop`.
 4. They tick what they have already bought. Items already at home leave the "to buy" list.
 5. During the month they handle each planned meal on the day screen: **Ate it**, **Skipped**, or **Replace** with another recipe for the same slot or with **I ate something else** (a searched food, or their own food, logged as replaced). Any choice can be undone or changed on the same screen. Food that was not a planned meal is added with **Add food outside the menu**.
 6. After saving (or after Replace), they see **Plan updated**: which upcoming meals changed (before and after), one sentence explaining why, and the effect on each target. They choose **Use updated plan** or **Keep my original plan**.
-7. The plan for the rest of the month is updated, favouring recipes that use food already bought or prepared. The shopping list updates to match.
+7. The plan for the rest of the month is updated, favouring recipes that use food already bought or already at home. The shopping list updates to match.
 8. They can open a **recipe detail** from a planned meal or an eaten block to see ingredients, nutrients for their targets, and three outside web-search links.
 9. Saved log entries can be corrected (remove, change a portion, switch Eaten and Skipped). **Start over** asks for confirmation before erasing the plan, logs and shopping ticks; **Change profile** keeps the log unless they also choose Start over.
 
@@ -76,7 +76,7 @@ Established from the mockups the learner chose:
 
 ### Plan updated
 - After a log, skip or replace, the next few days are recalculated so the targets are still met as closely as possible (the rest of the month stays as planned).
-- Recipes whose ingredients are already bought or prepared are kept where they still fit the targets.
+- Recipes whose ingredients are already bought or already at home are kept where they still fit the targets.
 - The screen shows before and after for each changed meal, a one-sentence reason that quotes the same rounded numbers as the Effect rows, and the effect on each target. A change that makes a target worse is said plainly, not framed as an improvement.
 - "Keep my original plan" leaves the plan unchanged.
 
@@ -106,7 +106,7 @@ Established from the mockups the learner chose:
 ## Product Decisions
 - All-English app, repository and video — required by the hackathon.
 - Targets are configurable for any nutrient, so one engine serves weight loss, cholesterol, recovery and athlete — avoids per-condition logic and keeps the build small.
-- Shopping list and "already at home" are part of the core loop, not later — the replan depends on what is already bought or prepared.
+- Shopping list and "already at home" are part of the core loop, not later — the replan depends on what is already bought or already at home.
 - Monthly planning horizon with a day-by-day view — the learner chose monthly goals and plan.
 - Neutral health wording and a visible disclaimer — the app is a support tool for use alongside a doctor.
 - No food photos, no login, no cloud — to keep the proof of concept small and licence-safe.

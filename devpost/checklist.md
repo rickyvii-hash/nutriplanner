@@ -61,18 +61,18 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 3 (the kernel)
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Early usable behavior explored — after slice 3 (the kernel)
+- [x] Final kick-the-tires exploration and feedback completed (hands-on runs on phone and desktop widths; defects fixed with tests first)
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship (independent code and UX reviews, 434 automated tests)
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [ ] Learning activity complete — not done for this submission (optional)
+- [ ] Optional edit and transfer reflection addressed — not done for this submission (optional)
+- [ ] `devpost/app-map.html` generated from finished code — not done for this submission (optional)
 
 Activity and evidence: not started
 Route and stops: not started
