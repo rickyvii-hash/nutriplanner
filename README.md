@@ -63,6 +63,8 @@ Everything is stored on this device only (browser localStorage). There are no ac
 
 Planned for a later version, not in this proof of concept:
 
+- **Targets from a professional**: a doctor or dietitian sends a small file with your targets; you open it, check it, and confirm. The app never decides targets by itself.
+- A **caregiver view**: a printable page of today with only the meals and the minimum to reach, for someone who does not use a screen.
 - A weekly shopping **budget** that shapes the plan: choose a budget and the planner favours affordable recipes while keeping your targets.
 - Excluded foods (allergies, intolerances, dislikes) and a second snack.
 - A simple lab-notes view that puts your own lab values next to your intake, without interpreting them.
