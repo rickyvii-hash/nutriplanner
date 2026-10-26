@@ -1,10 +1,31 @@
 import { el, escapeHtml, nutrientLabel, nutrientUnit } from './dom.js';
 
 /** Per-day average text: "n/a" when nothing is known, "≥12.2" when the average is a partial sum. */
-function averageText(value, incomplete, unknown, decimals) {
+export function averageText(value, incomplete, unknown, decimals) {
   if (unknown) return 'n/a';
   const text = value.toFixed(decimals);
   return incomplete ? `≥${text}` : text;
+}
+
+/**
+ * The one Effect row of Plan updated, as text. The preview card on Outside the
+ * menu reads the same model, so its rows use the same rounding, the same "n/a"
+ * and partial-sum mark, the same units and the same status words.
+ */
+export function effectRowModel(e) {
+  const decimals = e.nutrient === 'kcal' || e.nutrient === 'sodium' ? 0 : 1;
+  const before = averageText(e.before, e.beforeIncomplete, e.beforeUnknown, decimals);
+  const after = averageText(e.after, e.afterIncomplete, e.afterUnknown, decimals);
+  return {
+    nutrient: e.nutrient,
+    label: nutrientLabel(e.nutrient),
+    status: e.status,
+    before,
+    after,
+    kind: e.kind,
+    daily: e.daily,
+    detail: `${before} → ${after} ${nutrientUnit(e.nutrient)}/day avg (goal ${e.kind} ${e.daily})`,
+  };
 }
 
 export function renderUpdated(ctx) {
@@ -67,15 +88,13 @@ export function renderUpdated(ctx) {
     const fx = el(`<section class="card"><h3>Effect on targets</h3><ul class="effect-list"></ul></section>`);
     const ul = fx.querySelector('.effect-list');
     for (const e of proposal.effects) {
-      const decimals = e.nutrient === 'kcal' || e.nutrient === 'sodium' ? 0 : 1;
-      const before = averageText(e.before, e.beforeIncomplete, e.beforeUnknown, decimals);
-      const after = averageText(e.after, e.afterIncomplete, e.afterUnknown, decimals);
+      const row = effectRowModel(e);
       ul.appendChild(el(`<li class="effect-item">
         <div class="row">
-          <strong>${nutrientLabel(e.nutrient)}</strong>
-          <span class="pill">${escapeHtml(e.status)}</span>
+          <strong>${escapeHtml(row.label)}</strong>
+          <span class="pill">${escapeHtml(row.status)}</span>
         </div>
-        <div class="muted tiny">${before} → ${after} ${nutrientUnit(e.nutrient)}/day avg (goal ${e.kind} ${e.daily})</div>
+        <div class="muted tiny">${escapeHtml(row.detail)}</div>
       </li>`));
     }
     root.appendChild(fx);

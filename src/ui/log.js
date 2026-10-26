@@ -10,6 +10,7 @@ import {
   searchResultRow, setAmountMode,
 } from './custom_food.js';
 import { el, escapeHtml } from './dom.js';
+import { renderPreviewCard } from './preview_card.js';
 import { openConfirmPanel } from './reset.js';
 import { findPlannedRecipeForEntry } from '../log_corrections.js';
 import {
@@ -884,6 +885,7 @@ export function renderLog(ctx) {
     <ul class="logged-items" data-items></ul>
     <p class="sr-only" role="status" aria-live="polite" data-add-status></p>
     <p class="muted tiny empty-hint" data-empty>Nothing added yet.</p>
+    <div data-preview hidden></div>
     <button type="button" class="btn-primary" data-save disabled>Save and update plan</button>
   </section>`);
   root.appendChild(loggedCard);
@@ -957,14 +959,57 @@ export function renderLog(ctx) {
       if (!plannedTime.value) plannedTime.value = PLANNED_DEFAULT_TIME;
     }
     updateSaveState();
+    schedulePreview();
   };
   nowButton.addEventListener('click', () => selectWhen('now'));
   earlierButton.addEventListener('click', () => selectWhen('earlier'));
   plannedButton.addEventListener('click', () => selectWhen('planned'));
-  whenDate.addEventListener('input', updateSaveState);
-  whenTime.addEventListener('input', updateSaveState);
+  // Typing the moment never waits for a preview: the card catches up shortly.
+  const onWhenInput = () => {
+    updateSaveState();
+    schedulePreview();
+  };
+  whenDate.addEventListener('input', onWhenInput);
+  whenTime.addEventListener('input', onWhenInput);
   plannedDate.addEventListener('input', updateSaveState);
   plannedTime.addEventListener('input', updateSaveState);
+
+  // D29 "If you save this": a dry run of the save for the current draft. The
+  // card reads no stored state and writes nothing; it only shows what the Plan
+  // updated screen would say. Planned meals get no card (that is not eaten food).
+  const previewHost = root.querySelector('[data-preview]');
+  let previewTimer = null;
+  const paintPreview = () => {
+    previewHost.innerHTML = '';
+    previewHost.hidden = true;
+    if (whenMode === 'planned') return;
+    if (whenMode === 'earlier' && !whenCheck().ok) return;
+    if (flatDraftItems(draft).length === 0) return;
+    if (typeof ctx.previewExtra !== 'function') return;
+    let preview = null;
+    try {
+      preview = ctx.previewExtra(draftSavePayload(draft), whenForSave({
+        earlier: whenMode === 'earlier',
+        date: whenDate.value,
+        time: whenTime.value,
+      }));
+    } catch {
+      preview = null;
+    }
+    const card = preview ? renderPreviewCard(preview) : null;
+    if (!card) return;
+    previewHost.appendChild(card);
+    previewHost.hidden = false;
+  };
+  // A small debounce keeps typing and portion edits responsive.
+  const schedulePreview = () => {
+    if (typeof clearTimeout === 'function') clearTimeout(previewTimer);
+    if (typeof setTimeout !== 'function') {
+      paintPreview();
+      return;
+    }
+    previewTimer = setTimeout(paintPreview, 200);
+  };
 
   const findFood = (foodId) => ctx.foodsById?.get?.(foodId) || foods.find((f) => f.id === foodId) || null;
 
@@ -998,6 +1043,8 @@ export function renderLog(ctx) {
     empty.style.display = hasAnything ? 'none' : 'block';
     // The Save button also respects the date/time choice.
     updateSaveState();
+    // The dry-run card follows the list and its portions.
+    schedulePreview();
     // Clear all only exists while the draft holds something to clear.
     root.querySelector('[data-clear-all]').hidden = !hasAnything;
 

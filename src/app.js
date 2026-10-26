@@ -10,12 +10,14 @@ import {
   allFoodsWithCustomFoods, buildCustomFood, foodIndexWithCustomFoods, removeCustomFoodFromList,
 } from './engine/custom_foods.js';
 import {
-  buildPlan, replan, todayIso, localTime,
+  buildPlan, todayIso, localTime,
 } from './engine/planner.js';
 import { renderTargets } from './ui/targets.js';
 import { renderPlan, daySaveDecision } from './ui/plan.js';
-import { renderLog, logEntriesForSave, mergeLogEntries } from './ui/log.js';
-import { recomputePlanAfterSave, recomputeShownPlan } from './engine/plan_from_log.js';
+import { renderLog, mergeLogEntries } from './ui/log.js';
+import { recomputeShownPlan } from './engine/plan_from_log.js';
+import { computeExtraSave, extraSaveNextState } from './engine/extra_save.js';
+import { previewExtra } from './engine/preview_extra.js';
 import { makePlannedExtra, plannedExtraToLogEntry } from './engine/planned_extras.js';
 import { renderUpdated } from './ui/updated.js';
 import { renderShopping } from './ui/shopping.js';
@@ -157,10 +159,6 @@ const ctx = {
   },
   saveLogAndReplan: (payload, options = {}) => {
     if (!ctx.state.plan) return;
-    // Accept either a food-item array (older callers) or { items, skipped, replaced, eaten, extra }.
-    const items = Array.isArray(payload) ? payload : (payload?.items || []);
-    const skipped = Array.isArray(payload) ? [] : (payload?.skipped || []);
-    if (!items.length && !skipped.length) return;
     // The outside-the-menu screen logs now or an earlier moment. The day screen
     // passes the day it is showing, so a meal chosen on another day is saved for
     // that day on this path.
@@ -168,55 +166,38 @@ const ctx = {
       date: options?.date || payload?.when?.date || todayIso(),
       time: options?.time || payload?.when?.time || localTime(),
     };
-    // Free-search foods are tagged extra, so a saved entry says it was eaten outside
-    // the planned meals; a replacement keeps its `replaced` slot instead.
-    const entries = logEntriesForSave(
-      Array.isArray(payload) ? { items } : payload,
-      when,
-    );
-    if (entries.length === 0) return;
-    // Each date/slot keeps one outcome: a slot already logged is replaced, so the
-    // same meal can never be counted twice.
-    const log = mergeLogEntries(ctx.state.log, entries, {
-      date: when.date,
-      planDay: ctx.state.plan.days[when.date],
-      recipesById: ctx.recipesById,
-    });
     const today = todayIso();
-    if (when.date < today) {
-      // An extra dated before today counts on that day exactly as if it had been
-      // in the log all along. The shown plan is recomputed from the base plan and
-      // the whole log: the days already over (date < when.date is not enough,
-      // so every day before today) stay frozen and the make-up window starts
-      // from today. No second planner is involved.
-      const recomputed = recomputePlanAfterSave({
-        planBase: ctx.state.planBase || ctx.state.plan,
-        plan: ctx.state.plan,
-        log,
-        decisions: ctx.state.updateDecisions || [],
-        today,
-        targets: ctx.state.targets,
-        recipes: ctx.recipes,
-        foodsById: ctx.foodsById,
-        bought: ctx.state.bought || [],
-        mealPrefs: ctx.state.mealPrefs,
-        plannedExtras: ctx.state.plannedExtras || [],
-        fromDate: when.date,
-      });
-      const result = recomputed.result;
-      ctx.state = {
-        ...ctx.state,
-        log,
-        updateDecisions: recomputed.decisions,
-        pendingProposal: proposalToStore(result),
-      };
-      saveState(ctx.state);
-      ctx.proposal = result;
-      ctx.logDraft = null;
+    // One shared computation, the same one behind the dry-run card: the entries
+    // and the merged log are built with logEntriesForSave + mergeLogEntries, then
+    // recomputePlanAfterSave or the replan engine produce the proposal. No plan
+    // is ever computed twice. The base choice: ctx.state.planBase when the person
+    // already logged that day, plan: ctx.state.plan otherwise; the days already
+    // over are kept (keptPastDays, built inside the shared computation).
+    const computed = computeExtraSave({
+      state: ctx.state,
+      recipes: ctx.recipes,
+      recipesById: ctx.recipesById,
+      foodsById: ctx.foodsById,
+      payload,
+      when,
+      today,
+    });
+    if (!computed) return;
+    const result = computed.result;
+    // The saved state and the pending proposal the screens read.
+    ctx.state = extraSaveNextState(ctx.state, computed);
+    saveState(ctx.state);
+    ctx.proposal = result;
+    ctx.logDraft = null;
+    const pastDays = when.date < today;
+    if (pastDays) {
+      // An entry dated before today counts on that day exactly as if it had been
+      // in the log all along: the days already over stay frozen and the make-up
+      // window starts from today.
       if (options.stay) return result;
       // The person sees where the entry went: the day screen opens on that date.
       ctx.selectedDate = when.date;
-      if (recomputed.proposal) {
+      if (computed.proposal) {
         ctx.navigate('updated');
         return result;
       }
@@ -224,47 +205,10 @@ const ctx = {
       ctx.navigate('plan');
       return result;
     }
-    // A second log on the same day replans from the month plan as it was before any
-    // accepted update: the saved plan already holds the make-up for the earlier log,
-    // so replanning from it would apply that make-up twice. The full merged log is
-    // used, so one replan of every entry sees the same food as logging them one at a
-    // time. The first log of a later day instead starts from the current plan, so the
-    // make-up already accepted for past days is kept and only today and the days
-    // after it change for the new log.
-    const hadPriorToday = (ctx.state.log || []).some((entry) => entry?.date === when.date);
-    const basePlan = hadPriorToday
-      ? (ctx.state.planBase || ctx.state.plan)
-      : ctx.state.plan;
-    const result = replan({
-      targets: ctx.state.targets,
-      recipes: ctx.recipes,
-      plan: basePlan,
-      log,
-      bought: ctx.state.bought || [],
-      foodsById: ctx.foodsById,
-      fromDate: when.date,
-      mealPrefs: ctx.state.mealPrefs,
-      plannedExtras: ctx.state.plannedExtras || [],
-    });
-    // Days that are already over keep the meals of the plan in force right now:
-    // make-up accepted for an earlier log must not be wiped by a replan that starts
-    // from the base plan. Only `when.date` and the days after it are recalculated.
-    const keptPastDays = {};
-    for (const [date, meals] of Object.entries(ctx.state.plan?.days || {})) {
-      if (date < when.date) keptPastDays[date] = { ...meals };
-    }
-    result.plan = {
-      ...result.plan,
-      days: { ...result.plan.days, ...keptPastDays },
-    };
     // A day-screen save asks to stay: the day screen decides what to show (a
     // short status line, or the pending banner it can review later). The result
     // is stored either way, so a Skipped / Replace save that changes the plan
     // still opens the usual Plan updated screen.
-    ctx.state = { ...ctx.state, log, pendingProposal: proposalToStore(result) };
-    saveState(ctx.state);
-    ctx.proposal = result;
-    ctx.logDraft = null;
     if (options.stay) return result;
     // An outside-the-menu save never passes `stay`. A real change still opens
     // Plan updated; a save that changed nothing comes back to the day screen
@@ -278,6 +222,9 @@ const ctx = {
     ctx.navigate('updated');
     return result;
   },
+  // D29: the dry run behind "If you save this". It reads the saved state and the
+  // draft payload only: nothing is stored, navigated or changed.
+  previewExtra: (payload, when) => previewExtra(ctx, payload, when),
   // D26: a meal the person already knows they will eat outside the menu. It is
   // not eaten food: it goes to its own list, the plan leaves room for it on its
   // date, and the usual Plan updated screen asks whether to keep or use it.
