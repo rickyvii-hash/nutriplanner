@@ -1,4 +1,4 @@
-# NutriPlanner
+﻿# NutriPlanner
 
 An adaptive monthly meal planner that rebuilds your plan around what you actually ate, bought and prepared.
 
@@ -11,7 +11,7 @@ Nutrient values come from a curated set of USDA FoodData Central foods. Missing 
 
 ## Try it online
 
-Try it online: `<url>`  
+Try it online: https://rickyvii-hash.github.io/nutriplanner/  
 *(Publish this folder with GitHub Pages, then paste the site URL here.)*
 
 ### Enable GitHub Pages (after you create a public repo for this folder)
